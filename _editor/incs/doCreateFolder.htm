@@ -1,0 +1,20 @@
+lang("doCreateFolder");
+($folder,$num)=split(/=/,$params);
+$folder_=$folder;
+$folder=~s`$host`$root`;
+
+mkdir($folder,0755);
+chmod(0755,"$folder");
+if($num==2){$act="saveas"}
+if($num==3){$act="upload_file"}
+if($num==10){$act="gallery"}
+if($num==11){$act="film"}
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~document.body.style.cursor="default";
+	byId('yesBut').innerHTML="$OK"
+	active_alert="$htmlalert1&nbsp;&nbsp;$folder_$htmlalert2"
+	doAlert("alert")
+	active_function = new Function("byId('inputplace').innerHTML='';pad$num.location='$uttf?pathTree=x=$act';closeAlert()")~;
+	exit;
+1;

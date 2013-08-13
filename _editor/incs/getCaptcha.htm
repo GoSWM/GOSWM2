@@ -1,0 +1,100 @@
+lang("getCaptcha");
+use Crypt::Lite;
+&get_key;
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+sub get_key{
+open(USRS,"$users_txt");
+$adm=<USRS>;$adm=~s`\s+$``;
+($x,$kryptKey)=split(/=/,$adm);
+$kryptKey=~s`\W``g;$kryptKey=~s`^ce``;
+
+$emit=reverse(time);
+$key=crypt($emit,"aa");
+$key=~s/\W//g;$key=~s/\d//g;
+$key=$key.$key.$key;
+$xxrand=substr($emit,0,1);
+if($xxrand>5){$key=lc($key);$lc=1}else{$key=uc($key);$uc=1}
+$key=~s/[qlpvVwU]//g;
+$key=substr($key,2,6);
+$rand=rand(14);
+$randx=substr($rand,2);
+$random=int($rand);
+$key=$key.$random;
+}
+&check_key;
+
+$crypt = Crypt::Lite->new( debug => 0 );
+$encrypted = $crypt->encrypt($key, $kryptKey);
+$encrypted=~s/[\n]/Br_bR/g;$encrypted=~s/=/eQuAl/g;
+if($lc){$case="$lowercase"}
+if($uc){$case="$UPPERCASE"}
+
+$sub=time;
+$buttonWord=$params;
+$buttonWord=~s`_` `g;
+$RETURN= qq~
+document.write('<!-- secNum --><table border=0 cellpadding=0 cellspacing=0><tr><td align=center>'+
+'<img onload=moveSec() id=sec_image src="$uttf?secImage=$encrypted" width="120" height="30" border="1" alt="Security image"></td></tr>'+
+'<tr><td style="font-size:10px;font-family:arial,helvetica" align=center>$text1 <SPAN id=sec_case>$case</SPAN>'+
+'<br>$text2</td></tr>'+
+'<tr><td align=center><input type="text" style="font-size:12px;font-weight:bold" size="8" id=secnum name="secnum" '+
+'maxlength="6" onkeyup=confirmSec()></td></tr>'+
+'<tr><td align=center onclick=nuSecImg() style="font-size:9px;color:blue;cursor:pointer;font-family:arial,helvetica">'+
+'$text3</td></tr>'+
+'<input type="hidden" id=sec_key name="sec_key" value="">'+
+'<tr><td align=center><input id="$sub" disabled type="submit" value="$buttonWord" name="submitButton" '+
+'style="margin-top:10px;font-weight:bold"></table> <!-- /secNum -->');
+
+secKEY="$encrypted"
+secCase="$case"
+function nuSecImg(){
+	url="$uttf?getNuCaptcha=$sub"
+	JITc(url)
+}
+function confirmSec(){
+	if(document.getElementById("secnum").value.length==6){
+		if(secCase=="$UPPERCASE"){document.getElementById("secnum").value=document.getElementById("secnum").value.toUpperCase()}
+		if(secCase=="$lowercase"){document.getElementById("secnum").value=document.getElementById("secnum").value.toLowerCase()}
+		inpt=document.getElementById("secnum").value
+		kee=document.getElementById("sec_key").value
+		url="$uttf?confirmCaptcha=kee="+kee+"&inp="+inpt+"&byid="+$sub
+		JITc(url)
+	}
+}
+function JITc(url){
+	if(document.getElementById("secNom")){
+		document.getElementsByTagName('head')[0].removeChild(document.getElementById("secNom"))
+	};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = "secNom";	
+	script.src=url 
+	document.getElementsByTagName('head')[0].appendChild(script);
+}
+function moveSec(){
+	document.getElementById("sec_key").value=secKEY
+	document.getElementById("secnum").value=''
+}
+~;
+
+sub check_key{
+	$kfile="$txts_folder_PATH/captcha.txt";
+	if($#keys==-1){
+		open(K,"$kfile");
+		@keys=<K>;
+		close(K);
+	}
+	@test=@keys;
+if(test($key)){
+	sleep(1);
+	&get_key;
+}else{
+	push(@keys,$key);
+	if($#keys>4112){shift(@keys)}
+	open(K,">$kfile");
+	print K "@keys";
+	close(K);
+}
+}#check_key
+

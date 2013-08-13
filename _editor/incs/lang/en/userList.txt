@@ -1,0 +1,2 @@
+text1=List of files that you
+text2=are authorized to edit

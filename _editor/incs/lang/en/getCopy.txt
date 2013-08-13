@@ -1,0 +1,9 @@
+widgettitle=Copy / Move File
+CopyorMoveFile=Copy or Move File
+CurrentPath=Current Path
+NewPath=New Path
+OpenFolderToCopyOrMoveFileTo=Open Folder To Copy Or Move File To
+CopyFilebutton=Copy File
+MoveFilebutton=Move File
+Copy=Copy
+Move=Move

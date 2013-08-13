@@ -1,0 +1,128 @@
+lang("getSearch");
+$main="searchMain";
+$place="searchplace";
+$title="$widgettitle";
+$wigWid="400";
+$ico="search";
+require 'widgetBody.htm';
+
+if($isIE){
+$BTN=qq~<table align=center style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReApplyTextContentChangestitle" $unz onclick=;ceCopies("Redo")></td><td align=center><table style="margin:10px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Insert Form" $uns onclick=ceInsertSearch()>$InsertSearchFormbutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$UnApplyTextContentChangestitle" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>~;
+}else{
+$BTN=qq~<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Insert Form" $uns onclick=ceInsertSearch()>$InsertSearchFormbutton</td><td>$RBUT</td></tr></table>~;
+}
+
+$RETURN=qq~searchTbl='$BODY_TOP
+<table align=center border=0 cellpadding=1 cellspacing=0>
+<tr><td colspan=2 align=left>
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:3px">
+<img id=up_arrow14 onclick=upDIR14() src="$utif/up_arrow.png" width="16" height="16" border="0" 
+alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text1
+</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center class=widgetText11 style="padding:0px">
+<iframe name=pad14 style="margin:5px 0px 10px 0px;width:380px;height:150px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=search" $uns onload=setSearchFolder()></iframe>
+
+
+</td></tr>
+<tr>
+<td align=left class=widgetText11>$Basefoldertosearchin</td>
+<td align=left><input onkeydown=blur() id=baseFolder class=input value="" style="width:180px;background-color:#cccccc"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Listfolderstoexcludefromsearch</td>
+<td align=left><input id=excludeFolder onfocus=select() class=input value="cgi-bin,private" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Listextensionsoffilestosearch</td>
+<td align=left><input id=searchExtensions onfocus=select() class=input value="htm,html,php" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11 style="white-space:nowrap">$Charactersaftermatchtodisplay</td>
+<td align=left><input id=returnLength onfocus=select() class=input value="200" style="width:50px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Displayonlyfirstmatchonpage</td>
+<td align=left><input type=checkbox checked id=displayOnce value="1"></td>
+</tr>
+
+<tr>
+<td align=left class=widgetText11>$Heightofdisplay (px)</td>
+<td align=left><input id=displayHeight onfocus=select() class=input value="500" style="width:40px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Widthofdisplay (px)</td>
+<td align=left><input id=displayWidth onfocus=select() class=input value="700" style="width:40px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Widthofsearchfield (px)</td>
+<td align=left><input id=fieldWidth onfocus=select() class=input value="200" style="width:40px"></td>
+</tr>
+<tr><td colspan=2 align=center>
+
+$BTN
+</td>
+</tr></table>
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~function setSearchFolder(){
+	byId('baseFolder').value="/"+pad14.dirvirtual
+}
+function selection14(dir,path,url){
+	if(dir == "dir"){
+		pad14.location="$uttf?pathTree=x=search="+path
+		byId('undoBTN').style.visibility="hidden"
+		byId('redoBTN').style.visibility="hidden"		
+	}
+}
+function upDIR14(){
+	pad14.location="$uttf?pathTree=up=search="+pad14.updir
+}
+
+function ceInsertSearch(){
+	if(byId('displayOnce').checked==true){displayOnceValue=1}else{displayOnceValue=0}
+	strng=byId('displayWidth').value+
+	'='+byId('displayHeight').value+
+	'='+byId('returnLength').value+
+	'='+displayOnceValue+	
+	'='+byId('searchExtensions').value+
+	'='+byId('excludeFolder').value+
+	'='+byId('baseFolder').value
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(!doc().getElementById("embedSearch")){
+			cvsrch='<table border=0 cellpadding=0 cellspacing=0><tr><td align=left>'+
+			'<input id=searchTerms style="width:'+byId('fieldWidth').value+'px" value=""></td><td align=left>'+
+			'<img src="$utif/search.png" width="16" height="16" border="0" title="$SiteSearchtitle" alt="Search"'+
+			'style="cursor:pointer;margin-left:2px" onclick=doSearch()>'+
+			'</td></tr></table>'
+			cvsrch+='\\n<script id=embedSearch type="text/javascript" src="$uttf?embedSearch='+strng+'"></script>'
+			script =editPad.document.createElement('script');	
+			script.type = 'text/javascript';	
+			script.defer = true;	
+			script.id = 'embedSearch';	
+			script.src="$uttf?embedSearch="+strng	
+			editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+		}	
+		if(isIE){
+			capture()
+			byId('undoBTN').style.visibility="visible"
+			byId('redoBTN').style.visibility="hidden"			
+			cesel.pasteHTML(cvsrch)
+		}else{
+			doc().execCommand("InsertHTML", false, cvsrch); 
+		}
+		cvsrch=""
+	}	
+}
+
+
+byId('searchplace').innerHTML=searchTbl
+csSearch()
+~;
+
+1;

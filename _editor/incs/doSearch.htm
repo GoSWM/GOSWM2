@@ -1,0 +1,132 @@
+lang("doSearch");
+($displayWidth,$displayHeight,$returnLength,$displayOnce,$searchExtensions,$excludeFolder,$baseFolder,$searchTerms)=split(/=/,$params);
+
+$root=~s`/$``;
+$baseFolder=~s`^/``;
+$searchTerms=~s`\s+$``;
+$root=~s`^\w:\W`/`i;
+$U = "a";
+$V = 1;
+$W = $U.$V;
+$search_folder=$root.'/'.$baseFolder;
+
+@things=<$search_folder/*>;
+foreach $thing (@things){
+if(-f $thing){push(@FILES,$thing)}
+if(-d $thing){
+	$thing=~m!([^/]+)$!;$thingy=$1;
+	if($excludeFolder!~m!\b$thingy\b!){
+		@dir=<$thing/*>;
+		push(@$W,@dir);
+		}
+	}
+}
+&cycle;
+sub cycle{
+	foreach $thing (@$W){
+	if(-f $thing){push(@FILES,$thing)}
+	if(-d $thing){
+		$thing=~m!([^/]+)$!;$thingy=$1;
+		if($excludeFolder!~m!\b$thingy\b!){
+			@dir=<$thing/*>;
+			push(@X,@dir);
+			}
+		}
+	}
+if($#X > -1){++$V;$W = $U.$V;@$W=@X;@X=();&cycle}
+}#cycle
+
+foreach $f (@FILES){
+$f =~ m/\.(\w+)$/;$ext=$1;
+if($searchExtensions=~/\b$ext\b/){ 
+push(@Files,$f);
+}}
+foreach $file (@Files){
+
+	$FILE='';
+	open(F,"$file");
+	while(<F>){$FILE.=$_}
+	close(F);
+	$FILE=~s'head(.+)?head>''sig;$X=$1;
+	$FILE=~s'<script[^>]+</script>''gsi;
+	$FILE=~s`<[^>]+>``sig;
+	@file=split(/[\n\r]/,$FILE);
+		while($FILE=~m/($searchTerms.{0,$returnLength})/sig){
+			$fnd=$1;++$count;
+			$fnd=~s`($searchTerms)`<b>$1</b>`gi;
+			$file=~s!$root!!;$file=~s`/$``;if($file=~m`^/{2,}`){$file=~s`^/``;}
+			$file_=$file;$file_=~s!\.\./!!g;
+			
+			$qs=qq~qs=record&term=$searchTerms&file=$file~;
+			$qs =~ s/([\W])/"%" . uc(sprintf("%2.2x",ord($1)))/eg;
+			$line=qq~<table width=100% border=0 cellpadding=0 cellspacing=0>
+			<tr><td align=left style="font-size:11px;font-family:tahoma,arial">$file_</td>
+			<td align=right style="font-size:11px;font-family:tahoma,arial">$text1: 
+			<a href="$file">&laquo;$text2&raquo;</a>&nbsp;&nbsp;
+			<a href="$file" target="_blank">&laquo;$text3&raquo;</a></td></tr></table>
+			<DIV style="font-size:12px;font-family:verdana,helvetica;margin:0px 10px 10px 10px">$fnd....</DIV>~;
+			$RETURN.=$line;
+			if($displayOnce==1){last}
+		}
+}
+if($RETURN !~ /\w+/){$RETURN=qq~($searchTerms)<DIV style="font-family:tahoma,arial;font-size:12px;"><b>$text4</b></DIV>~;$count=0}
+
+$iheight=$displayHeight-5;
+$height=$displayHeight;
+$xheight=$displayHeight-35;
+$xheight.="px";
+$iheight.="px";
+
+$iwidth=$displayWidth-4;
+
+
+$HTML=qq~
+	<DIV style="text-align:left;border:1px black solid;height:$iheight;width:$iwidth;">
+		<DIV>
+			<table style="border-bottom:1px solid black" width=100% border=0 cellpadding=0 cellspacing=0><tr>
+			<td style="padding:1px 0px 0px 6px;background-color:#F9FFF8;font-family:tahoma,arial;font-size:12px">
+			$text5= => $count $text6 &nbsp;&nbsp;[ $searchTerms ]</td>
+			<td align="right" style="padding:2px 3px 1px 0px;background-color:#F9FFF8;font-family:tahoma,arial;font-size:12px">
+			<img onclick=closeSearch() src="$utif/close.png" title="$title" style="cursor:pointer"></td></tr></table>
+		</DIV>
+		<DIV style="height:$xheight;overflow-y:auto;overflow-x:hidden;padding:5px 25px 5px 5px;background-color:#fffff0;">$RETURN</DIV>
+	</DIV>
+
+~;
+$HTML=~s`[\n]``g;$HTML=~s`[\t]``g;$HTML=~s`'`&#39;`g;
+if($isIE){$opacity="filter='alpha(opacity:90)'"}
+if($isFF){$opacity="opacity='.9'"}
+
+$RETURN= qq~
+dcH=document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight
+dcW=document.documentElement.clientWidth?document.documentElement.clientWidth:document.body.clientWidth
+dcS=document.documentElement.scrollTop?document.documentElement.scrollTop:document.body.scrollTop
+
+	var shad = document.createElement("DIV");
+	shad.style.top="0px"
+	shad.style.left="0px"
+	shad.style.width= dcW+"px"
+	shad.style.height= dcH+"px"
+	shad.id= "SRCHSHD"
+	shad.style.position="fixed"
+	shad.style.backgroundColor="#bbbbbb"
+	shad.style.$opacity
+	document.getElementsByTagName('body')[0].appendChild(shad);
+
+selm=document.createElement('DIV');	
+selm.id = 'searchWidget';	
+selm.style.display="none"
+selm.style.position="fixed"
+selm.style.top=((dcH-$displayHeight)/2)+dcS+"px"
+selm.style.left=(dcW-$displayWidth)/2+"px"
+selm.style.width="$displayWidth"+"px"
+selm.style.height="$displayHeight"+"px"
+//selm.style.overflow-y="hidden"
+selm.innerHTML='$HTML'
+selm.style.display="block"
+document.getElementsByTagName('body')[0].appendChild(selm);		
+function closeSearch(){
+	document.getElementsByTagName('body')[0].removeChild(document.getElementById("searchWidget"))
+	document.getElementsByTagName('body')[0].removeChild(document.getElementById("SRCHSHD"))
+}
+~;

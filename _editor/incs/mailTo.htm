@@ -1,0 +1,25 @@
+$alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+$mess="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX";
+
+@alf=split(//,$alf);
+$alf_=@alf;
+
+@mess=split(//,$mess);
+$mess_=@mess;
+$params=~s`\.com$``;$params=~s`\.net$``;$params=~s`\.org$``;
+@chars=split(//,$params);
+$chars_=@chars;
+
+foreach $c (@chars){
+	$xx=$c;
+	for($m=0;$m<$mess_;++$m){
+		if($c eq $mess[$m]){
+			$xx=$alf[$m];
+		}		
+	}
+	$krypt.=$xx;
+}
+
+
+$RETURN=qq~location="mailto:$krypt"~;
+1;

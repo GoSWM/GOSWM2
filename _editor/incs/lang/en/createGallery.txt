@@ -1,0 +1,3 @@
+ClickToEnlarge=Click To Enlarge
+ShrinkImage=Shrink Image
+ExpandImage=Expand Image

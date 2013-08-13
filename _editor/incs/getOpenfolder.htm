@@ -1,0 +1,191 @@
+lang("getOpenfolder");
+$main="openMain";
+$place="openplace";
+$title="$widgettitle";
+$wigWid="500";
+$ico="openfolder";
+$close_img="modal_close_";
+&parseUser;
+require 'widgetBody.htm';
+
+
+$RETURN=qq~openfolderTbl='$BODY_TOP
+	<table width=480 align=center border=0 cellpadding=0 cellspacing=0>
+	<tr><td style="width:30px;padding-left:7px"><img id=up_arrow1 onclick=upDIR1() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+	<td class=widgetText11>$text1</td>
+	<td align=right style="width:80px;padding-right:10px">
+	<img onclick=ceCopyMove() id=treeImg style="visibility:hidden;margin-right:10px" src="$utif/tree.png" width="16" height="16" border="0" title="$CopyMoveFiletitle" $unz align=absmiddle>
+<img onclick=ceProperties() id=propImg style="visibility:hidden" src="$utif/properties.png" width="16" height="16" border="0" title="$FilePropertiestitle" $unz align=absmiddle>
+	</td>
+	<td align=right style="width:50px">
+	<table style="margin:0px 10px 0px 0px$renFo" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td id=PTrfolder align=center onclick=PTrenameFolder() class=button_centerD $uns>
+$RenameFolderbutton</td><td>$RBUT</td></tr></table>
+</td>
+	<td align=right style="width:90px">
+<table style="margin:0px 0px 0px 0px$delFo" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td id=PTdfolder align=center onclick=PTdeleteFolder() class=button_centerD $uns>
+$DeleteFolderbutton</td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td colspan=5 align=center>
+<iframe id=pad1 name=pad1 style="visibility:hidden;margin:5px 0px;width:480px;height:170px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=open_page" onload=this.style.visibility="visible"></iframe>
+</td></tr>
+<tr><td colspan=5 align=center >
+<table align=center border=0 cellpadding=6 cellspacing=0><tr><td style="font-family:tahoma,arial;font-size:11px;">$text2:</td>
+<td><input id=openURL class=input style="width:360px" value=""></td></tr></table>
+</td></tr>
+<tr><td colspan=5 align=center>
+<table border=0 cellpadding=0 cellspacing=0><td>
+<table style="margin:2px 10px 7px 10px$delFi" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td id=PTdfile align=center onclick=PTdeletePage() class=button_centerD $uns>
+$DeleteFilebutton</td><td>$RBUT</td></tr></table>
+</td><td>
+<table style="margin:2px 10px 7px 10px$reFi" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td id=PTrename align=center onclick=PTrenamePage() class=button_centerD $uns>
+$RenameFilebutton</td><td>$RBUT</td></tr></table>
+</td><td style="width:40px">&nbsp;
+</td><td>
+<table style="margin:2px 10px 7px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td id=PTopen align=center onclick=PTopenPage() class=button_centerD $uns>
+$OpenFilebutton</td><td>$RBUT</td></tr></table>
+</td><td>
+<table style="margin:2px 10px 7px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=byId("openplace").style.display="none"; $button_class $uns>
+$Cancelbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr>
+</table>
+<DIV id=openDrag style="display:anone;text-align:right;background-image:url($utif/resizebar.png);">
+		<img id=openDragImg src="$utif/e_resize.png" width="12" height="12" border="0" title="$openDragTitle" style="cursor:e-resize" ondragstart="return false" onmousedown=resizeOpen(event) $un></DIV>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function resizeOpen(e){
+ 	if(!e){var e=window.event};
+    offsetX=e.clientX;	
+    coordX=parseInt(byId('pad1').style.width);
+	dragOpenWin=true
+	byId('shadow').style.display="block"
+	zindx('shadow')
+   document.body.onmousemove=dragOpen;	
+   document.body.onmouseup=notDragOpenWin;
+}
+function dragOpen(e){
+	if(!dragOpenWin){return fale}
+	if(!e){var e=window.event};
+	var drgWid=coordX+e.clientX-offsetX
+	if(drgWid<500){return false}
+	byId('tbl_openMain').style.width=drgWid+"px"
+	byId('pad1').style.width=drgWid-20+"px"
+}
+function notDragOpenWin(){
+	dragOpenWin=false
+	byId('shadow').style.display="none"
+}
+function selection1(dir,path,url){
+	if(dir == "dir"){
+		unButtonPT()
+		pad1.location="$uttf?pathTree=x=open_page="+path
+		byId('propImg').style.visibility="hidden"
+		byId('treeImg').style.visibility="hidden"
+	}
+	if(dir == "txt"){
+		byId('openURL').value=url
+		byId('propImg').style.visibility="visible"
+		byId('treeImg').style.visibility="visible"
+		ButtonPT()
+	}
+}
+function ceProperties(){
+	var URL="$uttf?getProperties="+byId('openURL').value
+	JITc(URL)
+}
+function ButtonPT(){
+	byId('PTopen').className="button_center"
+	byId('PTrename').className="button_center"
+	byId('PTdfile').className="button_center"
+}
+function unButtonPT(){
+	byId('PTopen').className="button_centerD"
+	byId('PTrename').className="button_centerD"
+	byId('PTdfile').className="button_centerD"
+	byId('PTdfolder').className="button_centerD"
+	byId('PTrfolder').className="button_centerD"
+}
+function upDIR1(){
+	unButtonPT()
+	byId('propImg').style.visibility="hidden"
+	byId('treeImg').style.visibility="hidden"
+	url="$uttf?pathTree=up=open_page="+pad1.updir
+	pad1.location=url
+}
+
+function PTopenPage(){
+	if(demo==1){demoing();return false}
+	byId('PTopen').className="button_center_"
+	editPad.location=byId('openURL').value
+	byId('openURL').value=""
+	byId("openplace").style.display="none"
+}
+function PTrenamePage(){
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=file="+byId('openURL').value
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+function PTdeletePage(){
+	if(demo==1){demoing();return false}
+	byId('yesBut').innerHTML="$YES"
+	active_alert="$htmlalert1?<BR><BR>&nbsp;&nbsp;"+byId('openURL').value
+	doAlert("confirm")
+	active_function = new Function("doPTdeletePage()")
+	cancel_function = new Function("closeAlert()")
+}
+function doPTdeletePage(){
+	var URL="$uttf?deletePage="+byId('openURL').value
+	JITc(URL)
+}
+function PTrenameFolder(){
+	if(demo==1){demoing();return false}
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=folder1="+pad1.dir
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+
+function PTdeleteFolder(){
+	if(demo==1){demoing();return false}
+	if(byId('PTdfolder').className == "button_centerD"){return false}
+	byId('yesBut').innerHTML="$YES"
+	active_alert="$htmlalert2?<br><BR>&nbsp;&nbsp;"+pad1.urldir
+	doAlert("confirm")
+	active_function = new Function("doPTdeleteFolder()")
+	cancel_function = new Function("closeAlert()")
+}
+function doPTdeleteFolder(){
+	var URL="$uttf?deleteFolder="+pad1.dir
+	JITc(URL)
+}
+function ceCopyMove() {
+	if(byId('copyplace').innerHTML==""){
+		var URL="$uttf?getCopy=list="+byId('openURL').value
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('copyMain','copyplace',400)
+	}
+}
+byId('openplace').innerHTML=openfolderTbl
+byId('img_$main').style.display="none"
+;byId('propertyplace').style.display="none"
+ceopenfolder()
+~;
+
+1;

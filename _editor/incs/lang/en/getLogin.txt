@@ -1,0 +1,11 @@
+widgettitle=Editor
+alertusername=Enter Username
+adminnot=User 'admin' can not have a new password generated\n\nLogin with FTP and change admin\npassword in users.txt to 'start'
+closetitle=Close Login
+username=Username
+password=Password
+buttontitle=Login To Edit This Page
+buttonlogin=Login
+remember=Remember&nbsp;Password
+send=Send&nbsp;New&nbsp;Password
+

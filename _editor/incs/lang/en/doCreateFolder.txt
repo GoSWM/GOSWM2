@@ -1,0 +1,2 @@
+htmlalert1=Folder<BR>
+htmlalert2=<BR>was created

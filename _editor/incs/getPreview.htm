@@ -1,0 +1,64 @@
+lang("getPreview");
+
+$main="previewMain";
+$place="previewplace";
+$title="$widgettitle";
+$wigWid="$wid";
+$ico="picture";
+$close_img="modal_close";
+($img,$wid,$hei)=split(/=/,$params);
+$img="http://".$img;
+$img=qq~<img onclick=uncsShrink("$main");byId("$place").innerHTML="" src="$img" width="$wid" height="$hei" border="1" title="$ClickToClose">~;
+$wid_=$wid+10;
+
+
+
+$RETURN=qq~previewTbl='<DIV id="$main" style="display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("$place")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_$main class=$wigWid width=$wigWid border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"$main","hol_$main","bod_$main") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/$ico.png" ></td>
+				<td style="padding-left:7px;" class=widgetTitle id=tit_$main $uns>$title</td></tr></table>
+			</DIV>
+		</td>
+		<td style="text-align:right;" $uns>
+				<img id="img_$main" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("$main")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close border="0" title="$Close" 
+				onclick=uncsShrink("$main");byId("$place").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td id="bod_$main" class=widgetBody $uns>
+	<DIV id="hol_$main" style="padding-top:0px" $uns>$img</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('previewplace').style.zIndex=10000;
+byId('previewplace').innerHTML=previewTbl
+byId('previewplace').style.display="block";
+LeftPos = (document.body.clientWidth-$wid_)/2
+byId('previewplace').style.position="absolute"
+byId('previewplace').style.left=LeftPos+"px";
+byId('previewplace').style.top="100px"
+~;
+
+1;

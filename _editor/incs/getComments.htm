@@ -1,0 +1,209 @@
+lang("getComments");
+$main="commentsMain";
+$place="commentsplace";
+$title="$widgettitle";
+$wigWid="460";
+$ico="comments";
+$close_img="modal_close";
+require 'widgetBody.htm';
+
+$BTN=qq~<table id=apADD style="margin:5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceinsert_comm("ins") id=apADDbut>$AddComment</td><td>$RBUT</td></tr></table>~;
+$BTN2=qq~<table id=apREM style="margin:5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceinsert_comm("del") id=apREMbut>$RemoveComment</td><td>$RBUT</td></tr></table>~;
+$BTN3=qq~<table id=CancelCommentBut style="visibility:hidden;margin:0 0 10px 0" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceremove_insdel() id=CancelComment></td><td>$RBUT</td></tr></table>~;
+
+$RETURN=qq~commentsTbl='$BODY_TOP
+	
+<table align=center border=0 cellpadding=3 cellspacing=0><tr><td align=center>
+<tr valign=top><td width=50% align=center id=insButtons>
+</td><td width=50% align=center id=delButtons>
+</td></tr>
+
+
+<tr><td colspan=2 align=center>
+<div align=left id=oldcomment style="display:none;width:430px;height:100px;border:1px solid #A5ACB2;background-color:#efefef;overflow-y:auto;font-family:tahoma;font-size:12px"></div>
+</td></tr>
+<tr><td colspan=2 align=center style="padding-top:10px;padding-bottom:0px" class=widgetText11>
+$text1
+</td></tr>
+<tr><td colspan=2 align=center>
+<div align=left contenteditable=true id=cecomment style="width:430px;height:44px;border:1px solid #A5ACB2;background-color:#FFFFFF;overflow-y:auto;font-family:tahoma;font-size:12px"></div>
+</td></tr>
+<tr><td width=50% align=center>
+$BTN
+</td><td width=50% align=center>
+$BTN2
+</td></tr>
+<tr><td colspan=2 align=center>
+$BTN3
+</td></tr></table>
+
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~function ceinsert_comm(typ,whch){
+	if(byId('cecomment').innerHTML==""){return false}
+	if(byId('oldcomment').innerHTML!=''){
+		theComment=activeComment+"HoRiZ"+apType+' - '+byId('cecomment').innerHTML
+	}else{
+		theComment=apType+' - '+byId('cecomment').innerHTML
+	}
+	cecheck_selected()
+	ceget_selected()
+	if(typ=="ins"){
+		thecite='<ins cite="'+theComment+'">'+cetxt+'</ins>'		
+	}
+	if(typ=="del"){
+		thecite='<del cite="'+theComment+'">'+cetxt+'</del>'		
+	}
+	if(isIE){
+		if(cetxt!=''){
+			cesel.pasteHTML(thecite);
+		}else{		
+			if(typ=="ins"){
+				inscomms[activeIns].cite=theComment
+			}
+			if(typ=="del"){
+				delcomms[activeDel].cite=theComment
+			}
+		}
+	}else{
+		if(cetxt!=''){	
+			doc().execCommand("InsertHTML", false, thecite); 
+		}else{
+			if(typ=="ins"){
+				inscomms[activeIns].cite=theComment
+			}
+			if(typ=="del"){
+				delcomms[activeDel].cite=theComment
+			}
+		}
+	}
+	reloadAP()
+}
+
+byId('commentsplace').innerHTML=commentsTbl
+csComment()
+insButs='';
+
+inscomms=doc().getElementsByTagName("INS")
+for(i=0;i<inscomms.length;++i){
+	j=eval(i+1)
+	if(!inscomms[i].cite.match("REMOVED")){
+	insButs+='<table style="margin:5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceview_ins_comm('+i+') onmouseover=hiIns('+i+') onmouseout=lowIns('+i+') id=ins'+i+'>$SelectViewAddingComment - '+j+'</td><td>$RBUT</td></tr></table>'
+	}
+}
+byId('insButtons').innerHTML=insButs
+delButs='';
+delcomms=doc().getElementsByTagName("DEL")
+for(i=0;i<delcomms.length;++i){
+	j=eval(i+1)
+	if(!delcomms[i].cite.match("REMOVED")){
+	delButs+='<table style="margin:5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceview_del_comm('+i+') onmouseover=hiDel('+i+') onmouseout=lowDel('+i+') id=del'+i+'>$SelectViewDeletingComment - '+j+'</td><td>$RBUT</td></tr></table>'
+	}
+}
+byId('delButtons').innerHTML=delButs
+function ceremove_insdel(){
+	if(apstatus=="ins"){
+		inscomms[activeIns].style.textDecoration="none"
+		inscomms[activeIns].cite="REMOVED"
+		inscomms[activeIns].outerHTML=inscomms[activeIns].innerHTML
+	}
+	if(apstatus=="del"){
+		delcomms[activeDel].style.textDecoration="none"
+		delcomms[activeDel].cite="REMOVED"
+		delcomms[activeDel].outerHTML=delcomms[activeDel].innerHTML
+	}	
+	reloadAP()
+}
+activeIns=''
+function hiIns(n){
+	inscomms[n].style.backgroundColor="yellow"
+	inscomms[n].style.color="red"
+}
+function lowIns(n){
+	inscomms[n].style.backgroundColor=""
+	inscomms[n].style.color=""
+}
+function ceview_ins_comm(n){
+	ibutid="ins"+n;nn=eval(n+1);
+	if(byId(ibutid).innerHTML.match(/View/)){
+		unselectCommButts()		
+		byId(ibutid).innerHTML='$UnSelectAddingComment - '+nn
+		byId(ibutid).style.fontWeight="bold"
+		activeIns=n;activeDel=''
+		byId('apADD').style.visibility="visible";byId('apREM').style.visibility="hidden"
+		byId('apADDbut').innerHTML="$AddComment2"
+		if(inscomms[n].cite){
+			activeComment=inscomms[n].getAttribute("cite")
+			byId('oldcomment').innerHTML=activeComment.replace(/HoRiZ/g,"<HR align=center width=90%>")
+			byId('CancelComment').innerHTML="$CancelAddComment"
+			byId('CancelCommentBut').style.visibility="visible"
+			apstatus="ins"
+			byId('oldcomment').style.display="block"
+		}
+	}else{
+		inscomms=doc().getElementsByTagName("INS")
+		unselectCommButts()
+		activeComment=''
+		byId('oldcomment').innerHTML=''
+		byId('oldcomment').style.display="none"
+		byId('apREM').style.visibility="visible"
+		byId('apADDbut').innerHTML="$AddComment"
+	}
+}
+function hiDel(n){
+	delcomms[n].style.backgroundColor="red"
+	delcomms[n].style.color="yellow"
+}
+function lowDel(n){
+	delcomms[n].style.backgroundColor=""
+	delcomms[n].style.color=""
+}
+function ceview_del_comm(n){
+	dbutid="del"+n;nn=eval(n+1);
+	if(byId(dbutid).innerHTML.match(/View/)){
+		unselectCommButts()
+		byId(dbutid).innerHTML='$UnSelectDeletingComment - '+nn
+		byId(dbutid).style.fontWeight="bold"
+		activeDel=n;activeIns=''
+		byId('apREM').style.visibility="visible";byId('apADD').style.visibility="hidden"
+		byId('apREMbut').innerHTML="$RemoveComment2"
+		if(delcomms[n].cite){
+			activeComment=delcomms[n].getAttribute("cite")
+			byId('oldcomment').innerHTML=activeComment.replace(/HoRiZ/g,"<HR align=center width=90%>")
+			byId('CancelComment').innerHTML="$CancelDelComment"
+			byId('CancelCommentBut').style.visibility="visible"
+			apstatus="del"
+			byId('oldcomment').style.display="block"
+		}
+	}else{
+		delcomms=doc().getElementsByTagName("DEL")
+		unselectCommButts()
+		activeComment=''
+		byId('oldcomment').innerHTML=''
+		byId('oldcomment').style.display="none"
+		byId('apADD').style.visibility="visible"
+		byId('apREMbut').innerHTML="$RemoveComment"
+	}
+}
+ function reloadAP() {
+	byId("commentsplace").innerHTML=""
+	csComment()
+ }
+ function unselectCommButts(){
+ 		delcomms=doc().getElementsByTagName("DEL")
+		for(i=0;i<delcomms.length;++i){
+			dxbutid="del"+i;ii=eval(i+1)
+			byId(dxbutid).innerHTML='$SelectViewDeletingComment - '+ii
+			byId(dxbutid).style.fontWeight="normal"
+		}
+		inscomms=doc().getElementsByTagName("INS")
+		for(i=0;i<inscomms.length;++i){
+			ixbutid="ins"+i;ii=eval(i+1)
+			byId(ixbutid).innerHTML='$SelectViewAddingComment - '+ii
+			byId(ixbutid).style.fontWeight="normal"
+		}
+ }
+ if(iscomments=="author"){apType="Author"}
+  if(iscomments=="publisher"){apType="Publisher"}
+~;
+1;

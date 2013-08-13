@@ -1,0 +1,132 @@
+lang("getUpload");
+$main="uploadMain";
+$place="uploadsplace";
+$title="$widgettitle";
+$wigWid="400";
+$ico="upload";
+require 'widgetBody.htm';
+
+if($isFF){$moron="<DIV align=center>";$more_moron=";padding-left:10px"}
+&get_cookie;
+open(USRS,"$users_txt");
+while(<USRS>){
+	if(/$cookie{'ceuser'}=/){s`\s+$``;$usr=$_;last}
+}
+($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+if($isFF){$ffWid="size=45"}
+if($isIE){$ieWid="align=right";$ieBrd="border:1px solid #999999;background-color:#EBEBE4"}
+
+if($demo == 1){
+	$FUNC1=qq~demoing()~;
+}else{
+	$FUNC1=qq~ceUploadFiles()~;
+}
+
+
+$RETURN=qq~uploadTbl='$BODY_TOP
+<DIV style="font-size:1px">&nbsp;</DIV>
+$moron<table style="margin:5px 0px 10px 0px" align=center border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 style="padding-left:4px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:7px"><img id=up_arrow3 onclick=upDIR3() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+<td style="width:20px;padding-left:7px"><img id=nu_folders onclick=cenewFolder3() src="$utif/foldernew.png" width="16" height="16" border="0" alt="$CreateNewFoldertitle" style="cursor:pointer"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text
+</td></tr></table></td></tr>
+<tr><td colspan=3 align=center style="padding:0px">
+<iframe name=pad3 style="margin:5px 0px 10px 0px;width:380px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=upload_file"></iframe>
+</td></tr>
+<tr><td width=35 align=right>
+<input onfocus=select() id=numberOfUploads onkeyup=moreUploads(this.value) maxlength=2 style="background-color:#f9f9f9;font-size:11px;width:18px;border:1px solid #999999" value="1"></td><td width=345 style="font-family:tahoma,arial;font-size:11px$more_moron" id=howmanytoupload>$text2</td></tr>
+</td></tr>
+<tr><td id=uploadtr colspan=2>
+<table id=uploadTbl1 border=0 cellpadding=0 cellspacing=0>
+<tr><td width=35 align=right><img id=throbber1 style="visibility:hidden;margin-right:4px" src="$utif/throbber.gif" width="16" height="16" border="0"></td>
+<td align=center><form id=uploadForm1 style="margin:0px" enctype="multipart/form-data" method=post action=$uttf?doUpload=uploads target=hole>
+<input  $ffWid style="$ieBrd;font-size:11px;width:345px" type=file name=upload value=""><input type=hidden name=imgDIR id=imgDIR1 value=""></form>
+</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center>
+<table id=ceUploadButtonTbl style="margin:12px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=$FUNC1 $button_class id=ceUploadButton>$UploadFilebutton</td><td>$RBUT</td></tr></table>
+
+</td></tr>
+</table></DIV>
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function selection3(dir,path,url){
+	if(dir == "dir"){
+		pad3.location="$uttf?pathTree=x=upload_file="+path
+	}
+}
+function upDIR3(){
+	pad3.location="$uttf?pathTree=up=upload_file="+pad3.updir
+}
+function cenewFolder3(){
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=folder3="+pad3.urldir
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+
+
+totalFilesUploaded=0;totalToUpload=0;
+function ceUploadFiles(){
+	if(byId('numberOfUploads').value>0){
+		for(i=1;i<=byId('numberOfUploads').value;++i){
+			var imgDIR_="imgDIR"+i
+			byId(imgDIR_).value=pad3.dir
+		}
+		currentUploadNum=byId('numberOfUploads').value
+		currentUploadForm="uploadForm"+currentUploadNum
+		currentThrobber="throbber"+currentUploadNum
+		byId(currentThrobber).style.visibility="visible"
+		oldUploadNumber=eval(currentUploadNum)+1
+		if(oldUploadNumber<=totalToUpload){
+			oldUploadTbl="uploadTbl"+oldUploadNumber
+			byId(oldUploadTbl).style.display="none"
+		}
+		++totalFilesUploaded
+		if(byId('numberOfUploads').value>1){byId('ceUploadButton').innerHTML="$UploadFilesbutton"}else{byId('ceUploadButton').innerHTML="$UploadFilebutton"}	
+		byId(currentUploadForm).submit()
+		byId('numberOfUploads').value-=1	
+		byId('howmanytoupload').innerHTML="$htmlalert1"
+	}else{
+		byId('uploadTbl1').style.display="none"
+		if(byId('numberOfUploads').value==0){byId('ceUploadButtonTbl').style.visibility="hidden"}
+		if(totalFilesUploaded>1){
+			basicAlert(totalFilesUploaded+" $htmlalert2")
+			totalFilesUploaded=0
+			pad3.reloader()
+		}else{
+			basicAlert(totalFilesUploaded+" $htmlalert3")
+			totalFilesUploaded=0
+			pad3.reloader()
+		}
+		byId('howmanytoupload').innerHTML="$text3"
+	}
+}
+function resetup(){
+byId('numberOfUploads').value=1
+moreUploads(1)
+}
+function moreUploads(val){
+	totalToUpload=byId('numberOfUploads').value
+	totalFilesUploaded=0
+	numberOfUps=''
+	for(i=1;i<=byId('numberOfUploads').value;++i){
+	numberOfUps+='<table id=uploadTbl'+i+' border=0 cellpadding=0 cellspacing=0><tr><td width=35 align=right>'+
+	'<img id=throbber'+i+' style="visibility:hidden;margin-right:4px" src="$utif/throbber.gif" width="16" height="16" border="0"></td>'+
+	'<td align=center><form id=uploadForm'+i+' style="margin:0px" enctype="multipart/form-data" method=post action=$uttf?doUpload=uploads target=hole>'+
+	'<input  $ffWid style="$ieBrd;font-size:11px;width:345px" type=file name=upload value=""><input type=hidden name=imgDIR id=imgDIR'+i+' value=""></form></td></tr></table>'
+	}
+	if(byId('numberOfUploads').value>1){byId('ceUploadButton').innerHTML="$UploadFiles"}else{byId('ceUploadButton').innerHTML="$UploadFile"}
+	if(byId('numberOfUploads').value!=0){byId('ceUploadButtonTbl').style.visibility="visible"}
+	byId('uploadtr').innerHTML=numberOfUps
+}
+byId('uploadsplace').innerHTML=uploadTbl
+ceupload()
+~;
+
+1;

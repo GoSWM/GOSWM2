@@ -1,0 +1,4 @@
+htmlalert1=Image $url<br>was rewritten/resized from
+htmlalert2=to
+htmlalert3=Image
+htmlalert4=was NOT resized<BR><BR>Your server does not support resizing of images

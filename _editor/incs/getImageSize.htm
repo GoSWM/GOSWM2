@@ -1,0 +1,14 @@
+$img=$params;
+
+$img=~s`$host`$root`;
+$img=$root.$img;
+
+use Image::Size;
+($wid,$hei)=imgsize($img);
+
+
+$RETURN= qq~
+showresizetoFun("$params","$wid","$hei")
+;
+~;
+1;

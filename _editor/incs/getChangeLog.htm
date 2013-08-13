@@ -1,0 +1,58 @@
+lang("getChangeLog");
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+$usr=$params;
+$webdav=$users_txt;$webdav=~s`/users\.txt`/webdav.txt`;
+open(WD,"$webdav");
+while(<WD>){
+	s`\s+$``;
+	($un,$typ,$nom,$pos,$em,$pubs)=split(/=/);
+	@test=split(/\^/,$pubs);
+	if(test($usr)){push(@auths,$un)}
+	$NOMS{$un}=$nom;$POS{$un}=$pos;
+}
+@test=@auths;
+$chnglog=$users_txt;$chnglog=~s`/users\.txt`/changelog.txt`;
+open(CH,"$chnglog");
+while(<CH>){
+	s`\s+$``;
+	($page,$au,$dt,$ty)=split(/&/);
+	if(test($au)){
+		push(@PGS,$_);
+	}
+}
+$a="#CCCCCC";
+$b="#F0F0F0";$x=$b;
+
+if($#PGS>-1){
+	if($x eq $a){$x=$b}else{$x=$a}
+	foreach $pg (@PGS){
+		($page,$au,$dt,$ty)=split(/&/,$pg);
+		if($POS{$au} =~/\w+/){$POS=qq~ ($POS{$au})~;}
+		$PAGES.=qq~<tr bgcolor="$x"><td><a href="$page">$page</a></td><td>$NOMS{$au}$POS</td><td>$dt</td></tr>~;
+	}
+
+}else{
+
+}
+
+print "Content-type: text/html\n\n";
+print qq~<html><head><title>$ini_title</title>
+<style type="text/css">
+TD {font-size:12px;color:#333333;font-family:Verdana,Arial,Helvetica,sans-serif;}
+</style>
+</head>
+<BODY bgcolor=ffffff text=000000>
+
+<center>
+<font size=3 face="arial">$heading</font><br><br>
+<table style="border:1px solid black" border=0 cellpadding=8 cellspacing=0>
+<tr><td><b>$Page</b></td><td><b>$ChangedBy</b></td><td><b>$Date</b></td></tr>
+<tr><td colspan=3 style="font-size:3px">&nbsp;</td></tr>
+
+$PAGES
+
+<table><br>
+<font size=2 face="arial">$Click</font>
+</center>
+</body></html>~;
+1;

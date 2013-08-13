@@ -1,0 +1,5 @@
+htmlalert=You are not authorized to edit in this folder
+noticeAlert=This page needs to be modified to disable<br>editing of dynamic sections of the page<br><br>Allow the editor to modify this page?
+noticeAlert2=This page can be modified to allow editing <br>of only Dreamweaver InstanceEditable areas<br><br>Allow the editor to modify this page?
+confirmAlert=This page has been modified to disable<br>editing of dynamic sections of the page<br><br>THE PAGE WILL NOW RELOAD
+confirmAlert2=This page has been modified to allow<br>editing of only editblocks on the page<br><br>THE PAGE WILL NOW RELOAD

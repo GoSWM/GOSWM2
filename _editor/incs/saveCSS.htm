@@ -1,0 +1,60 @@
+lang("headContent");
+($file,$which,$css,$avail)=split(/=/,$params);
+
+$file=$root.$file;
+if($demo){&disab}
+
+if($which eq "apply"){
+	if($avail ne "true"){
+	$allow=qq~?no_access~;
+	}
+	open(F,"$file");
+	while(<F>){
+		s`<link [^>]+href="[^"]*$css[^"]*"[^>]+>\n``i;
+		s`</head>`<link rel="STYLESHEET" href="$css$allow" type="text/css">\n</head>`i;
+		$SAVE.=$_;
+	}
+
+	open(F,">$file");
+	print F "$SAVE";
+
+	$RETURN=qq~
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$cssalert"
+		doAlert("confirm")
+		active_function = new Function("editPad.location.reload(true);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+	~;
+}
+
+
+if($which eq "remove"){
+	$css=~s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+	open(F,"$file");
+	while(<F>){
+		s`<link [^>]+href="[^"]*$css[^"]*"[^>]+>\n``i;
+		$SAVE.=$_;
+	}
+
+	open(F,">$file");
+	print F "$SAVE";
+
+	$RETURN=qq~
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$cssalert2"
+		doAlert("confirm")
+		active_function = new Function("editPad.location.reload(true);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+		byId('remButCss').style.display="none"
+	~;
+}
+
+sub disab{
+	$RETURN=qq~
+	byId('yesBut').innerHTML="$OK"
+	active_alert="$disabled"
+	active_function = new Function("closeAlert()")
+	doAlert("alert")~;
+	&respond;
+}
+1;

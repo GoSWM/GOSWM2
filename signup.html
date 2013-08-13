@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>GOSWM2</title>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+			<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
+			<link rel="stylesheet" href="css/bootstrap-glyphicons.css" type="text/css" />
+			<style>
+				.navbar {
+					background-color: #2ecc71;
+				}
+				.navbar-brand {
+					color: white;
+				}
+				.navbar-brand:hover {
+					color: #27ae60;
+				}
+				.navbar-nav>.active>a, .navbar-nav>.active>a:hover, .navbar-nav>.active>a:focus {
+					background-color: #27ae60;
+					color: #ecf0f1;
+				}
+				.navbar-nav>li>a {
+					color: #347C17;
+				}
+				.navbar-nav>li>a:hover {
+					color: white;
+				}
+				.guidestats {
+					padding: 25px;
+					margin-top: 1.5em;
+					text-align: center;
+				}
+				.guidestat {
+					margin-left: 1px;
+					margin-right: 1px;
+				}
+				.navbar-toggle {
+					border: 1px solid white;
+				}
+				.navbar-toggle .icon-bar {
+					border: 1px solid white;
+				}
+				h2 {
+					padding-top: 6px;
+					padding-bottom: 12px;
+				}
+				html {
+					background-image: url("http://www.goswm.com/images/backgrounds/bg.jpg");
+					background-repeat:no-repeat;
+					background-attachment:fixed;
+					background-position:center; 
+					padding: 100px;
+					text-align: center;
+				}
+				body {
+					background-color: white;
+					border-radius: 2px;
+					padding-top: 70px;
+				}
+				.form-control {
+					width: 50%;
+					margin-left: 25%;
+				}
+				.panel {
+					margin-left: 25%;
+					margin-right: 25%;
+					margin-top: -30px;
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+			<br />
+				<header>
+					<div class="navbar navbar-fixed-top">
+						<div class="container">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a href="index.html" class="navbar-brand">GOSWM2</a>
+							<div class="nav-collapse collapse navbar-responsive-collapse">
+								<ul class="nav navbar-nav">
+									<li class="active"><a href="index.html">Home</a></li>
+									<li><a data-toggle="modal" href="#categoryswitcher">Categories</a></li>
+									<li><a href="#">Like us on Facebook!</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</header>
+				<div id="content">
+					<form class="form-horizontal xformblock" method="post" action="_editor/edit.pl?do_add_nu_user" target="formhole">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">Sign Up Free!</h3>
+							</div>
+							<p>Sign up for a free webpage to edit, then share it to your friends and family!</p>
+							<input type="text" name="user_name" class="form-control" placeholder="Username">
+							<br />
+							<input type="password" name="password" class="form-control" placeholder="Password">
+							<br />
+							<input type="text" name="user_email" class="form-control" placeholder="Email">
+							<br />
+							<button type="submit" class="btn btn-default">Sign Up!</button>
+						</div>
+						<input type="hidden" name="create_username_folder_in_folder" value="/guides">
+						<input type="hidden" name="folder_to_populate_from" value="_template">
+						<input type="hidden" name="default_user" value="default"><input type="hidden" name="notice_email" value="IbshifYeiq@IfrYl.cfl.com">
+					</form>
+				</div>
+				<footer>
+					<p class="lead">&copy;2013 GOSWM &amp; Oliver Pope</p>
+				</footer>
+				<!-- Category Switcher -->
+				<div class="modal fade" id="categoryswitcher">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+								<h4 class="modal-title">Categories</h4>
+							</div>
+							<div class="modal-body">
+								<div class="list-group">
+									<a href="#" class="list-group-item"><p class="lead">Shopping</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Automotive</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Arts &amp; Entertainment</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Food &amp; Dining</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Places to Stay</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Fun Activities</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Business &amp; Insurance</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Specialty Services</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Pets &amp; Animals</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Home &amp; Garden</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Education</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Personal Care &amp; Style</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Health &amp; Medical</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Real Estate &amp; Housing</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Professional Services</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Fishing &amp; Charters</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Farms &amp; Wineries</p></a>
+									<a href="#" class="list-group-item"><p class="lead">Tourism</p></a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- End Category Switcher -->
+				<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+				<script src="js/bootstrap.min.js" type="text/javascript"></script>
+				<script src="js/respond.js" type="text/javascript"></script>
+				<script src="js/holder.js" type="text/javascript"></script>
+			</div>
+		</body>
+	</html>

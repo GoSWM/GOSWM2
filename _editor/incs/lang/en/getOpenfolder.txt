@@ -1,0 +1,16 @@
+widgettitle=Open A Page
+text1=Open&nbsp;Web&nbsp;Page&nbsp;In&nbsp;Opened&nbsp;Folder
+CopyMoveFiletitle=Copy/Move File
+FilePropertiestitle=File Properties
+DeleteFolderbutton=Delete Folder
+RenameFolderbutton=Rename Folder
+text2=Open File
+DeleteFilebutton=Delete File
+RenameFilebutton=Rename File
+OpenFilebutton=Open File
+Cancelbutton=Cancel
+htmlalert1=Delete the selected file
+htmlalert2=Delete the open folder and all of it's contents
+htmlalert3=Rename the open folder 
+openDragTitle=Drag Left or Right to Expand File List
+

@@ -1,0 +1,53 @@
+lang("confirmCaptcha");
+use CGI::Carp qw(fatalsToBrowser);
+use Crypt::Lite;
+&get_input;
+$kee=~s`Br_bR`\n`g;$kee=~s`eQuAl`=`g;
+open(USRS,"$users_txt");
+$adm=<USRS>;$adm=~s`\s+$``;
+($x,$kryptKey)=split(/=/,$adm);
+$kryptKey=~s`\W``g;$kryptKey=~s`^ce``;
+
+$crypt = Crypt::Lite->new( debug => 0 );
+$decrypted = $crypt->decrypt($kee, $kryptKey);
+$decrypted=~s`\d+$``;
+
+$RETURN=" ";
+if($decrypted ne $inp){
+	$RETURN=qq~document.getElementById("$byid").disabled=true;if(confirm("$confirm")){nuSecImg()}~;
+}else{
+	$RETURN=qq~document.getElementById("$byid").disabled=false;~;
+}
+
+
+sub get_input{
+	$input=$params;
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		###################################################$value =~ tr/+/ /;
+		$value =~ s/~!/ ~!/g;
+		$value =~ s/[\r]//g;
+		$$name=$value;
+	}
+}#get_input
+
+
+
+sub kill_input {
+$value=~s`\W``g;
+print "Content-type: text/html\n\n";
+print qq~
+<HTML><HEAD>
+</HEAD><BODY>
+<CENTER><H1><FONT COLOR="#FF0000">CGI Alert</FONT></H1></CENTER>
+<CENTER><H3>THE SERVER REJECTED<br>
+THE CHARACTER<P><B>$&</B><P>IN YOUR SUBMISSION<br>
+Field input = $value<P>
+Please Click <form><input type=button 
+value=&nbsp;&nbsp;Here&nbsp;&nbsp; onClick="history.go(-1)"></form>
+to try again<p>
+Thank You!</H3></CENTER></BODY></HTML>~;
+exit;
+}#kill_input

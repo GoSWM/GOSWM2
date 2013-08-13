@@ -1,0 +1,186 @@
+lang("getCopy");
+
+($what,$path,$spot,$level)=split(/=/,$params);
+&get_cookie;
+open(USRS,"$users_txt");
+while(<USRS>){
+	if(/$cookie{'ceuser'}=/){s`\s+$``;$usr=$_;last}
+}
+($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+
+
+if($what eq "list"){
+$path=~s`$host`$root`;
+$folder=$path;
+$folder=~s`(/[^/]+)$``;$fileName=$1;
+
+$folder=$root;
+if($utype==5 || $utype == 6){
+	if($folder !~ /$urls/){$folder=$root.$urls}
+}
+@folders=<$folder/*>;
+foreach $folder (@folders){
+	if(-d $folder){
+		push(@FOLDERS,$folder);
+	}
+}
+$i=0;
+foreach $FOLDER (@FOLDERS){
+	$FOLD=$FOLDER;$FOLD=~s`\Q$root\E``;
+	$inc="inF".$i;
+	$TRS.=qq~<tr valign=top><td><img src="$utif/folder.png" width="16" height="16" border="0" alt=""></td>
+	<td style="padding-left:5px" id="$inc"><DIV style="cursor:pointer" onclick=getFolderPath("$FOLD","$inc","1") class=widgetText11>$FOLD</DIV></td></tr>~;
+	++$i;
+}
+$TRS=qq~<table border=0 cellpadding=0 cellspacing=0>$TRS</table>~;
+$path=~s`\Q$root\E``;
+$folder=~s`\Q$root\E``;
+$main="copyMain";
+$place="copyplace";
+$title="$widgettitle";
+$wigWid="400";
+$ico="tree";
+require 'widgetBody.htm';
+
+$RETURN=qq~nuDiv='<DIV style="display:block;left:1px;top:1px;position:absolute">
+<table align=center width=400 align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td style="-moz-user-select:none;text-align:left;padding-left:2px;" class=widgetTitle $uns>
+			<DIV>
+				<img align=$abs src="$utif/tree.png" $uns title="">
+				<SPAN style="padding-left:7px">$title</SPAN>
+			</DIV>
+		</td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close" 
+				onclick=byId("copyplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer"></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns align=center>
+	<DIV style="font-family:tahoma,arial;font-size:13px;margin:10px">$CopyorMoveFile</DIV>
+	<DIV style="overflow:hidden;">
+		<table align=center border=0 cellpadding=4 cellspacing=0 style="font-family:tahoma,arial;font-size:11px;white-space:nowrap">
+		<tr><td align=left>$CurrentPath:</td><td align=left><input id=oldfld style="width:270;border:1px dotted #888888;font-family:tahoma,arial;font-size:11px;background-color:transparent" value="$path"></td></tr>
+		<tr><td align=left>$NewPath:</td><td align=left><input id=nufld style="width:270;border:1px dotted #888888;font-family:tahoma,arial;font-size:11px;background-color:transparent" value="$folder"></td></tr>
+		<tr><td colspan=2 align=left style="padding-bottom:0px;font-size:9px;">
+		$OpenFolderToCopyOrMoveFileTo:</td></tr>
+		<tr><td colspan=2 align=left style="padding-top:0px;">
+		<DIV style="padding-left:3px;height:100px;overflow-y:auto;background-color:#FFFFFF;border:1px solid #999999">
+		$TRS</DIV></td></tr>
+		
+		<tr><td colspan=2 align=center>
+		<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+		<table style="margin:12px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=copyFile() class=button_center>$CopyFilebutton</td><td>$RBUT</td></tr></table>
+</td><td align=center>
+		<table style="margin:12px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=moveFile()  class=button_center>$MoveFilebutton</td><td>$RBUT</td></tr></table>
+
+</td></tr></table>
+</td></tr>
+	</table></DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="10" height="1" border="0" alt="" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table>
+</DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~fileToCopyMove="$fileName"
+function getFolderPath(path,fld,lvl){
+	byId('nufld').value=path+fileToCopyMove
+	url="$uttf?getCopy=folder="+path+"="+fld+"="+lvl
+	JITc(url)
+}
+function copyFile(){
+		if(demo==1){demoing();return false}
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$Copy<br>"+byId('oldfld').value+"<br>to<br>"+byId('nufld').value
+		doAlert("confirm")
+		URL="$uttf?getCopy=copy="+byId('oldfld').value+"="+byId('nufld').value
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+}
+function moveFile(){
+		if(demo==1){demoing();return false}
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$Move<BR>"+byId('oldfld').value+"<br>to<br>"+byId('nufld').value
+		doAlert("confirm")
+		URL="$uttf?getCopy=move="+byId('oldfld').value+"="+byId('nufld').value
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+}
+
+byId('copyplace').style.zIndex=10000;
+byId('copyplace').innerHTML=nuDiv;
+byId('copyplace').style.display="block";
+LeftPos = (document.body.clientWidth-400)/2
+byId('copyplace').style.position="absolute"
+byId('copyplace').style.left=LeftPos+"px";
+byId('copyplace').style.top="100px"
+~;
+}#what == list
+
+if($what eq "folder"){
+	$path=$root.$path;
+	@folders=<$path/*>;
+	foreach $folder (@folders){
+		if(-d $folder){
+			push(@FOLDERS,$folder);
+		}
+	}
+$i=0;
+++$level;
+foreach $FOLDER (@FOLDERS){
+	$FOLD=$FOLDER;$FOLD=~s`\Q$root\E``;
+	$inc="inF$level".$i;
+	$TRS.=qq~<tr valign=top style="cursor:pointer"><td>
+	<img src="$utif/folder.png" width="16" height="16" border="0" alt=""></td>
+	<td style="padding-left:5px" id="$inc"><DIV style="cursor:pointer" onclick=getFolderPath("$FOLD","$inc","$level") class=widgetText11>$FOLD</DIV></td></tr>~;
+	
+	++$i;
+}
+	if($level>1){$pad=$level*0}else{$pad=0}
+	$HTML=qq~<table style="margin-left:$pad" border=0 cellpadding=0 cellspacing=0>$TRS</table>~;
+	$HTML=~s`[\n]``g;$HTML=~s`[\t]``g;$HTML=~s`'`&#39;`g;
+	$RETURN=qq~
+	byId('$spot').innerHTML+='$HTML';
+	~;
+}#what == folder
+
+if($what eq "copy"){
+		$path=$root.$path;
+		$spot=$root.$spot;
+	open(NU,">$spot");
+	binmode NU if $^O eq 'MSWin32';
+	open(OLD,"$path");
+	binmode OLD if $^O eq 'MSWin32';
+	while(<OLD>){print NU}
+	$path=~s`\Q$root\E``;$spot=~s`\Q$root\E``;
+	$RETURN=qq~basicAlert("$path<br>was copied to<br>$spot")~;
+}#what == copy
+
+if($what eq "move"){
+		$path=$root.$path;
+		$spot=$root.$spot;
+	open(NU,">$spot");
+	binmode NU if $^O eq 'MSWin32';
+	open(OLD,"$path");
+	binmode OLD if $^O eq 'MSWin32';
+	while(<OLD>){print NU}
+	close(OLD);
+	unlink("$path");
+	$path=~s`\Q$root\E``;$spot=~s`\Q$root\E``;
+	$RETURN=qq~basicAlert("$path<br>was moved to<br>$spot")~;
+}#what == copy
+
+1;

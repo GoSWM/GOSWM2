@@ -1,0 +1,54 @@
+lang("prompt");
+
+$RETURN=qq~default_file_name="$default_file_name";
+isIE="$isIE";isFF="$isFF"
+kyz=''
+key="272727"
+key_='131313'
+promptKeys='$promptKeys'
+document.onkeypress=katch
+function katch(evt){
+	var e = evt? evt : window.event;
+	if(e.keyCode){kyz+=e.keyCode}
+	else{kyz+=e.which}
+	if(kyz.indexOf(key)!=-1){kyz='';editLogin()}
+	if(kyz.indexOf(key_)!=-1){kyz='';editLogin()}
+	if(promptKeys != '' && kyz.indexOf(promptKeys)!=-1){kyz='';editLogin()}
+	if(kyz.length>100){kyz=''}
+}
+function editLogin(){
+checkFlash()
+if(self!=top && parent.location.href.match("$uttf")){return false}
+if(location.pathname.lastIndexOf("/")==location.pathname.length-1){
+	if(default_file_name==""){alert("$address");return false}
+}
+var div = document.createElement( 'div' );
+div.setAttribute( 'id', 'loginplace' );
+document.getElementsByTagName( 'body' )[0].appendChild( div );
+	var URL="$uttf?getLogin"
+	JITc(URL)
+}
+function JITc(URL){
+	if(document.getElementById('JAX')){
+		document.getElementsByTagName('head')[0].removeChild(document.getElementById('JAX'))
+	};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JAX';	
+	script.src=URL 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}
+function checkFlash(){
+		for(i=0;i<document.getElementsByTagName("object").length;++i){
+			document.getElementsByTagName("object")[i].setAttribute("wmode","transparent")			
+		}
+		for(i=0; i<document.embeds.length; i++) {
+			newE = document.embeds[i].cloneNode(true);
+			newE.setAttribute('wmode', 'transparent');
+			document.embeds[i].parentNode.replaceChild(newE, document.embeds[i]);
+		}
+}
+
+~;
+1;

@@ -1,0 +1,39 @@
+lang("userList");
+&check_cookie;
+
+
+if($utype =~ /3|4/){
+	@urls=split(/,/,$urls);
+	foreach $u (@urls){
+		$LINKS.=qq~<div style="color:blue;cursor:pointer;margin:5px;10px" onclick=location="$host$u">$host$u</div>~;
+	}
+}
+if($utype =~ /5|6/){
+	@files=<$root$urls/*>;
+	foreach $f (@files){
+		if(-T $f){
+			if($f=~/\.pfd$/){next}
+			$f=~s~\Q$root\E~$host~;
+			$LINKS.=qq~<div style="color:blue;cursor:pointer;margin:5px;10px" onclick=location="$f">$f</div>~;
+		}
+	}
+}
+
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~
+<html>
+<head>
+	<title>Untitled</title>
+</head>
+
+<body style="background-color:white;margin:20px;font-family:verdana;font-size:12px">
+
+$text1 (<b>$ceuser</b>) $text2:<BR><BR>
+$LINKS
+
+</body>
+</html>
+~;
+
+1;

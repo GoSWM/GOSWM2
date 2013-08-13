@@ -1,0 +1,12 @@
+widgettitle=Save Page As...
+SaveAsInOpenedFolder=Save As In Opened Folder
+AddFileName=New File Name
+NewPageTitle=New Page Title
+DeleteFilebutton=Delete File
+RenameFilebutton=Rename File
+SaveAsbutton=SaveAs...
+htmlalert1=You have not added a file name to the<br>New File Name: url
+htmlalert11=Your file name for the New File Name:<br>does not contain an extension
+htmlalert2=The file
+htmlalert3=already exists<br><br>Overwrite the existing file
+htmlalert4=The <strong>New File Name:</strong> field must<br>include the entire URL to the new file.<br><br>Re-enter the new file's name.

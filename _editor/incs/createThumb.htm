@@ -1,0 +1,131 @@
+lang("createThumb");
+use Image::Size;
+($file,$wid,$hei)=split(/=/,$params);
+($file,$url)=split(/\|/,$file);
+$file=~s`^\w:``;
+if($demo == 1){&skip}
+
+$wh=$wid."x".$hei;
+eval { require Image::Magick; } ? 1 : 0;
+$thumb=$file;
+$thumb=~s`(\.[^\.]+)$`_th$1`;
+
+$thumb_=$url;
+$thumb_=~s`(\.[^\.]+)$`_th$1`;
+
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+if($isIM==1 && !$disableIM){	
+	require 'useImageMagick.htm';
+	$img = new Image::Magick;
+  	$img->Read("$file");
+	$img -> Resize($wh);
+	$img -> Write($thumb);
+	$ok=1;
+}elsif($isGD && !$disableGD){
+	require 'useGDLibrary.htm';
+	if($wid>$hei){$WH=$wid}else{$WH=$hei}
+	$file =~ m`\.(\w+)$`;$ext=$1;
+    open IN, "$file"  or die "Could not open.";
+	if($ext =~/png/i){
+        $srcImage = GD::Image->newFromPng(*IN);
+	}
+	if($ext =~/jpg/i){
+        $srcImage = GD::Image->newFromJpeg(*IN);
+	}
+    close IN;
+    ($thumbvar,$x,$y) = createGD($srcImage,$WH);
+    open OUT, ">$thumb" or die "Could not save ";
+    binmode OUT;
+	if($ext =~/jpg/i){
+		print OUT $thumbvar->jpeg;
+	}
+ 	if($ext =~/png/i){
+       	print OUT $thumbvar->png;
+	}
+    close OUT;
+	$ok=1;	
+}else{
+	$isLWP=eval { require LWP::Simple } ? 1 : 0;
+	if($isLWP==1){	
+		require 'useLWPSimple.htm';
+		$url=~s`http://``;
+		$get=get("http://gphrs.com/cgi/imagemagick_createThumb.cgi?resize=$url=$wid=$hei=$domain_license");
+		if($get =~ m/^OK=/){$ok=1;$get =~ s/^OK=//;
+			getstore("http://gphrs.com/cgi/$get","$thumb");
+			get("http://gphrs.com/cgi/imagemagick_createThumb.cgi?delete=$get");
+		}else{
+			$ok=2;
+		}
+	}
+}
+
+($width, $height) = imgsize("$thumb");
+
+$file=~m`(.+)/[^/]+$`;$folder=$1;
+@fldr=<$folder/*>;
+$OPTS=qq~<option value="">$select~;
+foreach $filex (@fldr){
+	if($filex =~ /thumbs/i){next}
+	if(-B $filex){
+		$root=~s`^[^/]+``;
+		$filex=~ m!([^/:\\]*)$!;$nm=$1;
+		$file_=$filex;$filex=~s`\Q$root\E`$host`;
+		if($thumb =~ /$nm/){$se="selected"}else{$se='not'}
+		$OPTS.=qq~<option value="$file_|$filex" $se>$nm~;
+		++$i;
+	}
+}
+
+$HTML=qq~<select onchange=checkForThumb(this.options[this.selectedIndex].text,this.options[this.selectedIndex].value) id=listImagesMenu class=input>$OPTS</select>~;
+
+
+
+$RETURN=qq~active_alert="$htmlalert1 $thumb_ $htmlalert2"
+doAlert("alert")
+active_function = new Function("byId('createSingleGalleryButton').style.display='none';byId('setSingleGalleryButton').style.display='block';pad10.reloader();closeAlert()")
+byId('cximg_list').innerHTML='$HTML'
+byId('thumtouse').style.display="block"
+byId('widS').value="$width"
+byId('heiS').value="$height"
+byId('sizTD').innerHTML="$width x $height"
+~;
+
+sub skip{
+$file=~m`(.+)/[^/]+$`;$folder=$1;
+@fldr=<$folder/*>;
+$OPTS=qq~<option value="">$select~;
+foreach $filex (@fldr){
+	if($filex =~ /thumbs/i){next}
+	if(-B $filex){
+		$filex=~ m!([^/:\\]*)$!;$nm=$1;
+		$file_=$filex;$filex=~s`\Q$root\E`$host`;
+		if($file_ =~ /_th/){$se="selected"}else{$se='not'}
+		$OPTS.=qq~<option value="$file_|$filex" $se>$nm~;
+		++$i;
+	}
+}
+$HTML=qq~<select onchange=checkForThumb(this.options[this.selectedIndex].text,this.options[this.selectedIndex].value) id=listImagesMenu class=input>$OPTS</select>~;
+$RETURN=qq~active_alert="$demoalert"
+doAlert("alert")
+active_function = new Function("byId('createSingleGalleryButton').style.display='none';byId('setSingleGalleryButton').style.display='block';pad10.reloader();closeAlert()")
+byId('cximg_list').innerHTML='$HTML'
+~;
+	&respond;
+}#skip
+
+1;
+
+sub createGD { my ($orig,$max) = (shift,shift);
+	($ox,$oy) = $orig->getBounds();
+	($maxx, $maxy);
+	if (($maxx, $maxy) = $max =~ /^(\d+)x(\d+)$/i){
+		$max = ($ox>$oy)? $maxx : $maxy;
+	} else {
+		$maxx = $maxy = $max;
+	}
+	$r = ($ox/$maxx) > ($oy/$maxy) ? ($ox/$maxx) : ($oy/$maxy);
+	$thumbvar = GD::Image->new($ox/$r,$oy/$r);
+	$thumbvar->copyResized($orig,0,0,0,0,$ox/$r,$oy/$r,$ox,$oy);
+	return $thumbvar, sprintf("%.0f",$ox/$r), sprintf("%.0f",$oy/$r);
+}

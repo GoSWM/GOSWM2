@@ -1,0 +1,1 @@
+alert=The Username $user_name Is Already In Use\n\nEnter A Different Username

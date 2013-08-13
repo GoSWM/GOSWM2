@@ -1,0 +1,173 @@
+lang("getBackups");
+if($params=~/replace=(.+)/){
+	replaceBAK("$1");
+}elsif($params=~/delete=(.+)/){
+	deleteBAK("$1");
+}else{
+
+$main="backupMain";
+$place="backupplace";
+$title="$widgettitle";
+$wigWid="306";
+$ico="backups";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+require 'menus.htm';
+
+$file=$params;
+$folder=$root.$params;
+$folder=~s`/[^/]+$``;
+@baks=<$folder/*>;
+$file=~m`(.*)(/[^/]+)(\.\w+$)`;
+$fnm=$2."_";$ext=$3;
+foreach $f (@baks){
+	$F=$f;$F=~s`$folder/``;
+	if($f=~m`$fnm\d+$ext$`){
+		$f=~s~\Q$root\E~~;
+		$OPTS.=qq~<option value="$f">$F~;
+	}
+}
+
+if($demo==1){
+	$FUNC1=qq~demoing()~;
+	$FUNC2=qq~demoing()~;
+}else{
+	$FUNC1=qq~replaceBak()~;
+	$FUNC2=qq~deleteBak()~;
+}
+
+
+if($OPTS){$opts="$option1"}else{$opts="$option2"}
+
+$RETURN=qq~backTbl='$BODY_TOP	
+	<input type=hidden id=origFile value="$file">
+	<table style="margin-bottom:10px" align=center border=0 cellpadding=2 cellspacing=0>
+	<tr><td align=center style="font-family:tahoma;font-size:11px"><select onchange=setBUbuttons(this.selectedIndex) id=bakList class=input><option value="">$opts$OPTS</select></td></tr>
+	
+	<tr><td align=center style="padding-top:10px">
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=$FUNC1 class="button_centerD" id=BUbut1>$button1</td><td>$RBUT</td></tr></table></td></tr>
+
+
+	<tr><td align=center style="padding-top:12px">
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=openBak() class="button_centerD" id=BUbut2>$button2</td><td>$RBUT</td></tr></table></td></tr>
+<tr><td align=center style="padding-top:2px">
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=reloadBak() class="button_centerD" id=BUbut3>$button3</td><td>$RBUT</td></tr></table></td></tr>
+
+
+<tr><td align=center style="padding-top:12px">
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=$FUNC2 class="button_centerD" id=BUbut4>$button4</td><td>$RBUT</td></tr></table></td></tr>
+	</table>
+	
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function openBak(){
+	if(byId('bakList').value!=''){
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$htmlalert1<br>&nbsp;&nbsp;<b>"+byId('bakList').value+"</b><br>$htmlalert2?"
+		doAlert("confirm")
+		active_function = new Function("editPad.location=byId('bakList').value;closeAlert()");byId('BUbut3').className="button_center";byId('BUbut2').className="button_centerD"
+		cancel_function = new Function("closeAlert()")
+	}
+}
+function replaceBak(){
+	if(byId('bakList').value!=''){
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$htmlalert3<br>&nbsp;&nbsp;<b>"+byId('origFile').value+"</b><br>$htmlalert4<br><b>"+byId('bakList').value+" ?</b>"
+		doAlert("confirm")
+		URL="$uttf?getBackups=replace="+byId('bakList').value
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+	}
+}
+function deleteBak(){
+	if(byId('bakList').value!=''){
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$htmlalert5<br>&nbsp;&nbsp;<b>"+byId('bakList').value+" ?</b>"
+		doAlert("confirm")
+		URL="$uttf?getBackups=delete="+byId('bakList').value
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+	}
+}
+function reloadBak(){
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$htmlalert6<br><b>"+byId('origFile').value+"</b><br>$htmlalert7?"
+		doAlert("confirm")
+		active_function = new Function("editPad.location=byId('origFile').value;closeAlert()");byId('BUbut2').className="button_center";byId('BUbut3').className="button_centerD"
+		cancel_function = new Function("closeAlert()")
+}
+function setBUbuttons(s){
+	if(s!=0){
+		byId('BUbut1').className="button_center"
+		byId('BUbut2').className="button_center"
+		byId('BUbut4').className="button_center"
+	}
+}
+byId('backupplace').innerHTML=backTbl
+byId('img_$main').style.display="none"
+cebackups()
+~;
+}#else
+
+sub replaceBAK{
+	$bak=$_[0];
+	$bak=$root.$bak;
+	$bak=~m`(.+)(/[^/]+)_(\d)+(\.\w+$)`;
+	$orig=$1.$2.$4;
+	$num="_".$3;
+	open(OR,">$orig");
+	open(BK,"$bak");
+	while(<BK>){
+		if(m`includeblock-([^"]+)`){push(@incs,$1)}
+		print OR "$_";
+	}
+	$orig=~s~\Q$root\E~~;
+	$bak=~s~\Q$root\E~~;
+	foreach $i (@incs){
+		$i=$root.$i;
+		$s=$i;
+		$s=~s`(.+)(\.\w+)$`$1$num$2`;
+		open(IN,">$i");
+		open(S,"$s");
+		while(<S>){print IN}
+	}
+	$RETURN.=qq~if(confirm("$htmlalert8\\n$orig\\n$htmlalert9\\n$bak\\n\\n$htmlalert10?")){editPad.location="$orig"}~;
+}#replaceBAK
+
+sub deleteBAK{
+	$page=$root.$_[0];
+	$page=~m`_(\d+)\.\w+$`;$num=$1;
+	open(PG,"$page");
+	while(<PG>){
+		if(m`includeblock-([^"]+)`){$rt=$root.$1;push(@incs,$rt)}
+	}
+	close(PG);
+	$fold=$root.$_[0];
+	$fold=~s`/([^/]+)$``;
+	@files=<$fold/*>;
+	foreach $i (@incs){
+		$i=~m`(.+)(\.\w+)$`;
+		$a=$1."_";$b=$2;
+		foreach $f (@files){
+			if($f=~m`$a$num$b`){$x=$f;
+				unlink($f);
+			}
+		}
+	}
+	unlink($page);	
+	if($isIE){$rem="byId('bakList').options.remove(i)"}
+	if($isFF){$rem="byId('bakList').options[i]=null"}	
+	$RETURN.=qq~byId('yesBut').innerHTML="$OK"
+	active_alert="$htmlalert11<br><b>$_[0]</b><br>$htmlalert12"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")	
+	for(i=0;i<byId('bakList').options.length;++i){
+		if(byId('bakList').options[i].value=="$_[0]"){
+			$rem
+		}
+	}
+	~;
+}#deleteAll
+
+1;

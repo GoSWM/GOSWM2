@@ -1,0 +1,27 @@
+$file=$params;
+
+use LWP::Simple;
+
+if(-d $file){&endit}
+$content=getstore("http://www.gphrs.com/updater/current/$file","$file");
+&endit;
+
+sub endit{
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~run_list()~;
+exit;
+}#endit
+1;
+
+
+sub not{
+	$short_name=$file;
+	chmod(0666,"$short_name");
+    open (SAVE,">$short_name") || die $!;
+	if($^O eq 'MSWin32' && $short_name=~m`png|gif|swf$`){binmode SAVE}
+	print SAVE "$content";
+	close(SAVE);
+	chmod(0644,"$short_name");
+
+}

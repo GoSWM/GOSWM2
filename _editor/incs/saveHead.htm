@@ -1,0 +1,35 @@
+lang("saveHead");
+($file,$title,$keywords,$description,$prompt)=split(/=/,$params);
+
+$file=$root.$file;
+
+if($prompt eq "true"){
+	$prompt=qq~<script type="text/javascript" src="$ENV{'SCRIPT_NAME'}?prompt"></script>~;
+}else{
+	$prompt='';
+}
+
+open(F,"$file");
+while(<F>){
+	s`<script type="text/javascript" src="[^"]+prompt"></script>\n``i;
+	s`<meta name="description" content="[^"]*"`<meta name="description" content="$description"`si;
+	s`<meta name="keywords" content="[^"]*"`<meta name="keywords" content="$keywords"`si;
+	s`<title>[^<]+</title>`<title>$title</title>`si;
+	if(m`</head>`i){s`\s+$``;s`(</head>)`$prompt\n$1\n`i}
+	$SAVE.=$_;
+}
+if($SAVE !~ m`<meta name="description" content="$description"`){
+	$SAVE=~s`<HEAD>`<HEAD>\n<meta name="description" content="$description">\n`i;
+}
+if($SAVE !~ m`<meta name="keywords" content="$keywords"`){
+	$SAVE=~s`<HEAD>`<HEAD>\n<meta name="keywords" content="$keywords">\n`i;
+}
+
+if(!$demo){
+open(F,">$file");
+print F "$SAVE";
+
+$RETURN=qq~basicAlert("$htmlalert")~;
+}else{
+$RETURN=qq~basicAlert("$disabled")~;
+}

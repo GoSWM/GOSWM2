@@ -1,0 +1,16 @@
+$FORM_FONT_FACE=q~
+<option value="Arial, Helvetica">Arial
+<option value="Courier, Courier New">Courier
+<option value="Comic Sans MS">Comic
+<option value="Lucida Console">Lucida
+<option value="Times New Roman, Times">Times
+<option value="Verdana">Verdana
+~;
+
+$FORM_BORDER_COLORS=q~
+<option value="#000000" style="background-color:#000000">#000000
+<option value="#CCCCCC" style="background-color:#CCCCCC">#CCCCCC
+<option value="#000080" style="background-color:#000080">#000080
+<option value="#778899" style="background-color:#778899">#778899
+~;
+1;

@@ -1,0 +1,9 @@
+widgettitle=Edit Source Code
+SelectFileToEdit=Select File To Edit
+FileToEdit=File To Edit
+EditFilebutton=Edit File
+widgettitle2=Edit File&#39;s Source Code
+SaveEditbutton=Save Edit
+WrapOnbutton=Wrap On
+htmlalert1=Edit Was Saved
+WrapOffbutton=Wrap Off

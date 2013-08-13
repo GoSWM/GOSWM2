@@ -1,0 +1,4 @@
+PriorImage=Prior Image
+NextImage=Next Image
+ShrinkImage=Shrink Image
+ExpandImage=Expand Image

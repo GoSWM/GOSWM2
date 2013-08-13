@@ -1,0 +1,74 @@
+use CGI qw/:standard :html3/;
+use CGI::Carp qw(fatalsToBrowser);
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+	if ($^O =~ /MSWin32/i){	
+		$temp = $ENV{'TEMP'} || $ENV{'TMP'} || $ENV{'WINDIR'};
+		if($temp =~ /Temp/i){
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp";
+			}
+		}else{
+			$temp=$temp."/Temp";
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp"; 
+			}else{
+				$tmp="$path_to_domain/Temp";
+				mkdir($tmp,0755);
+				$TempFile::TMPDIRECTORY="$tmp"; 
+				$CGITempFile::TMPDIRECTORY="$tmp"; 
+			}
+		}
+	}
+
+    $file = param('upload');
+    if (!$file) {&no_file}
+
+    $file =~ m!([^/:\\]*)$!; 
+    $short_name = $1;
+	$host=~s`/$``;
+
+	$imgs_folder_PATH=$imgs_folder_URL;
+	$imgs_folder_PATH=~s`\.\.``;
+	$imgs_folder_PATH=~s`$host``;
+	$imgs_folder_PATH="$root/$imgs_folder_PATH";
+	$flash_folder_PATH=$imgs_folder_PATH;
+	$flash_folder_PATH=~s`imgs`flash`;
+	if($short_name=~m`embed\.js|flowplayer|audioplayer|swfobject|spot\.jpg`){$short_name="$flash_folder_PATH/".$short_name}	
+	elsif($short_name=~m`captcha_bg|\.ttf`i){$short_name="$incs_folder_PATH/Captcha/".$short_name}
+	elsif($short_name=~m`png|gif$`){$short_name="$imgs_folder_PATH/".$short_name}
+	elsif($short_name=~m`htm$`){$short_name="$incs_folder_PATH/".$short_name}
+	elsif($short_name=~m`txt$` && $short_name =~ m`config|changelog|custom|emails|license|characters|users|webdav`){$short_name="$txts_folder_PATH/".$short_name}
+	elsif($file=~m`txt$`){
+		mkdir("$incs_folder_PATH/lang",0755);chmod(0755,"$incs_folder_PATH/lang");
+		mkdir("$incs_folder_PATH//lang/en",0755);chmod(0755,"$incs_folder_PATH/lang/en");
+		$short_name="$incs_folder_PATH/lang/en/".$short_name;
+	}
+	elsif($file=~m`css$`){
+		mkdir("$incs_folder_PATH/css",0755);chmod(0755,"$incs_folder_PATH/css");
+		$short_name="$incs_folder_PATH/css/".$short_name;
+	}
+	elsif($short_name=~m`Lite\.pm$`i){$short_name="$incs_folder_PATH/Crypt/".$short_name}
+	elsif($short_name=~m`Size\.pm$`i){$short_name="$incs_folder_PATH/Image/".$short_name}	
+	elsif($short_name=~m`Sendmail\.pm$`i){mkdir($incs_folder_PATH/Mail,0755);chmod(0755,"$incs_folder_PATH/Mail");$short_name="$incs_folder_PATH/Mail/".$short_name}	
+	
+    open (SAVE,">$short_name") || die $!;
+	if($^O eq 'MSWin32' && $short_name=~m`png|gif|swf$`){binmode SAVE}
+    while ($size = read($file,$data,1024)) {
+        print SAVE $data;
+        $total_size += $size;
+    }
+    close SAVE;
+	chmod(0644,"$short_name");
+    if ($total_size < 1) {unlink($file_name);&nothing}
+	print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print "OK";
+exit;
+1;
+
+sub no_file{
+	
+	print X "$ENV{'QUERY_STRING'}=$ENV{'CONTENT_LENGTH'}";
+}

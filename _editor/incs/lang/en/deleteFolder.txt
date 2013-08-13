@@ -1,0 +1,2 @@
+alert=You can not delete the home folder!
+htmlalert=The Folder<BR>&nbsp;&nbsp;$folder<BR>And It&#39;s Contents Was Deleted

@@ -1,0 +1,12 @@
+widgettitle=Comments
+AddComment=Mark Content To Be Added
+AddComment2=Amend Content To Be Added
+RemoveComment=Mark Content To Be Deleted
+RemoveComment2=Amend Content To Be Deleted
+CancelAddComment=Remove Add Mark From Selected Content
+CancelDelComment=Remove Delete Mark From Selected Content
+text1=Insert Comment explaining Adding or Deleting of content
+SelectViewAddingComment=Select/View Adding Comment
+SelectViewDeletingComment=Select/View Deleting Comment
+UnSelectAddingComment=Un-Select Adding Comment
+UnSelectDeletingComment=Un-Select Deleting Comment

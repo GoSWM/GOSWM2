@@ -1,0 +1,182 @@
+lang("editImg");
+$main="imgeditMain";
+$place="imgeditplace";
+$src=$params;
+$title="$widgettitle";
+$wigWid="360";
+$wigWid_=$wigWid;
+$ico="img_edit";
+require 'widgetBody.htm';
+$RETURN=qq~imageEditor='$BODY_TOP
+<table width=100% align=center border=0 cellpadding=3 cellspacing=0>
+<tr>
+	<td colspan=3 align=center class=widgetText12>$header</td></tr>
+		<tr><td colspan=2 align=center>
+		<DIV id=ipropdisplay style="width:340px;height:150px;overflow:auto;background-color:#FFFFFF;border:1px solid #555555">
+		<img src="$src">
+		</DIV>
+	<tr><td colspan=2 align=center>
+<table width=290 border=0 cellpadding=0 cellspacing=0 style="margin:5px;">
+<tr id=properties><td align=center>
+<table width=280 border=0 cellpadding=0 cellspacing=0 style="margin:5px"><tr><td align=center>
+<fieldset><legend>$ImageSize</legend>
+<table style="margin-top:5px" width=100% border=0 cellpadding=1 cellspacing=0><tr>
+	
+	<td align=center class=widgetText10>$CurrentWidth: <span id=ipwids></span></td>
+	<td align=center class=widgetText10>$CurrentHeight: <span id=ipheis></td></tr>
+	<tr>
+	<td align=right class=widgetText11>$Width: <input class=input onfocus=select(this.value) onkeyup=proratTHProp(this.id,this.value) size=3 id=widImgPro  value="$width"></td>
+	<td align=right class=widgetText11>$Height: <input class=input onfocus=select(this.value) onkeyup=proratTHProp(this.id,this.value) size=3 id=heiImgPro value="$height"></td></tr>
+	
+	<tr><td colspan=2 align=center class=widgetText11><input checked=true type=checkbox id=imgProretainth> $Maintain</td></tr>
+</table></fieldset></td></tr></table>
+<table width=100% border=0 cellpadding=1 cellspacing=0>
+<tr><td colspan=3 align=center>
+<table border=0 cellpadding=5 cellspacing=0><tr><td>
+<fieldset><legend>$AlignmentBorder</legend>
+<table style="margin-top:5px" border=0 cellpadding=3 cellspacing=0>
+<tr><td align=right class=widgetText11 nowrap>$Alignment:</td>
+<td align=left><select class=widgetText11 id="ipalign">
+<option value="">Select
+<option value="left">$optionleft
+<option value="right">$optionright
+<option value="texttop">$optiontexttop
+<option value="absmiddle">$optionabsmiddle
+<option value="baseline">$optionbaseline
+<option value="absbottom">$optionabsbottom
+<option value="bottom">$optionbottom
+<option value="middle">$optionmiddle
+<option value="top">$optiontop
+</select></td></tr><tr><td align=right class=widgetText11>$Border:</td>
+<td align=left><table border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+<input class=input onfocus=select(this.value) id=ipbdr value="" style="width:13px"></td>
+<td align=center id=brdrRad1 class=widgetText11 style="padding-left:10px;visibility:xhidden"><input name=bTypeIP id=bTypeIP1 type=radio>
+<div class=widgetText10>$Style</div></td>
+<td align=center id=brdrRad2 style="padding-left:10px;visibility:xhidden" class=widgetText11><input id=bTypeIP2 name=bTypeIP type=radio>
+<div class=widgetText10>$HTML</div></td></tr></table>
+</td></tr></table>
+</fieldset></td><td>
+<fieldset><legend>$Margins</legend>
+<table style="margin:9px 0px" border=0 cellpadding=3 cellspacing=0>
+<tr><td align=right class=widgetText11>$Vertical:</td>
+<td align=left><input class=input onfocus=select(this.value) id=ipver value="" style="width:25px"></td></tr>
+<tr><td align=right class=widgetText11 nowrap>$Horizontal:</td>
+<td align=left><input class=input onfocus=select(this.value) id=iphor value="" style="width:25px"></td></tr></table>
+</fieldset></td></tr></table>
+</td></tr></table>
+
+</td></tr>
+<tr><td colspan=2 align=center class=widgetText11 style="padding-top:10px">
+$TitleText: <input class=input id=iptitle value="" size=30></td></tr>
+<tr><td colspan=2 align=center style="padding-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center id=clasesIMGEapply>
+
+</td><td id=xclasesIMGEapply align=center>
+
+<table style="margin-bottom:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=applyImgProps() $button_class title="Insert Image" $uns id=nsImgBut>$ApplyButton</td><td>$RBUT</td></tr></table>
+</td>
+</tr></table></td></tr></table></td></tr></table>
+$BODY_BOT
+';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+
+$RETURN.=qq~
+byId('imgeditplace').innerHTML=imageEditor
+	scrolledTop()
+	setUp('imgeditMain','imgeditplace',$wigWid_)
+	byId('ipwids').innerHTML=active_editImgProperties.width
+	byId('ipheis').innerHTML=active_editImgProperties.height
+	byId('widImgPro').value=active_editImgProperties.width
+	byId('heiImgPro').value=active_editImgProperties.height
+	
+	if(active_editImgProperties.style.borderWidth){
+		byId('ipbdr').value=parseInt(active_editImgProperties.style.borderWidth)
+		byId('bTypeIP1').checked=true
+	}
+	else if(active_editImgProperties.border){
+		byId('ipbdr').value=active_editImgProperties.border
+		byId('bTypeIP2').checked=true
+	}else{
+		byId('brdrRad1').style.visibility="visible"
+		byId('brdrRad2').style.visibility="visible"
+	}
+	if(active_editImgProperties.vspace && active_editImgProperties.vspace!=""){ byId('ipver').value=active_editImgProperties.vspace}
+	if(active_editImgProperties.hspace && active_editImgProperties.hspace!=""){byId('iphor').value=active_editImgProperties.hspace}
+	byId('iptitle').value=active_editImgProperties.title
+	if(active_editImgProperties.align && active_editImgProperties.align!=""){
+		for(var i=0;i<byId('ipalign').options.length;++i){
+			if(byId('ipalign').options[i].value==active_editImgProperties.align.toLowerCase()){
+				byId('ipalign').options[i].selected=true
+			}
+		}
+	}
+wdImPr=active_editImgProperties.width
+heImPr=active_editImgProperties.height
+
+function proratTHProp(n,v){
+	if(byId('imgProretainth').checked==true){
+		if(n=="widImgPro"){
+			ratio=v/wdImPr
+			byId('heiImgPro').value=parseInt(heImPr*ratio)
+		}
+		if(n=="heiImgPro"){
+			ratio=v/heImPr;
+			byId('widImgPro').value=parseInt(wdImPr*ratio)
+		}
+	}
+	if(byId('widImgPro').value.match(/%/)){
+		active_editImgProperties.width=''
+		active_editImgProperties.style.width=byId('widImgPro').value
+	}else{
+		active_editImgProperties.width=byId('widImgPro').value
+	}
+	active_editImgProperties.height=byId('heiImgPro').value
+	if(active_editImgProperties.style.width){active_editImgProperties.style.width=byId('widImgPro').value+"px"}
+	if(active_editImgProperties.style.height){active_editImgProperties.style.height=byId('heiImgPro').value+"px"}
+}	
+function applyImgProps(){
+	active_editImgProperties.vspace=byId('ipver').value
+	active_editImgProperties.hspace=byId('iphor').value
+	active_editImgProperties.title=byId('iptitle').value
+	active_editImgProperties.align=byId('ipalign').options[byId('ipalign').selectedIndex].value
+	if(byId('bTypeIP2').checked==true && byId('ipbdr').value!=""){
+		active_editImgProperties.border=byId('ipbdr').value
+		if(active_editImgProperties.style.border){active_editImgProperties.style.border=""}
+	}
+	if(byId('bTypeIP1').checked==true && byId('ipbdr').value!=""){
+		active_editImgProperties.style.border=byId('ipbdr').value+"px solid black"
+		if(active_editImgProperties.border){active_editImgProperties.border=""}
+	}
+	if(byId('classesIMGEapply')){
+		if(byId('classesIMGEapply').options[byId('classesIMGEapply').selectedIndex].value==''){return false}
+		if(byId('imgCLS1').checked==true){
+			active_editImgProperties.className+=" "+byId('classesIMGEapply').options[byId('classesIMGEapply').selectedIndex].value
+		}else if(byId('imgCLS2').checked==true){
+			active_editImgPropertiesArray_=new Array()
+			active_editImgPropertiesArray=active_editImgProperties.className.split(/ /)
+			for(i=0;i<active_editImgPropertiesArray.length;++i){
+				if(active_editImgPropertiesArray[i] != byId('classesIMGEapply').options[byId('classesIMGEapply').selectedIndex].value){
+					active_editImgPropertiesArray_.push(active_editImgPropertiesArray[i])
+				}
+			}
+			active_editImgProperties.className=active_editImgPropertiesArray_.join(" ")		
+		}
+	}
+}	
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassOption'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+byId('clasesIMGEapply').innerHTML='<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>'+
+'<select id=classesIMGEapply class=input style="max-width:100px">'+sopts+'</select></td>'+
+'<td align=left><input name=imgCLS id=imgCLS1 type=radio></td><td align=left class=widgetText10>$Apply </td>'+
+'<td align=left><input name=imgCLS id=imgCLS2 type=radio></td><td align=left class=widgetText10>$Remove</td></tr></table>'
+byId('clasesIMGEapply').width="230"
+byId('xclasesIMGEapply').width="230"
+
+}
+
+	~;
+	
+1;

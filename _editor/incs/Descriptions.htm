@@ -1,0 +1,106 @@
+lang("userHelp");
+$order="openfolder,save,saveas,fonts_style,fonts_html,color,heads,para,chars,left,center,full,right,outdent,indent,hr,ul,ol,picture,audio,flash,film,gallery,upload,link,table,form,insert_html,insert_word,search,lock,edit_html,unformat,edit_source,headcontent,backups,auth,pub,adduser,undo,redo,reload,key,help,updates";
+$params="openfolder,save,saveas,fonts_style,fonts_html,color,heads,para,chars,left,center,full,right,outdent,indent,hr,ul,ol,picture,audio,flash,film,gallery,upload,link,table,form,insert_html,insert_word,search,lock,edit_html,unformat,edit_source,headcontent,backups,auth,pub,adduser,undo,redo,reload,key,help,updates";
+
+@order=split(/,/,$order);
+$params="onoff,".$params;
+$fnt=qq~align=absmiddle style="margin:0px 20px 0px 10px"~;
+&filler;
+@basic=split(/,/,$params);
+foreach $b (@basic){
+	if($b !~/\w/){next}
+	if($b =~ /help/){next}
+	if($b =~ /font_relative|font_fixed|block_tags/){next}
+	$i=$b.'_';$i=$$i;
+	$t=$b.'_x';$t=$$t;
+	$t=~s`=publog_=`$publog_`;
+	$RET.=qq~<div style="padding-bottom:5px"><table border=0 cellpadding=3 cellspacing=0>
+	<tr valign=top><td>$i</td><td style="font=family:tahoma,arial;font-size:11px">$t</td></tr></table></div>~;
+}
+$RET=~s`[\r]``g;$RET=~s`[\n]``g;$RET=~s`'`&#39;`g;
+$RETURN=qq~
+	<DIV style="padding:0px 6px 6px 6px;font-family:tahoma,arial;font-size:10px" $uns>
+$RET
+		</DIV>
+~;
+
+print "Content-type: text/html\n\n";
+
+print qq~<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+	<title>Tool Descriptions</title>
+</head>
+
+<body bgcolor="#FFFFFF" style="margin:0px">
+
+
+$RETURN
+
+</body>
+</html>
+~;
+sub filler{
+$onoff_=qq~<img id=onOffSwitch class=icon vspace=4 src="$utif/icon_off.png" width="16" height="16" border="0">~;
+$exit_=qq~<img class=icon vspace=4 src="$utif/exit.png" width="16" height="16" border="0">~;
+$openfolder_=qq~<img vspace=4 class=icon src="$utif/openfolder.png" width="16" height="16" border="0">~;
+$save_=qq~<img class=icon vspace=4 src="$utif/save.png" width="16" height="16" border="0">~;
+$backups_=qq~<img class=icon vspace=4 src="$utif/backups.png" width="16" height="16" border="0">~;
+$reload_=qq~<img class=icon vspace=4 src="$utif/reload.png" width="16" height="16" border="0">~;
+$picture_=qq~<img class=icon vspace=4 src="$utif/picture.png" width="16" height="16" border="0">~;
+$color_=qq~<img class=icon vspace=4 src="$utif/color.png" width="16" height="16" border="0">~;
+$fonts_html_=qq~<img class=icon  vspace=4 src="$utif/fonts_html.png" width="16" height="16" border="0">~;
+$fonts_style_=qq~<img class=icon  vspace=4 src="$utif/fonts_style.png" width="16" height="16" border="0">~;
+$heads_=qq~<img class=icon  vspace=4 src="$utif/heads.png" width="16" height="16" border="0">~;
+$unformat_=qq~<img class=icon vspace=4 src="$utif/unformat.png" width="16" height="16" border="0">~;
+$link_=qq~<img class=icon vspace=4 src="$utif/link.png" width="16" height="16" border="0">~;
+$table_=qq~<img id=tblImg class=icon  vspace=4 src="$utif/table.png" width="16" height="16" border="0">~;
+$left_=qq~<img class=icon vspace=4 src="$utif/left.png" width="16" height="16" border="0">~;
+$center_=qq~<img class=icon vspace=4 src="$utif/center.png" width="16" height="16" border="0">~;
+$right_=qq~<img class=icon vspace=4 src="$utif/right.png" width="16" height="16" border="0"~;
+$outdent_=qq~<img class=icon vspace=4 src="$utif/outdent.png" width="16" height="16" border="0">~;
+$indent_=qq~<img class=icon vspace=4 src="$utif/indent.png" width="16" height="16" border="0">~;
+$justify_=qq~<img class=icon  vspace=4 src="$utif/justify.png" width="16" height="16" border="0">~;
+$full_=qq~<img class=icon  vspace=4 src="$utif/full.png" width="16" height="16" border="0">~;
+$hr_=qq~<img class=icon vspace=4 src="$utif/hr.png" width="16" height="16" border="0">~;
+$ul_=qq~<img id=ulImg class=icon vspace=4 src="$utif/ul.png" width="16" height="16" border="0">~;
+$ol_=qq~<img id=olImg class=icon  vspace=4 src="$utif/ol.png" width="16" height="16" border="0">~;
+$upload_=qq~<img class=icon vspace=4 src="$utif/upload.png" width="16" height="16" border="0">~;
+$form_=qq~<img class=icon vspace=4 src="$utif/form.png" width="16" height="16" border="0">~;
+$saveas_=qq~<img class=icon vspace=4 src="$utif/saveas.png" width="16" height="16" border="0">~;
+$key_=qq~<img class=icon vspace=4 src="$utif/key.png" width="16" height="16" border="0">~;
+$edit_html_=qq~<img class=icon vspace=4 src="$utif/edit_html.png" width="16" height="16" border="0">~; 
+$edit_source_=qq~<img class=icon vspace=4 src="$utif/edit_source.png" width="16" height="16" border="0">~;
+$chars_=qq~<img class=icon vspace=4 src="$utif/chars.png" width="16" height="16" border="0">~;
+$para_=qq~<img id=paraImg class=icon vspace=4 src="$utif/para.png" width="16" height="16" border="0">~;
+$undo_=qq~<img class=icon vspace=4 src="$utif/undo.png" width="16" height="16" border="0">~;
+$redo_=qq~<img class=icon  vspace=4 src="$utif/redo.png" width="16" height="16" border="0">~;
+$updates_=qq~<img class=icon vspace=4 src="$utif/updates.png" width="16" height="16" border="0">~;
+$gallery_=qq~<img class=icon  vspace=4 src="$utif/gallery.png" width="16" height="16" border="0">~;
+$flash_=qq~<img class=icon vspace=4 src="$utif/flash.png" width="16" height="16" border="0">~;
+$insert_html_=qq~<img class=icon vspace=4 src="$utif/insert_html.png" width="16" height="16" border="0">~;
+$insert_word_=qq~<img class=icon vspace=4 src="$utif/insert_word.png" width="16" height="16" border="0">~;
+$headcontent_=qq~<img class=icon vspace=4 src="$utif/headcontent.png" width="16" height="16" border="0">~;
+$adduser_=qq~<img class=icon vspace=4 src="$utif/adduser.png" width="16" height="16" border="0">~;
+$search_=qq~<img class=icon vspace=4 src="$utif/search.png" width="16" height="16" border="0">~;
+$lock_=qq~<img class=icon vspace=4 src="$utif/lock.png" width="16" height="16" border="0">~;
+$film_=qq~<img class=icon vspace=4 src="$utif/film.png" width="16" height="16" border="0">~;
+$auth_=qq~<img class=icon vspace=4 src="$utif/comments.png" width="16" height="16" border="0">~;
+$pub_=qq~<img class=icon vspace=4 src="$utif/comments.png" width="16" height="16" border="0">~;
+$publog_=qq~<img align=absmiddle class=icon vspace=4 src="$utif/aplog.png" width="16" height="16" border="0">~;
+$audio_=qq~<img class=icon vspace=4 src="$utif/audio.png" width="16" height="16" border="0">~;
+
+
+
+if($site_colors_only eq "yes"){
+$color_x=$color_x1;
+}else{
+$color_x=$color_x2;
+}
+
+
+}#seed
+
+exit
+1;

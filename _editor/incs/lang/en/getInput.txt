@@ -1,0 +1,5 @@
+RenameFile=Rename File
+CreateFolder=Create Folder
+CreateFolderIn=Create Folder In
+EnterNewFolderName=Enter New Folder Name
+RenameFolder=Rename Folder

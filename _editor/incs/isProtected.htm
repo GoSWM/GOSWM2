@@ -1,0 +1,75 @@
+lang("getLock");
+
+$folder=$params;
+$folder=~s`/$``;
+$passwd=$folder."/.htpasswd";
+if(-e $passwd){
+	open(PW,"$passwd");
+	while(<PW>){
+		s`\s+$``;
+		($usr,$pwd,$eml)=split(/:/);
+		push(@FND,$usr);
+	}
+}
+@FND=sort(@FND);
+foreach $u (@FND){
+	$OPTS.=qq~<option value="$u">$u~;
+}
+if($OPTS){
+	$HTML=qq~
+<table width=460 align=center border=0 cellpadding=0 cellspacing=0><tr valign=top><td style="padding-bottom:10px" width=50% align=center>
+<fieldset><legend>$AddNewMember</legend>
+<table style="margin-top:8px" border=0 cellpadding=2 cellspacing=0>
+<tr><td class=widgetText11 align=center><input class=input id=NewMemberName style="width:150px" value=""><br>$NewMemberName</td></tr>
+<tr><td class=widgetText11 align=center><input class=input id=NewPassword style="width:150px" type=password value=""><br>$NewPassword</td></tr>
+<tr><td class=widgetText11 align=center><input class=input id=RepeatNewPassword style="width:150px" type=password value=""><br>$NewRepeatPassword</td></tr>
+<tr><td class=widgetText11 align=center><input class=input id=NewMemberEmail style="width:150px" value=""><br>$NewMemberEmail</td></tr>
+<tr><td align=center>
+<table style="margin-top:3px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceAddMember()>$AddMemberbutton</td><td>$RBUT</td></tr></table>
+</td></tr>
+</table></fieldset>
+</td><td width=50%  align=center>
+<fieldset><legend>$RemoveMember</legend>
+	<select id=RemoveMember class=select style="margin-top:10px"><option value="">$SelectMemberToRemove$OPTS</select><br><table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceRemoveMember()>$Removebutton</td><td>$RBUT</td></tr></table></fieldset>
+<br><br>
+<fieldset><legend>$RemoveHtaccess</legend>
+	<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceRemoveProtection()>$RemoveAllbutton</td><td>$RBUT</td></tr></table></fieldset>
+</td></tr></table>
+~;
+	$HTML2=qq~
+	<table align=center border=0 cellpadding=10 cellspacing=0>
+	<tr><td class=widgetText11 align=center>$text4</td></tr>
+	<tr><td align=center>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=ceInsertProtection()>$AddFormbutton</td><td>$RBUT</td></tr></table><br></td></tr></table>~;
+
+}else{
+	$HTML=qq~<DIV style="padding:20px; font-weight:bold">$Folderisnotprotected</DIV>~;
+	$HTML2=qq~<DIV style="padding:20px; font-weight:bold">$Folderisnotprotected</DIV>~;
+}
+
+$HTML=~s`[\n]``g;$HTML=~s`[\t]``g;$HTML=~s`'`&#39;`g;
+$HTML2=~s`[\n]``g;$HTML2=~s`[\t]``g;$HTML2=~s`'`&#39;`g;
+$RETURN=qq~
+byId('memberopts').innerHTML='$HTML'
+byId('signupdiv').innerHTML='$HTML2'
+byId('Foldertoprotect').value="/"+pad17.dirvirtual
+
+function ceInsertProtection(){
+	protectForm='<form method=post action="$uttf?basicSignup" target=basicIframe><input size=30 name=uname value=""><br>$form1<br><br><input size=30 name=upass value=""><br>$form2<br><br><input size=30 name=uemail value=""><br>$form3<br><br><input type=submit value="$submitbutton"><input type=hidden name=folder value="$folder"></form><iframe name=basicIframe style="display:none"></iframe>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(protectForm);
+		}else{
+			doc().execCommand("InsertHTML", false, protectForm); 
+		}
+	}
+}
+
+~;
+
+
+
+1;

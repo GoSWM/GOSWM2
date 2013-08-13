@@ -1,0 +1,3 @@
+scriptNote=You have a &lt;script&gt; ... &lt;/script&gt; block in the body of the page. The entire script block must be enclosed in an excludeblock to prevent the editor from editing that area of the page. Example:<BR><BR>&lt;span id="excludeblock-1"&gt;<br>&lt;script type="text/javascript"&gt;<br>script content<br>&lt;/script&gt;<br>&lt;/span&gt;&lt;!-- "excludeblock-1" --&gt;<br>
+title=Script Warning
+button=Close

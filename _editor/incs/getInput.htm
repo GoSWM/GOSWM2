@@ -1,0 +1,449 @@
+lang("getInput");
+($param1,$param2)=split(/=/,$params);
+
+if($demo==1){
+	$FUNC1=qq~demoing()~;
+	$FUNC2=qq~demoing()~;
+}else{
+	$FUNC1=qq~PTcreateFolder()~;
+	$FUNC2=qq~PTdoRename()~;
+}
+if($param1 eq "file"){
+$param2=~s`.+/``;
+
+$RETURN=qq~inputTbl='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="font-weight:bold;padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$RenameFile</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$RenameFile<br>$param2</td></tr>
+<td><input class=input id=PTre_name value="" style="width:126px"></td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC2 $uns>$RenameFile</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~byId('inputplace').innerHTML=""
+function PTdoRename(){
+	var URL="$uttf?doRename="+byId('openURL').value+"="+byId('PTre_name').value+"=page"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl;
+PTrenamePage()
+~;
+}#file
+
+if($param1 eq "folder1"){
+$param2=~s`.+/``;
+
+$RETURN=qq~inputTbl='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="font-weight:bold;padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$RenameFile</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$RenameFolder<br>$param2</td></tr>
+<td><input class=input id=PTre_namef value="" style="width:126px"></td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC2 $uns>$RenameFolder</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~byId('inputplace').innerHTML=""
+function PTdoRename(){
+	var URL="$uttf?doRename="+pad1.dir+"="+byId('PTre_namef').value+"=folder"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl;
+PTrenameFolder()
+~;
+}#folder1
+
+if($param1 =~ /img|flash/){
+$param2=~s`.+/``;
+$RETURN=qq~inputTbl='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$RenameFile</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$RenameFile<br>$param2</td></tr>
+<td><input class=input id=PTre_name value="" style="width:126px"></td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC2 $uns>$RenameFile</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+}
+if($param1 eq "img"){
+$RETURN.=qq~byId('inputplace').innerHTML=""
+function PTdoRename(){
+	var URL="$uttf?doRename="+byId('csimgurl').value+"="+byId('PTre_name').value+"=img"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl;
+cerenameImage()
+~;
+}#img
+if($param1 eq "flash"){
+$RETURN.=qq~byId('inputplace').innerHTML=""
+function PTdoRename(){
+	var URL="$uttf?doRename="+byId('csflashurl').value+"="+byId('PTre_name').value+"=flash"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl;
+cerenameFlash()
+~;
+}#flash
+
+
+if($param1 eq "folder2"){
+$RETURN=qq~inputTbl2='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="padding-left:7px" class=widgetTitle id=tit_inputMain $uns>$CreateFolder</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CreateFolderIn:<br>$param2 </td></tr>
+<td style="font-family:tahoma,arial;font-size:10px" align=center><input class=input id=PTnu_folder value="" style="width:126px"><br>$EnterNewFolderName</td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC1 $uns>$CreateFolder</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('inputplace').innerHTML=""
+function PTcreateFolder(){
+	var URL="$uttf?doCreateFolder="+byId('saveasURL').value+"/"+byId('PTnu_folder').value+"=2"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl2;
+cenewFolder()
+~;
+}#folder2
+
+if($param1 eq "folder3"){
+$RETURN=qq~inputTbl3='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$CreateFolder</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CreateFolderIn:<br>$param2 </td></tr>
+<td style="font-family:tahoma,arial;font-size:10px" align=center><input class=input id=PTnu_folder value="" style="width:126px"><br>$EnterNewFolderName</td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC1 $uns>$CreateFolder</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('inputplace').innerHTML=""
+function PTcreateFolder(){
+	var URL="$uttf?doCreateFolder="+pad3.urldir+"/"+byId('PTnu_folder').value+"=3"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl3;
+cenewFolder3()
+~;
+}#folder3
+
+if($param1 eq "folder10"){
+$RETURN=qq~inputTbl10='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$CreateFolder</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CreateFolderIn:<br>$param2 </td></tr>
+<td style="font-family:tahoma,arial;font-size:10px" align=center><input class=input id=PTnu_folder value="" style="width:126px"><br>$EnterNewFolderName</td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC1 $uns>$CreateFolder</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('inputplace').innerHTML=""
+function PTcreateFolder(){
+	var URL="$uttf?doCreateFolder="+pad10.urldir+"/"+byId('PTnu_folder').value+"=10"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl10;
+cenewFolder10()
+~;
+}
+
+if($param1 eq "folder11"){
+$RETURN=qq~inputTbl11='<DIV id="inputMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputMain","hol_inputMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="padding-left:7px;" class=widgetTitle id=tit_inputMain $uns>$CreateFolder</td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close"
+				onclick=uncsShrink("inputMain");byId("inputplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr><td rowspan=2 style="padding-left:10px"><img src="$utif/input.png" width="32" height="32" border="0" alt=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CreateFolderIn:<br>$param2 </td></tr>
+<td style="font-family:tahoma,arial;font-size:10px" align=center><input class=input id=PTnu_folder value="" style="width:126px"><br>$EnterNewFolderName</td></tr>
+<tr><td colspan=2 align=center style="padding-left:100px">
+<table align=center style="margin:4px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class onclick=$FUNC1 $uns>$CreateFolder</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('inputplace').innerHTML=""
+function PTcreateFolder(){
+	var URL="$uttf?doCreateFolder="+pad11.urldir+"/"+byId('PTnu_folder').value+"=11"
+	document.body.style.cursor="wait"
+	JITc(URL)
+}
+byId('inputplace').innerHTML=inputTbl11;
+cenewFolder11()
+~;
+
+}
+
+
+1;

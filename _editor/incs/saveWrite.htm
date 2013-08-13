@@ -1,0 +1,600 @@
+lang("saveWrite");
+&get_edits;
+&mv_nc;
+$space="%20";
+$FILE=$pageURL;
+$FILE=~s`$host`$root`;
+$FILE=~s`\?.+$``;
+$FILE=~s`$space` `g;
+if(!-f $FILE){exit}
+if($change_permissions>0 && -f $FILE){chmod(0666,"$FILE")}
+if($backitup eq "true"){$backitup=1}else{$backitup=0}
+if($backup_all){$backitup=1}
+open(FILE,"$FILE");
+while(<FILE>){$PAGE .= $_}
+close(FILE);
+if($email_source){$BUPAGE=$PAGE}
+if($PAGE=~m`excludeblock-`){
+	while($PAGE =~ m!excludeblock-(.+?)("[^>]*>.+?</(span|div)\W+?)excludeblock-\1"!sig){$exc{$1}=$2;}
+}
+if($PAGE=~m`excludeblock="`){
+	while($PAGE =~ m!excludeblock="(.+?)"[^>]*>(.+?)</(span|div)\W+?excludeblock="\1"!sig){$exc{$1}=$2;}
+}
+if($backitup){backup($FILE)}
+$PAGE=~m`(gallerySpace.+<SCRIPT.+</SCRIPT>.+gallerySpace)`si;$GAL=$1;
+foreach $eblock (@editblocks){
+	cleanup($EBLOCK{$eblock});
+	if($tidy){tidy_block($EBLOCK{$eblock})}
+	$EBLOCK{$eblock}=~s!<=textarea!</textarea!ig;
+	$EBLOCK{$eblock}=~s!&\+!+!ig;
+	$EBLOCK{$eblock}=~s!class=("*)formblock!class=$1xformblock!g;
+	$EBLOCK{$eblock}=~s` excludexblock``g;
+	$EBLOCK{$eblock } =~s`excludeblock-(.+?)(".+?)(excludeblock-\1)`excludeblock-$1$exc{$1}$3`sig;	
+	iso_utf($EBLOCK{$eblock});
+	$PAGE =~ s`($eblock\W[^>]*>)(.*)(</.+?$eblock\W)`$1$EBLOCK{$eblock}$3`si;
+	$xblock=$eblock;
+	$xblock=~s`editblock_([\w-]+)`editblock="$1"`;
+	$xblock=~s`userblock_([\w,]+)`userblock="$1"`;
+	#$PAGE =~ s`($xblock[^>]*>)(.*)(</.+?$xblock)`$1$EBLOCK{$eblock}$3`si;
+}
+if($page_body){
+	iso_utf($page_body);
+	if($PAGE=~m`<body[^>]*>.+</body>`si){
+		$PAGE =~ s`(<body[^>]*>).+</body>`$1$page_body</body>`si;
+	}else{
+		if($utype=~m/1|3|5/){
+			$page_body=~s`(.+)`$1`sig; <!-- $page_body=~s`<pre>(.+)</pre>`$1`sig; -->
+			$PAGE = $page_body;
+		}
+	}
+	$PAGE=~s` excludexblock``sig;
+	$PAGE=~s`excludeblock-(.+?)(".+?)(excludeblock-\1)`excludeblock-$1$exc{$1}$3`sig;	
+	cleanup($PAGE);
+}
+$PAGE=~s`[\r]``g;
+$PAGE=~s` cellborder``sig;
+$PAGE=~s` contentEditable="*true"*``sig;
+$PAGE=~s` contentEditable="*false"*``sig;
+$galblock=qq~<DIV style="font-size:11px;font-family:trebuchet ms,arial">$text1<br><br><img src="$imgs_folder_URL/throbber_bar.gif" width="128" height="15" border="0"></DIV>~;
+$PAGE=~s`id="galleryJS"`id=galleryJS`;
+$PAGE=~s`(gallerySpot[^>]+>).+(galleryJS)`$1$galblock</div>\n<SCRIPT id=$2`sig;
+$PAGE=~s`(videoSpot[^>]+) style=[^>]+>.+?_videoSpot`$1></div><!-- _videoSpot`sig;
+$PAGE=~s`(<div )[^>]+(id="\d+" class="videoSpot">).+?_videoSpot`$1$2</div><!-- _videoSpot`sig;
+$PAGE=~s`<div id="*captchaSpot"*>[^<]+</div>``sig;
+$PAGE=~s`SCRAPTW`SCRIPT`ig;
+if($PAGE !~ m`audiolinkclass`){$PAGE=~s`<iframe[^>]+audioholeclass[^>]+></iframe>``i}
+if($PAGE =~m`audiolinkclass` && $PAGE !~m`audioholeclass`){
+	$PAGE=~s`</body>`<iframe class=audioholeclass name=audiohole style="width:1px;height:1px" src="about:blank"></iframe></body>`i;
+}
+$PAGE=~s`<SPAN class="*audioREMOVEclass.+?</SPAN>``i;
+if($email_source){&email_source}
+if($saveitas eq ''){
+	if($authpub eq "author"){
+		$FILENAME=$FILE;
+		if($FILENAME !~ m|_pending\.\w+$|){$FILENAME =~ s|(.\w+$)|_pending$1|;$pageURL =~ s|(.\w+$)|_pending$1|}
+		$URL=qq~parent.editPad.location='$pageURL'~;
+		unless($PAGE =~ m`\?prompt`i){
+			$prompt=qq~<script type="text/javascript" src="$ENV{'SCRIPT_NAME'}?prompt"></script>~;
+			$PAGE =~s`(</head>)`$prompt\n$1`i;
+		}
+		$htmlalertX=$htmlalert3;
+	}else{
+		$FILENAME=$FILE;
+		$URL=qq~parent.editPad.location.reload(true)~;
+		$htmlalertX=$htmlalert1;
+	}	
+	if($convertpending eq "true" && $FILENAME =~ /_pending\./){
+		unlink($FILENAME);
+		$FILENAME=~s`_pending``;
+		$pageURL=~s`_pending``;$URL=qq~parent.editPad.location='$pageURL'~;
+	}
+	$PAGE=~s!<=textarea!</textarea!ig;
+	$PAGE==~s`<!-- secNum -->.+?<!-- /secNum -->``sig;
+	open(FILE,">$FILENAME") ||  holealert("$alert3 $FILENAME $alert4");
+	print FILE "$PAGE";
+	close(FILE);
+	if($page_body && $tidy){tidy("$FILE")}
+	if($change_permissions==2 && -f $FILE){chmod(0644,"$FILE")}
+	if($log_saves){log_saves($FILE)}
+}else{
+	if($change_permissions==2 && -f $FILE){chmod(0644,"$FILE")}
+	$PAGE=~s`<title>.+</title>`<title>$saveastitle</title>`;
+	open(FILE,">$saveitas") || holealert("$alert2");
+	print FILE "$PAGE";
+	close(FILE);	
+	if($tidy){tidy("$saveitas")}
+	if($change_permissions==2 && -f $saveitas){chmod(0644,"$saveitas")}
+	if($log_saves){log_saves($saveitas)}
+}
+
+foreach $iblock (@includeblocks){
+	if($iblock=~/-[^-]+-[^-]+-/){($n,$INC,$ub,$ur)=split(/-/,$iblock,4)}
+	elsif($iblock=~/-/){($n,$INC)=split(/-/,$iblock,2)}
+	elsif($iblock=~/_/){($n,$INC)=split(/_/,$iblock,2)}
+	
+	$IBLOCK{$iblock}=~s!<=textarea!</textarea!ig;
+	$IBLOCK{$iblock}=~s!&\+!+!ig;
+		iso_utf($IBLOCK{$iblock});
+	$IBLOCK{$iblock}=~s` excludexblock``ig;	
+	if($IBLOCK{$iblock}=~m`excludeblock="`){
+		while($IBLOCK{$iblock} =~ m!excludeblock="(.+?)"[^>]*>(.+?)</(span|div)\W+?excludeblock="\1"!sig){$exci{$1}=$2;}
+		$IBLOCK{$iblock}=~s` class="excludeblock-[^"]+"``gi;
+	}
+	if($IBLOCK{$iblock}=~m`excludeblock-`){
+		while($IBLOCK{$iblock} =~ m!excludeblock-(.+?)("[^>]*>.+?</(span|div)\W+?)excludeblock-\1"!sig){$exci{$1}=$2}
+	}
+	$INC=~s!^/!!;
+	$INC=$root."/".$INC;
+	if($change_permissions>0 && -f $INC){chmod(0666,"$INC")}
+	if($backitup){backup_inc($INC)}
+	cleanup($IBLOCK{$iblock});
+		$IBLOCK{$iblock}=~s`xnbzp_`&nbsp;`g;
+		$IBLOCK{$iblock}=~s`hTtXp`http`ig;
+	$IBLOCK{$iblock}=~s`[\r]``sig;
+	$IBLOCK{$iblock}=~s` cellborder``sig;
+	
+	open(INC,">$INC") || holealert("$alert3 ,$iblock, $INC $alert4");
+	print INC "$IBLOCK{$iblock}";
+	close(INC);
+	if($tidy){tidy_block("$INC")}
+	if($change_permissions==2 && -f $INC){chmod(0644,"$INC")}
+
+	if($log_saves){log_saves($INC)}
+}
+
+if($saveitas eq ''){
+	if($reload_confirm_after_save==0){
+		$endThis="$URL";
+	}else{
+		$endThis=qq~parent.doAlert("confirm")
+		parent.active_function = new Function("$URL;parent.closeAlert();location='about:blank'")
+		parent.cancel_function = new Function("parent.closeAlert();location='about:blank'")
+	~;
+	}
+	$RETURN=qq~parent.saving=0;
+	parent.byId('saveitbutton').innerHTML="$YES";
+	parent.byId('cearea').innerHTML="";
+	parent.byId('saveitas').value="";
+	parent.byId('backitup').value="";
+	parent.byId('pageURL').value="";
+	parent.byId('savingplace').style.display="none";
+	parent.byId('yesBut').innerHTML="$YES"
+	parent.active_alert="$htmlalertX?"
+	$endThis
+	~;
+}else{
+	$saveitas=~s`\Q$root\E`$host`;
+	$RETURN=qq~parent.saving=0;
+	parent.byId('cearea').innerHTML=""
+	parent.byId('saveitas').value=""
+	parent.byId('backitup').value=""
+	parent.byId('pageURL').value=""
+	parent.byId('yesBut').innerHTML="$YES"
+	parent.active_alert="$htmlalert2?"
+	parent.doAlert("confirm")
+	parent.active_function = new Function("parent.byId('savasplace').style.display='none';parent.editPad.location='$saveitas';parent.closeAlert();location='about:blank'")
+	parent.cancel_function = new Function("parent.byId('savasplace').style.display='none';parent.closeAlert();location='about:blank'")
+	~;
+}
+if($authpub eq "author" || $authpub eq "publisher"){
+	$webdav=$users_txt;$webdav=~s`/users\.txt`/webdav.txt`;
+	$chnglog=$users_txt;$chnglog=~s`/users\.txt`/changelog.txt`;
+	$pageURL_=$pageURL;$pageURL_=~s`$host``;	
+	if($authpub eq "author"){
+		open(WD,"$webdav");
+		while(<WD>){
+			s`\s+$``;
+			($un,$aptype,$apnom,$position,$apemail,$pubs)=split(/=/);
+			if($apemail=~/\@/){$REC{$un}=$apemail}
+			$NOM{$un}=$apnom;
+			if($un eq $username){
+				$SENDER=$_;
+				@REC=split(/\^/,$pubs);
+			}
+		}
+		$datetime = localtime;($wkday, $mon, $date, $time, $yr) = split(/\s+/,$datetime);$now=$mon."/".$date."-".$time;
+		$LOGREC=qq~$pageURL_&$username&$now&$authpub\n~;
+		open(CL,"$chnglog");
+		while(<CL>){
+			if(/^$pageURL_/ && /\&$username\&/){$fndlog=1;$_=$LOGREC}
+			$SAVECL.=$_;
+		}
+		if($fndlog==1){
+			open(CL,">$chnglog");
+			print CL "$SAVECL";
+		}else{
+			open(CL,">>$chnglog");
+			print CL "$LOGREC";
+		}
+	}#author
+	if($authpub eq "publisher" && $convertpending ne "true"){	
+		open(CL,"$chnglog");
+		while(<CL>){
+			($pg,$au,$dt)=split(/&/);
+			if($pg eq $pageURL_ && $au ne $username){
+				$AUTH=$au;
+			}
+		}
+		open(WD,"$webdav");
+		while(<WD>){
+			s`\s+$``;
+			$NOM{$un}=$apnom;
+			$REC{$un}=$apemail;
+			($un,$aptype,$apnom,$position,$apemail,$pubs)=split(/=/);
+			if($un eq $AUTH){
+				push(@REC,$un);
+			}
+			if($un eq $username){
+				$SENDER=$_;
+			}
+		}		
+	}
+	if($convertpending ne "true"){
+		if($#REC>-1){
+			&emailap;
+		}
+	}
+	if($convertpending eq "true"){
+		$pageURL_ =~ s|(.\w+$)|_pending$1|;
+		open(CL,"$chnglog");
+		while(<CL>){
+			if(/^$pageURL_/){$fndlog=1;$_=''}
+			$SAVECL.=$_;
+		}
+		if($fndlog==1){
+			open(CL,">$chnglog");
+			print CL "$SAVECL";
+		}
+	}
+}#AP
+
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+
+sub get_edits{
+	&check_cookie;
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		$value =~ tr/+/ /;
+		$value =~ s/ ~!/  ~!/g;
+		$value =~ s/[\r]//g;
+		$value=~s`[\t]``g;
+		$value=~s`&pLuS`+`g;
+		$value=~s`hTtXp`http`g;
+		if($name =~ /^editblock|^userblock/){
+			$EBLOCK{$name}=$value;
+			push(@editblocks,$name);
+		}elsif($name =~ /^includeblock/){
+			$IBLOCK{$name}=$value;
+			push(@includeblocks,$name);
+		}else{
+			$$name=$value;
+		}
+	}
+	&check_session;
+}#get_edits
+
+sub backup{ #+++++++++++++++++++++++++++++++++++++++++++++++++++
+$_[0]=~m`(.+)(/[^/]+)(\.\w+$)`;
+@baks=<$1/*>;
+$tik=0;$tst=$1.$2."_";$fnm=$2."_";$ext=$3;
+foreach $f (@baks){
+	if($f=~m`$fnm(\d+)$ext$`){$tik=$1}
+}
+++$tik;
+$bak=$tst.$tik.$ext;
+
+open(BAK,">$bak");
+print BAK "$PAGE";
+close(BAK);
+if($^O !~ /mswin32/i && -f $bak){chmod(0644,"$bak")}
+}#backup
+
+sub backup_inc{ #+++++++++++++++++++++++++++++++++++++++++++++++++
+open(IN,"$_[0]");
+while(<IN>){$IN.=$_}
+$_[0]=~m`(.+)(/[^/]+)(\.\w+$)`;
+@baks=<$1/*>;
+$tik=0;$tst=$1.$2."_";$fnm=$2."_";$ext=$3;
+foreach $f (@baks){
+	if($f=~m`$fnm(\d+)$ext$`){$tik=$1}
+}
+++$tik;
+$bak=$tst.$tik.$ext;
+open(BAK,">$bak");
+print BAK "$IN";
+close(BAK);
+if($^O !~ /mswin32/i && -f $IN){chmod(0644,"$IN")}
+}#back_inc
+
+sub cleanup{ #++++++++++++++++++++++++++++++++++++++++++++++++++
+if($relative_urls){
+	$dotpath=$FILE;$dotpath=~s`$root/``;$dotpath=~s`/[^/]+$`/`;$dotpath=~s`[^/]+`..`g;if($dotpath eq ".."){$dotpath=""}
+	$_[0] =~ s`([^>])https*://$host_`$1$dotpath`g;
+	$_[0] =~ s`([^>])https*://www\.$host_`$1$dotpath`g;	
+	$_[0] =~ s`\.\.//`../`g;	
+}elsif($absolute_urls){
+}else{
+	$_[0] =~ s`([^>])https*://$host_/`$1/`ig;
+	$_[0]=~ s`([^>])https*://www\.$host_/`$1/`ig;
+}
+$_[0]=~s`<?XML:NAMESPACE[^>]+>``gi;
+$_[0]=~s`<span class="">([^>]+)</span>`$1`gsi;
+$_[0]=~s` *class=""``g;
+$_[0]=~s`\n<IMG`<IMG`ig;
+$_[0]=~s`<IMG`\n<IMG`ig;
+$_[0]=~s`<IMG([^>]+) />`<IMG$1>`sig;
+$_[0]=~s`<IMG([^>]+)>`<IMG$1 />`sig;
+$_[0]=~s` unselectable="\w{2,3}"``g;
+$_[0]=~s` ondblclick=""``gi;
+$_[0]=~s`BORDER-\w+?: 0px*;*``gi;
+$_[0]=~s`PADDING-\w+?: 0px*;*``gi;
+$_[0]=~s`MARGIN-\w+?: 0px*;*``gi;
+$_[0]=~s`MARGIN: 0cm 0cm 0pt;*``gi;
+$_[0]=~s`mso-pagination: widow-orphan;*``gi;
+$_[0]=~s`style="\W*?"``gi;
+$_[0]=~s`style="\s+(.+?)"`style="$1"`gi;
+$_[0]=~s`contenteditable="?\w{4,5}"? ?``gi;
+#$_[0]=~s`<span>([^>]+)</span>`$1`gsi;
+$_[0]=~s`  +` `g;
+$_[0]=~s` >`>`g;
+if($isIE){$_[0]=~s`(</table>)`\n$1\n`gi;}
+$_[0]=~s`(<tr)`\t$1`gi;
+if($isIE){$_[0]=~s`(</tr>)`\n\t$1`gi;}
+$_[0]=~s`(<td)`\t\t$1`gi;
+if($place_close_TD_tags_at_end_of_line){$_[0]=~s`\s+(</td>)`$1`gi}
+if($isIE){$_[0]=~s`(</TBODY>)`\n$1`gi;}
+#$_[0]=~s`(<IMG.+?)/>`$1>`ig;
+#$_[0]=~s`(<IMG.+?)>`$1 />`ig;
+$_[0]=~s`</FORM>`\n</FORM>\n`ig;
+$_[0]=~s`\s*<CENTER>`\n<CENTER>\n`sig;
+$_[0]=~s`\s*</CENTER>\s*`\n</CENTER>\n`sig;
+$_[0]=~s`</DIV>\s*`</DIV>\n`sig;
+$_[0]=~s/<(\w+) lang=[^ |>]+/<$1/gi;
+$_[0]=~s/<P style="MARGIN-BOTTOM: 0in">/<P>/gi;
+$_[0]=~s/<\?//g;
+$_[0]=~s/<xml[^>]+>//gi;
+$_[0]=~s/<\xml[^>]+>//gi;
+$_[0]=~s/<\?xml[^>]+>//gi;
+$_[0]=~s/<\/?st1:[^>]*>//g;  
+$_[0]=~s/style="[^"]?excel[^"]?"//gi;  
+$_[0]=~s/style="[^"]?access[^"]?"//gi;  
+$_[0]=~s/style="[^"]?word[^"]?"//gi;  
+$_[0]=~s/<LI>\s*<P>/<LI>/gi;
+$_[0]=~s/<\/P>\s*<\/LI>/<\/LI>/gi;
+$_[0]=~s/<\/?[a-z]\:[^>]*>//g; 
+$_[0]=~s/class=Mso\w+//gi;
+$_[0]=~s/ style=""//gi;
+$_[0]=~s/<b>/<strong>/gi;
+$_[0]=~s/<\/b>/<\/strong>/gi;
+$_[0]=~s/<em>/<i>/gi;
+$_[0]=~s/<\/em>/<\/i>/gi;
+$_[0]=~s/  +/ /gi;
+$_[0]=~s/<strong[^>]*><\/strong>//gi;
+$_[0]=~s/<font[^>]*><\/font>//gi;
+$_[0]=~s/<p[^>]*><\/p>//gi;		
+$_[0]=~s/<span[^>]*><\/span>//gi;
+$_[0]=~s/<a[^>|name=]*><\/a>//gi;		
+$_[0]=~s/<PARAM NAME/\n<PARAM NAME/g;
+$_[0]=~ s/<PARAM NAME="Play" VALUE="0">/<PARAM NAME="Play" VALUE="-1">/gi;
+unless(/<meta/){$_[0]=~s`(\s\w+=)([^ >\s'"]+)([>\s]+)`$1"$2"$3`g;}
+$_[0]=~s` class="Apple-style-span"``gi;
+$_[0]=~s`<!-- secNum -->.+?<!-- /secNum -->``sig;
+$_[0]=~s`<INS[^>]+cite="*REMOVED[^>]+>(.+)?</INS>`$1`sig;
+$_[0]=~s`<DEL[^>]+cite="*REMOVED[^>]+>(.+)?</DEL>`$1`sig;
+$_[0]=~s`\%u2019`&#8217;`gi; #MAC UNICODE SHIT
+$_[0]=~s`\%u2018`&#8216;`gi;
+$_[0]=~s`\%u201C`&#8220;`gi;
+$_[0]=~s`\%u201D`&#8221;`gi;
+$_[0]=~s`\%u2014`&#8212;`gi;
+$_[0]=~s`\%u2013`&#8211;`gi;
+$_[0]=~s`\%u2022`&#8226;`gi;
+
+if($tidy){$_[0]=~s`<BR>`<br />`gi;}
+if($tidy){$_[0]=~s`<HR>`<hr />`gi;}
+}#cleanup
+
+sub tidy{
+$sc_off=1;
+open(T,"$_[0]");
+while(<T>){
+	if(/<script|<\?php/i){$sc_off=0}
+	if($sc_off==1){
+		s`(<\w+>)`lc($1)`ge;
+		s`(<\w+ )`lc($1)`ge;
+		s`(<\/\w+>)`lc($1)`ge;	
+		s`(\w+-\w+:)`lc($1)`ge;
+		$_[0]=~s`(style="[^"]+)`lc($1)`gie;
+		s`<u></u>``gi;
+		s`\s\w+=""``g;
+		s`(\w+=)([^>\s'"]+)([>\s]+)`$1"$2"$3`g;
+		s`(codebase=".+?)="(.+)""`$1=$2"`gsi;
+		s`(href=".+?)="(.+)""`$1=$2"`gsi;
+		s`(action=".+?)="(.+)""`$1=$2"`gsi;
+	}
+	if(/<\/script|\?>>/i){$sc_off=1}
+	$TIDY.=$_;
+	}
+open(T,">$_[0]");
+print T "$TIDY";
+close(T);
+}#tidy
+
+sub tidy_block{
+	$_[0]=~s`(<\w+>)`lc($1)`ge;
+	$_[0]=~s`(<\w+ )`lc($1)`ge;
+	$_[0]=~s`(<\/\w+>)`lc($1)`ge;	
+	$_[0]=~s`(\w+-\w+:)`lc($1)`ge;
+	$_[0]=~s`(style="[^"]+)`lc($1)`gie;
+	$_[0]=~s`<u></u>``gi;
+	$_[0]=~s`\s\w+=""``g;
+	$_[0]=~s`(\w+=)([^>\s'"]+)([>\s]+)`$1"$2"$3`g;
+	$_[0]=~s`(codebase=".+?)="(.+)""`$1=$2"$3`gsi;
+	$_[0]=~s`(href=".+?)="(.+)""`$1=$2"`gsi;
+	$_[0]=~s`(action=".+?)="(.+)""`$1=$2"`gsi;	
+}#tidy_block
+
+sub spec_chars{
+	if($native_utf==0){
+		open(CT,"$txts_folder_PATH/specialcharacters.txt");
+		while(<CT>){++$r;
+			s`\s+$``;
+			unless(/gt|lt|nbsp|amp/){
+				($qwr,$spe)=split(/=/);
+				$spec{$qwr}=$spe;
+				push(@qwr,$qwr);
+			}
+		}
+	}
+	if($native_utf==1){
+		open(NT,"$txts_folder_PATH/nativecharacters.txt");
+		while(<NT>){++$rr;
+			s`\s+$``;
+			($qwr,$spe)=split(/=/);
+			$natv{$spe}=$qwr;
+			push(@spe,$spe);
+		}
+	}
+}#
+sub iso_utf{
+	if($#qwr<0){&spec_chars}
+	$_[0]=~s`xnbzp_`&nbsp;`g;
+	$_[0]=~s`hTtXp`http`ig;
+	foreach $q (@qwr){
+		$_[0]=~s`$q`$spec{$q}`g;
+	}
+	foreach $s (@spe){
+		$_[0]=~s`$s`$natv{$s}`g;
+	}
+}
+
+sub mv_nc{
+	$nvinc="$incs_folder_PATH/nativecharacters.htm";
+	if(-e $nvinc){
+		$nvtxt="$txts_folder_PATH/nativecharacters.txt";
+		if(!-e $nvtxt){			
+			open(NVINC,"$nvinc");
+			open(NVTXT,">$nvtxt");
+			while(<NVINC>){
+				print NVTXT "$_";
+			}
+			close(NVINC);
+			close(NVTXT);
+		}
+		unlink($nvinc);
+	}
+}#mv_nc
+
+sub emailap{
+	&find_mail;
+	if($found_sendmail && !$use_sendmailpm){
+		($un_,$aptype_,$apnom_,$position_,$apemail_,$auths_)=split(/=/,$SENDER);
+		open(UE,"$txts_folder_PATH/emails.txt");
+		while(<UE>){s`\s+$``;($n,$v)=split(/=/);$APMAILS{$n}=$v;}
+		if($position_=~/\w+/){$position=qq~ ($position_)~}
+		foreach $un (@REC){			
+			open(MAIL,"|$found_sendmail -t -f $APMAILS{'default_email'}");
+			print MAIL "From: $host_ <$APMAILS{'default_email'}>\n";
+			print MAIL "To: $REC{$un}\n";
+			print MAIL "Subject: File Edited - $pageURL \n\n";
+			print MAIL qq~Hello $NOM{$un}
+			
+$apnom_$position edited the page
+$pageURL
+$now
+Click the URL to review the edits on this page. Once the page
+has loaded into the editor, tap your Enter key 3 times to login.
+			~;
+		}
+	}
+}#emailap
+
+
+sub email_source{
+	&find_mail;
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;($n,$v)=split(/=/);$$n=$v;
+	}
+	if($found_sendmail && !$use_sendmailpm){
+		open(MAIL,"|$found_sendmail -t -f $default_email");
+		print MAIL "From: $host_ <$default_email>\n";
+		print MAIL "To: $default_email\n";
+		print MAIL "Subject: Copy of $FILE\n\n";
+		print MAIL qq~===========
+ORIGINAL
+===========
+$BUPAGE		
+===========
+NEW EDITS
+===========
+$PAGE
+		~;
+	}else{
+		$sm_recipient=$account_email;
+		$sm_from="$host <$account_email>";
+		$sm_subject="$email_source1";
+		$sm_message=qq~===========
+$email_source2
+===========
+$BUPAGE		
+===========
+$email_source3
+===========
+$PAGE
+		~;
+		&sendemail;
+	}
+}#email_source
+
+sub find_mail{
+if($path_to_sendmail){$found_sendmail=$path_to_sendmail}else{
+  if(-e "/usr/sbin/sendmail"){ $found_sendmail="/usr/sbin/sendmail"; }
+  elsif(-e "/usr/lib/sendmail"){ $found_sendmail="/usr/lib/sendmail"; }
+  elsif(-e "/usr/bin/sendmail"){ $found_sendmail="/usr/bin/sendmail"; }
+  elsif(-e "/usr/local/sbin/sendmail"){ $found_sendmail="/usr/local/sbin/sendmail"; }
+  elsif(-e "/usr/local/lib/sendmail"){ $found_sendmail="/usr/local/lib/sendmail"; }
+  elsif(-e "/usr/local/bin/sendmail"){ $found_sendmail="/usr/local/bin/sendmail"; }
+  elsif(-e "/sendmail/sendmail.exe"){ $found_sendmail="/sendmail/sendmail.exe"; }
+}
+}#find_mail
+
+sub log_saves{
+	$_[0]=~s/$root//;
+	$now=time;
+	$then=time - ($log_saves * 86400);
+	($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($now);
+	++$mon;
+	if($mon<10){$mon="0".$mon}
+	if($mday<10){$mday="0".$mday}
+	$year+=1900;
+	open(LOG,"$txts_folder_PATH/log.txt");
+	while(<LOG>){
+		s`\s+$``;
+		@logline=split(/=/);
+		if($logline[3]>$then){
+			$SAVELOG.=$_."\n";
+		}
+	}
+	open(LOG,">$txts_folder_PATH/log.txt");
+	print LOG "$SAVELOG";
+	print LOG qq~$ceuser=$_[0]=$mon/$mday/$year $hour:$min=$now\n~;
+	close(LOG);
+}# log_saves
+
+sub check_session{
+	($u,$editorsession,$r,$p)=split(/\|/,$loginParams);	
+	($sess,$sess_)=split(/&/,$editorsession);
+	$session=$sess;$sess=reverse($sess);
+	$sexx=crypt($sess,substr($sess,0,2));
+	$sexxx=$sexx;
+	$sexx=~s`\d\d``;
+	#open(X,">x.txt");
+	#print X "$sess_ ne $sexx";
+	if($sess_ ne $sexx && $sess_ ne $sexxx){$RETURN=qq~alert("Session Error!\\n\\nNo Edits Were Saved!!\\n\\n Login Again.")~;&holeRespond}
+}#check_session
+
+1;

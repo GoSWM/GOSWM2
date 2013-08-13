@@ -1,0 +1,3 @@
+OnlineImage=Online Image
+EnterOnlineImageURL=Enter Online Image URL
+ApplyURL=Apply URL

@@ -1,0 +1,5 @@
+widgettitle=Insert Word Content
+ReApplyTextContentChangestitle=ReApply Text Content Changes
+UnApplyTextContentChangestitle=UnApply Text Content Changes
+InsertContent=Insert Content
+text1=Enter or Paste content from Word Processor document

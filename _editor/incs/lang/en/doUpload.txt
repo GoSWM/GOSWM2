@@ -1,0 +1,4 @@
+htmlalert1=Select A File From Your Computer To Upload
+htmlalert2=Could Not Create File
+htmlalert3=The File
+htmlalert4=Was empty

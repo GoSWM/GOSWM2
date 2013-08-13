@@ -1,0 +1,64 @@
+widgettitle=Table Properties
+tabletab=Table
+rowtab=Row
+celltab=Cell
+
+#TABLE_DIV
+leftoption=Left
+centeroption=Center
+rightoption=Right
+applybutton=Apply
+TableAlignment=Table Alignment
+Blockoption=Block
+Inlineoption=Inline
+Noneoption=None
+TableDisplay=Table Display
+TableWidthPercentage=Table Width Percentage
+TableHeightFixed=Table Height Fixed
+TableBorder=Table Border
+Solidoption=Solid
+Dotoption=Dot
+Dashoption=Dash
+All=All
+TableCellPadding=Table Cell Padding
+TableCellSpacing=Table Cell Spacing
+SelectColorButton=Select Color
+TableBackgroundColor=Table Background Color
+TableBorderColor=Table Border Color
+removebutton=Remove
+DeleteTable=Remove Entire Table From Page
+
+#ROW_DIV
+topoption=Top
+middleoption=Middle
+bottomoption=Bottom
+RowVerticalAlignment=Row Vertical Alignment
+RowAboveSelectedRow=Row Above Selected Row
+insertbutton=Insert
+RowBelowSelectedRow=Row Below Selected Row
+SelectedRowToNewRowBelow=Selected Row To New Row Below
+deletebutton=Delete
+EntireSelectedRow=Entire Selected Row
+selectcolorbutton=Select Color
+RowBackgroundColor=Row Background Color
+clonebutton=Clone
+
+#CELL_DIV
+CellHorizontalAlignment=Cell Horizontal Alignment
+CellVerticalAlignment=Cell Vertical Alignment
+CellBorderThickness=Cell Border Thickness
+CellWidth=Cell Width
+fixed=fixed
+percent=percent
+CellFixedHeight=Cell Fixed Height
+CellLeftOfSelectedCell=Cell Left Of Selected Cell
+CellRightOfSelectedCell=Cell Right Of Selected Cell
+RemoveSelectedCell=Remove Selected Cell
+SelectedCellColSpan=Selected Cell&#39;s ColSpan
+SelectedCellRowSpan=Selected Cell&#39;s RowSpan
+CellBackgroundColor=Cell Background Color
+CellBorderColor=Cell Border Color
+
+htmlalert1=You cannot create a row above the table&rsquo;s top row
+htmlalert2=You cannot create a cell left of the row&rsquo;s left cell
+htmlalert3=Remove this entitre table and all<br>of it's contents from the page

@@ -1,0 +1,206 @@
+lang("getSrc");
+@params=split(/=/,$params);
+if($params[0] eq "find"){
+$main="srceditMain";
+$place="srceditplace";
+$title="$widgettitle";
+$wigWid="380";
+$ico="edit_source";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+
+$RETURN.=qq~srcTbl='$BODY_TOP
+	<table width=380 align=center border=0 cellpadding=0 cellspacing=0>
+	<tr><td style="width:20px;padding-left:7px"><img id=up_arrow8 onclick=upDIR8() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+	<td style="width:340px;font-family:tahoma,arial;font-size:11px;padding-left:7px">$SelectFileToEdit
+</td></tr>
+<tr><td colspan=2 align=center>
+<iframe name=pad8 style="margin:5px 0px;width:360px;height:170px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=editsrc"></iframe>
+</td></tr>
+<tr><td colspan=3 align=center >
+<table align=center border=0 cellpadding=6 cellspacing=0><tr><td style="padding-left:0px;padding-right:0px;font-family:tahoma,arial;font-size:11px;">$FileToEdit:</td>
+<td style="padding-left:6px;padding-right:0px"><input id=editURL class=input style="width:290px" value=""></td></tr></table></td></tr>
+
+<tr><td colspan=3 align=right style="padding-right:20px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<table style="margin:2px 10px 7px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td id=PTopen align=center onclick=PTedit() class=button_center $uns>
+$EditFilebutton</td><td>$RBUT</td></tr></table>
+</td><td>
+<table style="margin:2px 10px 7px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=byId("$place").style.display="none" $button_class $uns>
+$Cancel</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr>
+</table>
+$BODY_BOT';~;
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function selection8(dir,path,url){
+	if(dir == "dir"){
+		pad8.location="$uttf?pathTree=x=editsrc="+path
+	}else{
+		byId('editURL').value=url
+	}
+}
+function upDIR8(){
+	pad8.location="$uttf?pathTree=up=editsrc="+pad8.updir
+}
+function PTedit(){
+	ceeditsrc(byId('editURL').value)
+	byId('srceditplace').style.display="none"
+}
+
+byId('srceditplace').innerHTML=srcTbl
+byId('img_$main').style.display="none"
+cesrc()
+~;
+}#find
+
+if($params[0] eq "editor"){
+$main="editsrcMain";
+$place="editsrcplace";
+$title="$widgettitle2";
+$wigWid="700";
+$ico="edit_source";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+if($isFF){$FF=";visibility:hidden"}
+$RETURN.=qq~edsrcTbl='$BODY_TOP
+	<table width=100% align=left border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+	<table border=0 cellpadding=0 cellspacing=0>
+	<tr><td align=left style="width:20px;padding-left:10px"><table style="margin:2px 10px 7px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td id=PTopen align=center onclick=doSub() class=button_center $uns>
+$SaveEditbutton</td><td>$RBUT</td></tr></table></td>
+	<td align=left style="width:20px;padding-left:7px"><table style="margin:2px 10px 7px 10px$FF" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center id=wrapBut2 onclick=WrapHTML2() $button_class>$WrapOnbutton</td><td>$RBUT</td></tr></table></td></tr></table></td></tr>
+<tr><td colspan=2 align=center>
+<iframe name=srcTA scrolling="no" id=srcTA style="margin:0px;width:680px;height:300px;border:0px" frameborder=0 src="$uttf?getSrc=get_txt=$params[1]"></iframe>
+		<DIV id=editSrcDrag style="text-align:right;background-image:url($utif/resizebar.png);"><img src="$utif/resizecornor.png" width="12" height="12" border="0" alt="Resize"  onmousedown=dragSrcCornor(event) style="cursor:nw-resize"></DIV>
+</div>
+</td></tr>
+</table>
+$BODY_BOT';~;
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function WrapHTML2(){
+	if(document.getElementById("srcTA").contentWindow.byId("srcTA").getAttribute("wrap")=="off"){
+		byId('wrapBut2').innerHTML="$WrapOffbutton"
+		document.getElementById("srcTA").contentWindow.byId("srcTA").setAttribute("wrap","soft")
+	}else{
+		document.getElementById("srcTA").contentWindow.byId("srcTA").setAttribute("wrap","off")
+		byId('wrapBut2').innerHTML="$WrapOnbutton"
+	}
+}
+byId('editsrcplace').innerHTML=edsrcTbl
+byId('img_$main').style.display="none"
+demo="$demo"
+function doSub(){
+	if(demo==1){alert("$disabled");return false}
+	document.getElementById("srcTA").contentWindow.doSub()
+}
+function dragSrcCornor(e){
+ 	if(!e){var e=window.event};
+    offsetX=e.clientX;
+    offsetY=e.clientY;
+    coordX=parseInt(byId('srcTA').style.width);
+    coordY=parseInt(byId('srcTA').style.height);
+    MaxSrcCornorDrag=true;
+    document.onmousemove=dragSrcCornorMax;	
+	document.onmouseup=nodragSrcCornor;
+}
+function nodragSrcCornor(){
+	if(MaxSrcCornorDrag==true){
+		MaxSrcCornorDrag=false;
+		document.onmouseup=''
+	}
+}
+function dragSrcCornorMax(e){
+	if(!MaxSrcCornorDrag){return};
+	if(!e){var e=window.event};
+   	var drgWid=coordX+e.clientX-offsetX
+   	var drgHei=coordY+e.clientY-offsetY
+	if(drgWid<460){return false}
+	if(drgHei<200){return false}
+	srcTA.byId('srcTA').style.width=drgWid+"px"
+	srcTA.byId('srcTA').style.height=drgHei+"px"
+	byId('srcTA').style.width=drgWid+"px"
+	byId('srcTA').style.height=drgHei+"px"
+	byId('tbl_$main').style.width=drgWid+10+"px"
+	return false;
+}
+byId('editsrcMain').style.left="0px"
+byId('editsrcMain').style.top="0px"
+ceeditsrc()
+byId('editsrcMain').style.left="0px"
+byId('editsrcMain').style.top="0px"
+~;
+}#editor
+
+if($params[0] eq "get_txt"){
+$file=$params[1];
+$file=~s`$host`$root`;
+open(F,"$file");
+while(<F>){
+	$FILE.=$_;
+}
+$FILE=~s`</textarea>`<=textarea>`ig;
+if($isIE){$WRP=qq~ wrap="off"~}
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <script type="text/javascript">
+demo="$demo"
+function byId(_id){return document.getElementById(_id)}
+function doSub(){
+if(demo==1){alert("$disabled");return false}
+byId('srcTA').value=byId('srcTA').value.replace(/<=textarea>/g,"</textarea>")
+byId('srcTA').value=byId('srcTA').value.replace(/\\+/g,"pLuS")
+byId("srcEditForm").submit()
+}</script></head>
+<BODY style="background-color:white;border:0px;margin:0px" scroll="no">
+<form style="margin:0px" id=srcEditForm method=post action="$uttf?getSrc=save">
+<input type="hidden" name=srcFile id=srcFile value="$file">
+<textarea$WRP COLS=1000 ROWS=1000 name=srcTA  id=srcTA style="margin:0px 0px;width:680px;height:300px;border:1px solid #999999">$FILE</textarea>
+</form></body></html>~;
+exit
+}#get_txt
+
+if($params[0] eq "save"){
+	&get_input;
+	$srcURL=$srcFile;$srcURL=~s`\Q$root\E`$host`;
+	open(F,">$srcFile");
+	print F "$srcTA";
+	close(F);
+	print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<script type="text/javascript">
+	parent.document.body.style.cursor="default";
+	parent.byId('yesBut').innerHTML="$OK"
+	parent.active_alert="$htmlalert1"
+	parent.doAlert("alert")
+	parent.active_function = new Function("parent.closeAlert();parent.ceeditsrc('$srcURL','re')")</script>~;
+	exit;
+}#save
+&respond;
+
+sub get_input{
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ tr/+/ /;
+		$value =~ s/pLuS/+/g;
+		$value=~s`xnbzp_`&nbsp:`;
+		$value=~s`%uFFFD`&nbsp:`;
+		$value =~ s/~!/ ~!/g;
+		$value =~ s/[\r]//g;
+		$$name=$value;
+	}
+}#get_input
+
+
+1;
+

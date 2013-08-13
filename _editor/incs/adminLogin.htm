@@ -1,0 +1,2117 @@
+$order="openfolder,save,saveas,fonts_style,fonts_html,color,heads,para,chars,left,center,full,right,outdent,indent,hr,ul,ol,picture,gallery,audio,flash,film,upload,link,table,form,insert_html,insert_word,search,lock,edit_html,unformat,edit_source,headcontent,backups,auth,pub,adduser,undo,redo,reload,key,help,updates";
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+@order=split(/,/,$order);
+if($parent_url){pop(@order)}
+lang("adminLogin");
+($function,$params)=split(/=/,$params);
+if($demo){exit}
+if($function){&$function}
+if(!$text72){$text72="Editable Table Cell Border"}
+if(!$exclude_extensions){$exclude_extensions=qq~css,cgi,js,txt~}
+&get_input;
+
+sub setUser{
+	open(USR,"$users_txt");
+	while(<USR>){
+		if(/^$params=/){
+			s`\s+$``;
+			($user,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+			last
+		}
+	}
+	
+	$RETURN=qq~
+	for(i=0;i<document.getElementsByName("utype").length;++i){
+		if(document.getElementsByName("utype")[i].value=="$utype"){
+			document.getElementsByName("utype")[i].checked=true
+		}
+	}
+	cloneUser="$user"
+	otype("$utype")
+	~;
+	&respond;
+}#setUser
+
+sub sendPw{
+	if($demo){exit}
+	$nu=time;
+	$nuu=substr(reverse($nu),0,6);
+	$kryp=crypt($nuu,"ce");
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;
+		if(/^$params=(.+)/){$useremail=$1;}
+	}
+	if($useremail !~ /\w+\@\w+/){	$RETURN=qq~alert("$alert1\\n\\n$params")~;&respond;}
+	open(URS,"$users_txt");
+	while(<URS>){
+		if(/^$params=/){
+			s`\s+$``;
+			($user,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+			$_=qq~$user=$kryp=$urls=$basic=$imgfldr=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n~;
+		}
+		$SAVE.=$_;
+	}
+	if($change_permissions>0){chmod(0666,"$users_txt")}
+	open(URS,">$users_txt");	
+	print URS "$SAVE";
+	close(URS);
+	chmod(0600,"$users_txt");
+	&sendPassword("$useremail","$nuu");
+	$RETURN=qq~alert("$alert2\\n\\n$useremail\\n\\n$alert3")~;
+	&respond;
+}
+
+if($cycle eq "login"){
+open(URS,"$users_txt");
+while(<URS>){
+	if(/^admin=/){
+		s`\s+$``;
+		($ceuser,$passw)=split(/=/);
+		last;
+	}
+}
+close(URS);
+$passw=~s`\s+$``;
+if($passw eq "start"){$passw=crypt($passw,'ce');&reWritePW}
+$SaLT=substr($pw,0,2);
+$PASSW=crypt($passw,$SaLT);
+#$PW=crypt($pw,"ce");
+if($pw ne $PASSW){&awrong}
+
+sub reWritePW{
+	open(URS,"$users_txt");
+	while(<URS>){
+		s`\s+$``;
+		if(/^admin=/){			
+			($ceuser,$passwx)=split(/=/);
+			$passwx=crypt($passwx,'ce');
+			$_=qq~admin=$passwx~;
+		}
+		$SAVERW.=$_."\n";
+	}
+	open(URS,">$users_txt");
+	print URS "$SAVERW";
+	close(URS);
+}#reWritePW
+
+$uttf=~ m!([^/:\\]*)$!; 
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$AdminTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">
+function adminManu(){
+	window.open("http://ezwysiwyg.com/admin_manual/","_adMan")
+}
+
+function vidTuts(){
+	window.open("http://ezwysiwyg.com/pro_user_tutorials/","_vdTut")
+}
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $AdminTitle</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody align=center>
+<DIV style="padding:20px 40px 40px 40px">
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() style="width:75px" 
+		class=button_center><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() style="width:75px"
+		class=button_center><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() style="width:75px"
+	class=button_center><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=adminManu() class=button_center><b>$AdminManual</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center>
+	<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=vidTuts() class=button_center><b>$VideoTutorials</b></td><td>$RBUT</td></tr></table></td></tr></table></DIV>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center></body></html>~;
+}#login
+
+if($cycle eq "siteSetup"){
+if($^O eq 'MSWin32'){
+	open(CS,"$txts_folder_PATH/custom.txt");
+	while(<CS>){s`\s+$``;($n,$v)=split(/=/);$$n=$v;}
+	$WINMAIL=qq~<tr><td>$text68</td><td colspan=2><input style="width:300px" name=smtp_server value="$smtp_server"></td></tr>
+<tr><td>$text69<br>&nbsp;</td><td colspan=2><input style="width:300px" name=smtp_username value="$smtp_username"><center>$text71</center></td></tr>
+<tr><td>$text70</td><td colspan=2><input style="width:300px" name=smtp_password value="$smtp_password"></td></tr>~;
+}
+open(CON,"$config_txt");
+while(<CON>){
+	s`\s+$``;
+	($n,$v)=split(/=/);
+	$$n=$v;
+}
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;
+		if(/default_email=(.+)/){$default_email=$1;last}
+	}
+@sitecolors=split(/,/,$site_colors);
+foreach $c (@sitecolors){
+	$color.=qq~$c
+~;}
+@families=split(/:/,$font_faces);
+$i=1;
+foreach $f (@families){
+	($n,$v)=split(/&/,$f);
+	$families.=qq~<tr><td><input style="width:100px" name=fn$i value="$n"></td><td><input style="width:200px" name=fv$i value="$v"></td></tr>~;
+	++$i;
+}
+open(VER,"$incs_folder_PATH/version.htm");
+$version=<VER>;
+if($domain_license=~m`(\d{4})(\d{2})(\d{2})` && !$client){$tempLIC=qq~alert("$alert4 $2/$3/$1")~}
+if($xserver_license){$domain_license=$xserver_license}
+  $isIM=eval { require Image::Magick; } ? 1 : 0;
+  $isGD=eval { require GD; } ? 1 : 0;
+  $isLWP=eval { require LWP::Simple; } ? 1 : 0;
+	if($isIM){$isIM=qq~$yes~}else{$isIM=qq~$no~}
+	if($isGD){$isGD=qq~$yes~}else{$isGD=qq~$no~}
+	if($isLWP){$isLWP=qq~$yes~}else{$isLWP=qq~$no~}
+$families=qq~<table id=famTbl border=0 cellpadding=0 cellspacing=0>
+<tr><td>$text57</td><td>$text58</td></tr>
+$families</table>~;
+if($borderAllTables==1){$borderAllTables1="checked"}else{$borderAllTables2="checked"}
+
+if($tidy==1){$tckY="checked"}else{$tckN="checked"}
+if($place_close_TD_tags_at_end_of_line==1){$tdY="checked"}else{$tdN="checked"}
+if($font_size_type eq "pixel"){$chkp="selected"}
+if($widgetLeft eq "left"){$chka="selected"}
+if($widgetLeft eq "center"){$chkb="selected"}
+if($widgetLeft eq "right"){$chkc="selected"}
+if($native_utf==0){$nc0="checked"}
+if($native_utf==1){$nc1="checked"}
+if($native_utf==2){$nc2="checked"}
+if(!$editablecellborder){$editablecellborder="#333333"}
+if($body_attributes){$BHstyleX="checked"}
+if($external_css){$BHcssX="checked"}
+if($meta_tags){$BHmetaX="checked"}
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$SiteSetupTitle</title>
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<script type="text/javascript">
+rws=$i
+function byId(_id){return document.getElementById(_id)}
+function add_group(){
+	trx=byId('famTbl').rows.length
+	byId('famTbl').insertRow(trx)
+	byId('famTbl').rows[trx].insertCell(0);byId('famTbl').rows[trx].insertCell(1)
+	byId('famTbl').rows[trx].cells[0].innerHTML='<input style="width:100px" name=fn'+rws+' value="">'
+	byId('famTbl').rows[trx].cells[1].innerHTML='<input style="width:200px" name=fv'+rws+' value="">'
+	++rws
+}
+$tempLIC
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin11</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td style="display:none"><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cs.submit() class=button_center><b>$GoToCustomSettings</b></td><td>$RBUT</td></tr></table></td></tr></table><br>
+
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=saveSiteSetup>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=3 align=center>$text53 $version</td></tr>
+<tr><td colspan=3 align=center>
+<table border=0 cellpadding=3 cellspacing=0>
+<tr><td align=left>$text79</td><td>$isIM</td></tr>
+<tr><td align=left>$text80</td><td>$isGD</td></tr>
+<tr><td align=left>$text81</td><td>$isLWP</td></tr>
+</table>
+</td></tr>
+
+<tr><td>$text52</td><td colspan=2><input style="width:300px" name=domain_license value="$domain_license$clientx"></td></tr>
+<tr><td>$text51<br>&nbsp;</td><td colspan=2><input style="width:300px" name=default_email value="$default_email">
+<center>$text51_</center></td></tr>
+$WINMAIL
+<tr><td>$text50</td><td><input style="width:150px" name=editable_color value="$editable_color"></td><td>$text50_</td></tr>
+<tr><td>$text49</td><td><input style="width:150px" name=includeable_color value="$includeable_color"></td><td>$text49_</td></tr>
+<tr><td>$text48</td><td><input style="width:150px" name=excludable_color value="$excludeable_color"></td><td>$text48_</td></tr>
+<tr><td>$text72</td><td><input style="width:150px" name=editablecellborder value="$editablecellborder"></td><td>$text48_</td></tr>
+
+<tr><td valign=top>$text82</td><td colspan=2><table border=0 cellpadding=0 cellspacing=0>
+<tr><td><input type=radio name=borderAllTables value=1 $borderAllTables1></td><td>$text83</td></tr>
+<tr><td><input type=radio name=borderAllTables value=0 $borderAllTables2></td><td>$text84</td></tr>
+</table></td></tr>
+
+<tr><td>$text47</td><td><input style="width:150px" name=image_extensions value="$image_extensions"></td><td>$text47_</td></tr>
+<tr><td>$text73<BR>($text74)</td><td><input style="width:150px" name=exclude_extensions value="$exclude_extensions"></td><td>$text47_</td></tr>
+<tr valign=top><td>$text46</td><td><textarea rows=8 style="width:150px" name=site_colors>$color</textarea></td><td>
+$text45<br><br></td></tr>
+<tr valign=top><td>$text44<br><br>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=add_group($i) class=button_center>$AddGroupButton</td><td>$RBUT</td></tr></table><br><br>$text43</td>
+<td colspan=2>$families</td></tr>
+<tr valign=top><td>$text88<br><br></td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0><tr><td><input name=BHmeta type=checkbox value=1 $BHmetaX></td><td>$text85</td></tr>
+<tr><td><input name=BHstyle type=checkbox value=1 $BHstyleX></td><td>$text86</td></tr>
+<tr><td><input name=BHcss type=checkbox value=1 $BHcssX></td><td>$text87</td></tr></table>
+</td></tr>
+<!-- <tr><td>$text42</td><td colspan=2><select name=font_size_type><option value="relative">$text42a<option value="pixel" $chkp>$text42f</select></td></tr> -->
+<tr><td>$text41</td><td colspan=2><select name=widgetLeft><option value="center" $chkb>$text41c<option value="left" $chka>$text41l<option value="right" $chkc>$text41r</select></td></tr>
+<tr><td>$text40</td><td colspan=2><input style="width:50px" name=widgetTop value="$widgetTop">&nbsp;px</td></tr>
+<tr><td>$text39</td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td><input type=radio name=tidy value=1 $tckY></td><td>&nbsp;$yes</td><td>&nbsp;&nbsp;<input type=radio name=tidy value=0 $tckN></td><td>&nbsp;$no</td></tr></table></td></tr>
+<tr><td>$text38</td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td><input type=radio name=place_close_TD_tags_at_end_of_line value=1 $tdY></td><td>&nbsp;$yes</td><td>&nbsp;&nbsp;<input type=radio name=place_close_TD_tags_at_end_of_line value=0 $tdN></td><td>&nbsp;$no</td></tr></table></td></tr>
+<tr valign=top><td>$text37</td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0>
+
+<tr valign=top><td><input type=radio name=native_utf value=0 $nc0></td><td>&nbsp;
+$text36</td></tr>
+<tr valign=top><td><input type=radio name=native_utf value=2 $nc2></td><td>&nbsp;
+$text35</td></tr>
+<tr valign=top><td><input type=radio name=native_utf value=1 $nc1></td><td>&nbsp;
+$text34</td></tr></table></td></tr>
+<tr><td colspan=3 align=center style="padding-top:20px"><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() class=button_center><b>$SaveSiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table></form><form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center></body></html>~;
+}#siteSetup
+
+if($cycle eq "saveSiteSetup"){
+$site_colors=~s`[\n]`,`g;
+foreach $f (@faces){
+	$f=~/(\d+)/;$x=$1;
+	$fv="fv".$x;
+	$face=qq~$$f&$$fv~;
+	push(@FACES,$face);
+}
+$font_faces=join(":",@FACES);
+open(CON,"$config_txt");
+while(<CON>){
+	s`\s+$``;
+	($n,$v)=split(/=/);
+	if($n =~ m`native_utf`){$ncfnd=1}
+	if($n =~ m`editablecellborder`){$editablecellborderfnd=1}
+	if($n =~ m`exclude_extensions`){$exclude_extensionsfnd=1}
+	if($n =~ m`headers|change_permissions`){
+		$SAVE.=qq~$n=$v\n~;
+	}else{
+		$SAVE.=qq~$n=$$n\n~;
+	}
+}
+if(!$ncfnd){
+	$SAVE.=qq~native_utf=$native_utf\n~;
+}
+if(!$editablecellborderfnd){
+	$SAVE.=qq~editablecellborder=$editablecellborder\n~;
+}
+if(!$exclude_extensionsfnd){
+	$SAVE.=qq~exclude_extensions=$exclude_extensions\n~;
+}
+
+if($change_permissions>0){chmod(0666,"$config_txt")}
+open(CON,">$config_txt");
+print CON "$SAVE";
+close(CON);
+chmod(0600,"$config_txt");
+if($change_permissions>0){chmod(0666,"$license_txt")}
+open(LICS,">$license_txt");
+print LICS "$domain_license";
+close(LICS);
+close(LICS);
+chmod(0600,"$license_txt");
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;
+		if(/default_email=/){$fnde=1;$_=qq~default_email=$default_email~}
+		$SEVE.=$_."\n";
+	}
+	if($fnde){
+		if($change_permissions>0){chmod(0666,"$txts_folder_PATH/emails.txt")}
+		open(UE,">$txts_folder_PATH/emails.txt");
+		print UE "$SEVE";
+	}else{
+		if($change_permissions>0){chmod(0666,"$txts_folder_PATH/emails.txt")}
+		open(UE,">>$txts_folder_PATH/emails.txt");
+		print UE qq~default_email=$default_email\n~
+	}
+	close(UE);
+chmod(0600,"$txts_folder_PATH/emails.txt");
+
+if($smtp_server){
+	open(CS,"$txts_folder_PATH/custom.txt");
+	while(<CS>){
+		s`\s+$``;($n,$v)=split(/=/);
+		if($n eq "smtp_server"){$fnd=1;$_=qq~smtp_server=$smtp_server~}
+		if($n eq "smtp_username"){$_=qq~smtp_username=$smtp_username~}
+		if($n eq "smtp_password"){$_=qq~smtp_password=$smtp_password~}
+		$SMTP.=$_."\n";
+	}
+	if($fnd){
+		open(CS,">$txts_folder_PATH/custom.txt");
+		print CS "$SMTP";
+	}else{
+		open(CS,">>$txts_folder_PATH/custom.txt");
+		print CS qq~smtp_server=$smtp_server
+smtp_username=$smtp_username
+smtp_password=$smtp_password
+borderAllTables=$borderAllTables
+~;
+	}
+}
+if(!$BHstyle){$BHstyle=0}
+if(!$BHmeta){$BHmeta=0}
+if(!$BHcss){$BHcss=0}
+
+$BH=qq~body_attributes=$BHstyle
+meta_tags=$BHmeta
+external_css=$BHcss
+~;
+
+open(CS,"$txts_folder_PATH/custom.txt");
+while(<CS>){
+	($n,$v)=split(/=/);
+	if($n eq "borderAllTables"){$BND=1;$_=qq~borderAllTables=$borderAllTables\n~}
+	if(/^body_attributes=/){$_=''}
+	if(/^meta_tags=/){$_=''}
+	if(/^external_css=/){$_=''}
+	$SAVEBRD.=$_;
+}
+if($BND){
+	open(CS,">$txts_folder_PATH/custom.txt");
+	print CS "$SAVEBRD$BH";
+}else{
+	open(CS,">>$txts_folder_PATH/custom.txt");
+	print CS qq~borderAllTables=$borderAllTables
+$BH~;
+}
+
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$AdminTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style></head>
+<BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin10</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center>Site Setup Was Saved</td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center></body></html>~;
+exit;
+}#saveSiteSetup
+
+if($cycle eq "userSetup"){
+open(US,"$users_txt");
+while(<US>){
+	($us,$rest)=split(/=/);
+	$opts.=qq~<option value="$us">$us~;
+	if($us eq "admin"){next}
+	$optz.=qq~<option value="$us">$copyOption - $us~;
+	if(/,auth,/){$aopts.=qq~<option value="$us">Author - $us~;}
+	if(/,pub,/){$popts.=qq~<option value="$us">Publisher - $us~;}
+}
+$menu=qq~<select style="margin-top:10px;width:150px" name="user" class=input>$opts</select>~;
+$apmenu=qq~<select style="margin-top:10px;width:150px" name="user" class=input>$aopts$popts</select>~;
+
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$Admin9</title>
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<script type="text/javascript">
+function copyUser(val){
+	if(val!=''){
+		byId('newCopy').style.display="block"
+	}
+}
+function byId(_id){return document.getElementById(_id)}
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin8</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td style="display:none"><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cs.submit() class=button_center><b>$GoToCustomSettings</b></td><td>$RBUT</td></tr></table></td></tr></table><br>
+
+
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td align=center>
+<fieldset style="width:200px;padding:0px;border:4px double #999999"><legend class=legend>$editauserlegend</legend>
+<form name=editUser method=post action=$uttf?adminLogin style="margin:0px">
+$menu<br>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=document.editUser.submit() $button_class title="">$EditSelectedUserButton</td><td>$RBUT</td></tr></table>
+<input type=hidden name=cycle value=editUser></form>
+</fieldset>
+</td></tr>
+<tr><td align=center>
+<fieldset style="width:200px;padding:0px;border:4px double #999999"><legend class=legend>$createuserlegend</legend>
+<form name=createUser method=post action=$uttf?adminLogin style="margin:0px">
+<input type=hidden name=cycle value=createUser>
+</form>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=document.createUser.submit() $button_class>$CreateNewUserButton</td>
+<td>$RBUT</td></tr></table>
+</fieldset>
+</td></tr>
+
+<tr><td align=center>
+<fieldset style="width:200px;padding:0px;border:4px double #999999"><legend class=legend>$manageauthorpublisherlegend</legend>
+<form name=manageUser method=post action=$uttf?adminLogin style="margin:0px">
+$apmenu<br>
+<input type=hidden name=cycle value=manageUser>
+</form>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=document.manageUser.submit() $button_class>$ManageAuthorPublisherButton</td>
+<td>$RBUT</td></tr></table>
+</fieldset>
+</td></tr>
+
+
+<tr><td id=userSpace>
+</td></tr></table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+<form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+</body></html>~;
+}#userSetup
+
+if($cycle eq "createUser"){
+open(USR,"$users_txt");
+while(<USR>){
+	($un,$x)=split(/=/);
+	if($un=~/admin/){next}
+	push(@uns,$un);
+}
+@uns=sort(@uns);
+foreach $un (@uns){
+	$usel.=qq~<option value="$un">$un~;
+}
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$NewUserSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">
+function byId(_id){return document.getElementById(_id)}
+function JITc(url){
+	if(document.getElementById('JQX')){document.getElementsByTagName('head')[0].removeChild(document.getElementById('JQX'))};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JQX';	
+	script.src=url 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}	
+cloneUser=''
+function otype(nm){
+	url="$uttf?adminLogin=getUserSetup="+nm+"|"+cloneUser
+	JITc(url)
+}
+function locatefolder(){
+	if(byId('locfldbut').innerHTML=="$LocFold"){
+		byId('locfolder').style.display="block"
+		byId('locfldbut').innerHTML="$ClsLoc"
+	}else if(byId('locfldbut').innerHTML=="$ClsLoc"){
+		byId('locfolder').style.display="none"
+		byId('locfldbut').innerHTML="$LocFold"
+	}
+}
+function selection6(dir,path,url){
+	if(dir == "dir"){
+		pad6.location="$uttf?pathTree=x=find_img_folder6="+path
+	}
+}
+function upDIR6(){
+	pad6.location="$uttf?pathTree=up=find_img_folder6"
+	byId('imgfldr').value=""
+}
+
+function locatefiles(){
+	if(byId('locfilbut').innerHTML=="$LocFiles"){
+		byId('locfiles').style.display="block"
+		byId('locfilbut').innerHTML="$ClsLoc"
+	}else if(byId('locfilbut').innerHTML=="$ClsLoc"){
+		byId('locfiles').style.display="none"
+		byId('locfilbut').innerHTML="$LocFiles"
+	}
+}
+function locatefolders(){
+	if(byId('locfolbut').innerHTML=="$LocFold"){
+		byId('locfoles').style.display="block"
+		byId('locfolbut').innerHTML="$ClsLoc"
+	}else if(byId('locfolbut').innerHTML=="$ClsLoc"){
+		byId('locfoles').style.display="none"
+		byId('locfolbut').innerHTML="$LocFold"
+	}
+}
+
+function selection7(dir,path,url){
+	if(dir == "dir"){
+		pad7.location="$uttf?pathTree=x=find_files7="+path
+	}else{
+		url_=url.replace("$host","")
+		document.getElementById("urls").value+=url_+"\\n"
+	}
+}
+function upDIR7(){
+	pad7.location="$uttf?pathTree=up=find_files7"
+}
+function selection7a(dir,path,url){
+	if(dir == "dir"){
+		pad7a.location="$uttf?pathTree=x=find_folders7a="+path
+	}
+}
+function upDIR7a(){
+	pad7a.location="$uttf?pathTree=up=find_folders7a"
+}
+
+function fix_(obj){
+	var repls = /[^a-zA-Z0-9_.]/;
+	var pls = ""
+	val=obj.value.replace(repls,'')
+	obj.value= val
+}
+	function descriptions(){
+		window.open("$uttf?Descriptions","DESC","top=0,left=0,width=575,height=500,resizable=1,scrollbars=1")
+	}
+function setUser(u){
+	url="$uttf?adminLogin=setUser="+u
+	JITc(url)
+}
+allows=''
+basics=''
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin7</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cs.submit() class=button_center><b>$GoToCustomSettings</b></td><td>$RBUT</td></tr></table></td></tr></table><br>
+
+<form name=saveNewUser method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=writeNewUser>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=3 align=center style="font-size:13px"><b>$text59</b><br><br></td></tr>
+<tr><td>$text33</td><td colspan=2><input style="width:100px;margin-right:20px" name=username value="" onkeyup=fix_(this)> $text33_</td></tr>
+<tr><td>$text32</td><td colspan=2><input style="width:100px;margin-right:20px" name=password value="" onkeyup=fix_(this)> $text32_</td></tr>
+<tr><td>$text31</td><td colspan=2><input style="width:100px;margin-right:20px" name=useremail value=""> $text31_</td></tr>
+<tr><td colspan=3>$text75 &nbsp;&nbsp;<select onchange=setUser(this.options[this.selectedIndex].value)><option>$text76$usel</select> </td></tr>
+
+<tr><td colspan=3>$text30</td></tr>
+<tr><td>&nbsp;</td><td colspan=2>$text29</td></tr>
+<tr><td align=right>$UserType1</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=1></td><td>$UserType1_</td></tr>
+<tr><td align=right>$UserType2</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=2></td><td>$UserType2_</td></tr>
+<tr ><td></td><td colspan=2>$text55</td></tr>
+<tr ><td align=right>$UserType3</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=3></td><td align=left>$UserType3_</td></tr>
+<tr><td align=right>$UserType4</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=4></td><td>$UserType4_</td></tr>
+
+<tr ><td></td><td colspan=2>$text56</td></tr>
+<tr ><td align=right>$UserType5</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=5></td><td align=left>$UserType5_</td></tr>
+<tr><td align=right>$UserType6</td><td style="width:1px"><input onclick=otype(this.value) type=radio name=utype value=6></td><td>$UserType6_</td></tr>
+</table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tbody id=tb00 style="visibility:hidden">
+<tr valign=top><td style="padding-bottom:0px">$text54</td><td colspan=2><table border=0 cellpadding=0 cellspacing=0><tr><td style="padding-bottom:0px">
+<input style="width:400px" readonly name=imgfldr id=imgfldr value="$imgfldr"><DIV id=fldrNote>$text20</DIV></td><td  valign=top style="padding-bottom:0px;padding-left:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefolder() $button_class id=locfldbut>$LocateFolderButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+</table></td></tr>
+<tr><td></td><td style="padding-top:0px" class=widgetText11 colspan=2><DIV id=fldrNote></DIV></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfolder style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow6 onclick=upDIR6() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text19
+</td></tr></table>
+<iframe name=pad6 style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=find_img_folder"></iframe>
+</DIV></td></tr>
+</tbody></table>
+<DIV id=formBody></DIV>
+</form>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+<form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+</body></html>~;
+
+}#createUser
+
+sub getUserSetup{
+$tr=1;
+($params,$cloneUser)=split(/\|/,$params);
+if($cloneUser=~m`\w+`){
+	open(USR,"$users_txt");
+	while(<USR>){
+		if(/^$cloneUser=/){
+			s`\s+$``;
+			($user,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+			last
+		}
+	}
+	if($nu_folders){$nf="checked"}
+	if($del_folders){$dfl="checked"}
+	if($del_files){$dfi="checked"}
+	if($ren_files){$rfi="checked"}
+	if($ren_folders){$rff="checked"}
+	if($site_colors_only){$sco="checked"}
+	$IMGFLDR=qq~byId('imgfldr').value="$imgfldr"~;
+	
+}
+foreach $b (@order){
+	$B=ucfirst($b); 
+	$B=~s~Edit_html~$toolEditHtml~;
+	$B=~s~Ol~$toolNumberedLists~;
+	$B=~s~Ul~$toolBulletedLists~;
+	$B=~s~Para~$toolParagraph~;
+	$B=~s~Picture~$toolInsertImages~;
+	$B=~s~Color~$toolColorWidget~;
+	$B=~s~Openfolder~$toolOpenPage~;
+	$B=~s~Heads~$toolHeadingTags~;
+	$B=~s~Edit_source~$toolEditSourceCode~;
+	$B=~s~Fonts_html~$toolHTMLFontTags~;
+	$B=~s~Fonts_style~$toolStyleTypeFonts~;
+	$B=~s~Insert_html~$toolInsertHTMLCode~;
+	$B=~s~Insert_word~$toolInsertWord~;	
+	$B=~s~Headcontent~$toolMetaTitleTags~;
+	$B=~s~Adduser~$toolAddNewUser~;
+	$B=~s~Search~$toolSiteSearch~;
+	$B=~s~Save\b~$toolSave~;
+	$B=~s~Saveas~$toolSaveas~;
+	$B=~s~Chars~$toolChars~;
+	$B=~s~Left~$toolLeft~;
+	$B=~s~Center~$toolCenter~;
+	$B=~s~Full~$toolFull~;
+	$B=~s~Right~$toolRight~;
+	$B=~s~Outdent~$toolOutdent~;
+	$B=~s~Indent~$toolIndent~;
+	$B=~s~Hr~$toolHr~;
+	$B=~s~Flash~$toolFlash~;
+	$B=~s~Film~$toolFilm~;
+	$B=~s~Gallery~$toolGallery~;
+	$B=~s~Upload~$toolUpload~;
+	$B=~s~Link~$toolLink~;
+	$B=~s~Table~$toolTable~;
+	$B=~s~Form~$toolForm~;
+	$B=~s~Unformat~$toolUnformat~;
+	$B=~s~Backups~$toolBackups~;
+	$B=~s~Undo~$toolUndo~;
+	$B=~s~Redo~$toolRedo~;
+	$B=~s~Reload~$toolReload~;
+	$B=~s~Key~$toolKey~;
+	$B=~s~Help~$toolHelp~;
+	$B=~s~Updates~$toolUpdates~;
+	$B=~s~Audio~$toolAudio~;
+	$B=~s~Auth~$toolAuth~;
+	$B=~s~Pub~$toolPub~;
+	if($b=~/auth|pub/){$bb="comments.png";$checked=""}else{$bb=$b.".png";$checked="checked"}
+
+	if($params==3 || $params==4){if($b =~ /saveas|edit_source/){next}}
+	if($params==2 || $params==6){if($b =~ /edit_source/){next}}	
+	if($tr==1){$tools.=qq~<tr>~;}
+	if($basic=~m`\w+`){if($basic=~m`\b$b\b`){$checked="checked"}else{$checked=''}}
+	$tools.=qq~<td><input type=checkbox id=tool$b name=tool$b value=1 $checked></td>
+	<td><img src="$utif/$bb" width="16" height="16" border="0" alt=""></td><td>$B</td>~;
+	++$tr;
+	if($tr==5){$tools.=qq~</tr>~;$tr=1}
+}
+
+if($params==1 || $params==2){
+$HTML=qq~<table width=100% border=0 cellpadding=5 cellspacing=0><tr valign=top><td style="padding-top:11px"><b>$text77</b></td><td>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td align=right colspan=2><input type=checkbox name=site_colors_only value="1" $sco></td><td>$text15</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=nu_folders value="1" $nf></td><td>$text14</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_folders value="1" $dfl></td><td>$text13</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_files value="1" $dfi></td><td>$text12</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_files value="1" $rfi></td><td>$text11</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_folders value="1" $rff></td><td>$text11a</td></tr>
+</table></td></tr></table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr valign=top><td style="padding-top:10px;"><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table>
+</td><td colspan=2><table border=0 cellpadding=3 cellspacing=0>$tools</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveNewUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+~;
+}
+
+if($params==3 || $params==4){
+if($urls=~m`\w+`){
+	$URLZ=qq~urlstr="$urls";
+	urlz=urlstr.split(",")
+	for(i=0;i<urlz.length;++i){
+		byId('urls').value+=urlz[i]+"\\n"
+	}
+	~;
+	$URLZ.=qq~alert("$filealert")~
+}
+$HTML=qq~
+<table border=0 cellpadding=5 cellspacing=0>
+<tbody id=tb34>
+<tr valign=top><td style="padding-top:10px;">$text17<BR><BR>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefiles() $button_class id=locfilbut>$LocateFilesButton</td><td>$RBUT</td></tr></table>
+</td><td colspan=2><textarea style="width:500px;height:100px" id=urls name=urls>$URLS</textarea></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfiles style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow7 onclick=upDIR7() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text16
+</td></tr></table>
+<iframe name=pad7 style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=find_files"></iframe>
+</DIV></td></tr></table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td><b>$text78</b><td align=right><input type=checkbox name=site_colors_only value="1" $sco></td><td>$text15</td></tr></table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr valign=top><td style="padding-top:10px;" colspan=2><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table>
+</td><td><table border=0 cellpadding=3 cellspacing=0>$tools</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveNewUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr></tbody>
+~;
+}
+
+if($params==5 || $params==6){
+if($urls=~m`\w+`){$URLZ=qq~alert("$folderalert")~}
+$HTML=qq~
+<table border=0 style="table-layout:fixed" cellpadding=5 cellspacing=0>
+
+<tr valign=top><td style="padding-top:10px;"><b>$text10</b>
+
+</td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+<input style="width:400px;" id=fldrurls name=fldrurls value=""></td><td style="padding-left:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefolders() $button_class id=locfolbut>$LocateFolderButton</td><td>$RBUT</td></tr></table>
+</td></tr></table></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfoles style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow7a onclick=upDIR7a() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text9</td><td>
+
+</td></tr></table>
+<iframe name=pad7a style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=find_folders"></iframe>
+</DIV></td></tr>
+<tr><td width=146><b>$text77</b></td>
+<td align=left width=34><input type=checkbox name=site_colors_only value="1" $sco></td>
+<td width=500>$text15</td></tr>
+<tr><td></td><td align=left><input type=checkbox name=nu_folders value="1" $nf></td><td>$text14</td></tr>
+<tr><td></td><td align=left><input type=checkbox name=del_folders value="1" $dfl></td><td>$text13</td></tr>
+<tr><td></td><td align=left><input type=checkbox name=del_files value="1" $dfi></td><td>$text12</td></tr>
+<tr><td></td><td align=left><input type=checkbox name=ren_files value="1" $rfi></td><td>$text11</td></tr>
+<tr><td></td><td align=left><input type=checkbox name=ren_folders value="1" $rff></td><td>$text11a</td></tr>
+<tr valign=top><td align=right style="padding-top:10px;"><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table></td><td colspan=2><table border=0 cellpadding=3 cellspacing=0>$tools</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveNewUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr></tbody>
+</table>
+~;
+$JS=qq~byId('fldrNote').innerHTML="$text20"~;
+}
+print "Content-type: text/html\n\n";
+$HTML=~s`[\n]``g;$HTML=~s`[\t]``g;$HTML=~s`'`&#39;`g;
+print qq~$JS
+byId('formBody').innerHTML='$HTML'
+byId('tb00').style.visibility="visible"
+$IMGFLDR
+$URLZ
+~;
+}#createUser
+
+if($cycle eq "writeNewUser"){
+if($password){$pw=crypt($password,"ce");}
+
+push(@TOOLS,@saves);
+push(@TOOLS,@fonts);
+push(@TOOLS,@tools);
+$tools=join(",",@TOOLS);
+
+if($utype ==1 || $utype == 2){$urls="all"}
+if(!$site_colors_only){$site_colors_only=0}
+if(!$nu_folders){$nu_folders=0}
+if(!$del_folders){$del_folders=0}
+if(!$del_files){$del_files=0}
+if(!$ren_files){$ren_files=0}
+if(!$ren_folders){$ren_folders=0}
+$urls=~s`[\n]+$``;
+$urls=~s`[\n]`,`g;
+$urls=~s`https*://[^/]+``g;
+$imgfldr=~s`https*://[^/]+``g;
+
+$fldrurls=~s`[\n]+$``;
+$fldrurls=~s`[\n]`,`g;
+$fldrurls=~s`https*://[^/]+``g;
+
+if($fldrurls !~ /\w+/){$fldrurls="all"}
+if($change_permissions>0){chmod(0666,"$users_txt")}
+open(US,">>$users_txt");
+if($utype==1 || $utype==2){
+print US "$username=$pw=$urls=$tools=$imgfldr=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n";
+}
+if($utype==3 || $utype==4){
+print US "$username=$pw=$urls=$tools=$imgfldr=$utype=0=0=0=0=$site_colors_only=0\n";
+}
+if($utype==5 || $utype==6){
+print US "$username=$pw=$fldrurls=$tools=$imgfldr=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n";
+}
+close(US);
+chmod(0600,"$users_txt");
+if($change_permissions>0){chmod(0666,"$txts_folder_PATH/emails.txt")}
+open(UE,">>$txts_folder_PATH/emails.txt");
+print UE "$username=$useremail\n";
+close(UE);
+chmod(0600,"$txts_folder_PATH/emails.txt");
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$SiteSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">alert("New User $username Was Created")</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin6</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>$text27 - $username - $text27_</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table></center>
+</body></html>~;
+}#writeNewUser
+
+if($cycle eq "manageUser"){
+$webdav=$users_txt;$webdav=~s`/users\.txt`/webdav.txt`;
+	open(US,"$users_txt");
+	while(<US>){
+		($usr,$pw,$ur,$basic)=split(/=/);
+		if(/,pub,/){$s=1;push(@PUBS,$usr)}
+		if($usr eq $user){
+			if(/,pub,/){$type="publisher"}
+			if(/,auth,/){$type="author"}
+		}
+	}
+
+open(WD,"$webdav");
+while(<WD>){
+	s`\s+$``;
+	if(/^$user=/){
+		($un,$txype,$nom,$pos,$em,$pubs)=split(/=/);
+		if($pub){$fnd=$pub}
+	}
+}
+		if($type eq "publisher"){
+			$text6x=$text64;		
+			$ABUTT=qq~<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+			<td align=center onclick=document.apform.submit() $button_class><b>$SavePubBut</b></td><td>$RBUT</td></tr></table>~;
+		}
+		if($type eq "author"){
+			$fnd=$pubs;
+			$text6x=$text65;
+			$ABUTT=qq~<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+			<td align=center onclick=document.apform.submit() $button_class><b>$SaveAuthBut</b></td><td>$RBUT</td></tr></table>~;
+			foreach $pub (@PUBS){
+				if($pub eq $fnd){$x="selected"}else{$x=""}
+				$opts.=qq~<option value=$pub $x>$pub~;
+			}
+			$PUBS=qq~<select name=publ class=input style="width:150px"><option value="">$opts</select>~;
+			$PUBS_=qq~$PUBS<br>$text66~;
+		}
+
+$TYPE=ucfirst($type);
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$UserSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin13</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td>
+<td align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td>
+<td align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td>
+<td align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+<form name=apform method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=saveAuthPub>
+<input type=hidden name=user value="$user">
+<input type=hidden name=utype value="$type">
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center><b>$text60 $TYPE $user</b></td></tr>
+<tr><td align=left>$text61</td><td align=left><input style="width:150px" class=input name=nom value="$nom"></td></tr>
+<tr><td align=left>$text62</td><td align=left><input style="width:150px" class=input name=pos value="$pos"></td></tr>
+<tr><td align=left>$text63</td><td align=left><input style="width:150px" class=input name=em value="$em"></td></tr>
+<tr><td align=center colspan=2 style="font-size:10px">
+$text6x</td></tr>
+<tr><td align=center colspan=2 style="font-size:10px">
+$PUBS_
+</td></tr>
+</table></form>
+$ABUTT
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table></center>
+</body></html>~;
+}#manageUser
+
+if($cycle eq "saveAuthPub"){
+	$webdav=$users_txt;$webdav=~s`/users\.txt`/webdav.txt`;
+	open(WD,"$webdav");
+	while(<WD>){
+		if(/$user=/){$fnd=1;$_=qq~$user=$utype=$nom=$pos=$em=$publ\n~}
+		$SAVE.=$_;
+	}
+	if($fnd){
+		open(WD,">$webdav");
+		print WD "$SAVE";
+	}else{
+		open(WD,">>$webdav");
+		print WD qq~$user=$utype=$nom=$pos=$em=$publ\n~;
+	}
+	if($utype eq "author"){$textx=$text67}else{$textx=$text67}
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$UserSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin13</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>$textx - $user</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table></center>
+</body></html>~;
+}#saveAuthPub
+
+if($cycle eq "editUser"){
+if($user eq "admin"){&auser}
+open(US,"$users_txt");
+while(<US>){
+	if(/^$user=/){
+		s`\s+$``;
+		($zuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+		last;
+	}
+}
+open(UE,"$txts_folder_PATH/emails.txt");
+while(<UE>){
+	s`\s+$``;
+	if(/^$user=(.+)/){$useremail=$1}
+}
+@urls=split(/,/,$urls);
+foreach $u (@urls){
+	$URLS.=qq~$u
+~;
+}
+@basic=split(/,/,$basic);
+@test=@basic;
+$tr=1;$tx=1;
+foreach $b (@order){
+	$B=ucfirst($b); 
+	#if($utype !=1 && $b eq "edit_source"){next}
+	$B=ucfirst($b); 
+	$B=~s~Edit_html~$toolEditHtml~;
+	$B=~s~Ol~$toolNumberedLists~;
+	$B=~s~Ul~$toolBulletedLists~;
+	$B=~s~Para~$toolParagraph~;
+	$B=~s~Picture~$toolInsertImages~;
+	$B=~s~Color~$toolColorWidget~;
+	$B=~s~Openfolder~$toolOpenPage~;
+	$B=~s~Heads~$toolHeadingTags~;
+	$B=~s~Edit_source~$toolEditSourceCode~;
+	$B=~s~Fonts_html~$toolHTMLFontTags~;
+	$B=~s~Fonts_style~$toolStyleTypeFonts~;
+	$B=~s~Insert_html~$toolInsertHTMLCode~;
+	$B=~s~Insert_word~$toolInsertWord~;	
+	$B=~s~Headcontent~$toolMetaTitleTags~;
+	$B=~s~Adduser~$toolAddNewUser~;
+	$B=~s~Search~$toolSiteSearch~;
+	$B=~s~Save\b~$toolSave~;
+	$B=~s~Saveas~$toolSaveas~;
+	$B=~s~Chars~$toolChars~;
+	$B=~s~Left~$toolLeft~;
+	$B=~s~Center~$toolCenter~;
+	$B=~s~Full~$toolFull~;
+	$B=~s~Right~$toolRight~;
+	$B=~s~Outdent~$toolOutdent~;
+	$B=~s~Indent~$toolIndent~;
+	$B=~s~Hr~$toolHr~;
+	$B=~s~Flash~$toolFlash~;
+	$B=~s~Film~$toolFilm~;
+	$B=~s~Gallery~$toolGallery~;
+	$B=~s~Upload~$toolUpload~;
+	$B=~s~Link~$toolLink~;
+	$B=~s~Table~$toolTable~;
+	$B=~s~Form~$toolForm~;
+	$B=~s~Unformat~$toolUnformat~;
+	$B=~s~Backups~$toolBackups~;
+	$B=~s~Undo~$toolUndo~;
+	$B=~s~Redo~$toolRedo~;
+	$B=~s~Reload~$toolReload~;
+	$B=~s~Key~$toolKey~;
+	$B=~s~Help~$toolHelp~;
+	$B=~s~Updates~$toolUpdates~;
+	$B=~s~Audio~$toolAudio~;
+	$B=~s~Auth~$toolAuth~;
+	$B=~s~Pub~$toolPub~;
+	if($b=~/auth|pub/){$bb="comments.png";}else{$bb=$b.".png";}
+	#if($b =~ /openfolder|saveas|edit_source/){next}
+	if($tr==1){$TOOLS.=qq~<tr>~;}
+	if(test($b)){$x="checked"}else{$x=""}
+	#if("@basic" =~ /$b/){$x="checked"}else{$x=""}
+	$TOOLS.=qq~<td><input type=checkbox name=tool$b value=1 $x></td>
+	<td><img src="$utif/$bb" width="16" height="16" border="0" alt=""></td><td>$B</td>~;
+	++$tr;
+	if($tr==5){$TOOLS.=qq~</tr>~;$tr=1}
+}
+if($site_colors_only == 1){$sco1="checked"}else{$sco1=""}
+if($nu_folders == 1){$sco2="checked"}else{$sco2=""}
+if($del_folders == 1){$sco3="checked"}else{$sco3=""}
+if($del_files == 1){$sco4="checked"}else{$sco4=""}
+if($ren_files == 1){$sco5="checked"}else{$sco5=""}
+if($ren_folders == 1){$sco6="checked"}else{$sco6=""}
+if($utype ==1){$ut=qq~$utype1~;$listDis="none";$listDisF="none"}
+if($utype ==2){$ut=qq~$utype2~;$listDis="none";$listDisF="none"}
+if($utype ==3){$ut=qq~$utype3~;$optDis="none";$listDisF="none"}
+if($utype ==4){$ut=qq~$utype4~;$optDis="none";$listDisF="none"}
+if($utype ==5){$ut=qq~$utype5~;$optDis="none";$listDis="none"}
+if($utype ==6){$ut=qq~$utype6~;$optDis="none";$listDis="none"}
+
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$SiteSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">
+function byId(_id){return document.getElementById(_id)}
+function locatefolder(){
+	if(byId('locfldbut').innerHTML=="$LocFold"){
+		byId('locfolder').style.display="block"
+		byId('locfldbut').innerHTML="$ClsLoc"
+		pad6.location="$uttf?pathTree=x=find_img_folder"
+	}else if(byId('locfldbut').innerHTML=="$ClsLoc"){
+		byId('locfolder').style.display="none"
+		byId('locfldbut').innerHTML="$LocFold"
+	}
+}
+function selection6(dir,path,url){
+	if(dir == "dir"){
+		pad6.location="$uttf?pathTree=x=find_img_folder6="+path
+	}
+}
+function upDIR6(){
+	pad6.location="$uttf?pathTree=up=find_img_folder6"
+	byId('imgfldr').value=""
+}
+
+function locatefiles(){
+	if(byId('locfilbut').innerHTML=="$LocFiles"){
+		byId('locfiles').style.display="block"
+		byId('locfilbut').innerHTML="$ClsLoc"
+	}else if(byId('locfilbut').innerHTML=="$ClsLoc"){
+		byId('locfiles').style.display="none"
+		byId('locfilbut').innerHTML="$LocFiles"
+	}
+}
+function locatefolders(){
+	if(byId('locfolbut').innerHTML=="$LocFold"){
+		byId('locfoles').style.display="block"
+		byId('locfolbut').innerHTML="$ClsLoc"
+	}else if(byId('locfolbut').innerHTML=="$ClsLoc"){
+		byId('locfoles').style.display="none"
+		byId('locfolbut').innerHTML="$LocFold"
+	}
+}
+function selection7(dir,path,url){
+	if(dir == "dir"){
+		pad7.location="$uttf?pathTree=x=find_files7="+path
+	}else{
+		url_=url.replace("$host","")
+		document.getElementById("urls").value+=url_+"\\n"
+	}
+}
+function upDIR7(){
+	pad7.location="$uttf?pathTree=up=find_files7"
+}
+function selection7a(dir,path,url){
+	if(dir == "dir"){
+		pad7a.location="$uttf?pathTree=x=find_folders7a="+path
+	}
+}
+function upDIR7a(){
+	pad7a.location="$uttf?pathTree=up=find_folders7a"
+}
+function delete_user(){
+	if(confirm("$Deleteuser $user?")){
+		document.deleteUser.submit()
+	}
+}
+function fix_(obj){
+	var repls = /[^a-zA-Z0-9_.]/;
+	var pls = ""
+	val=obj.value.replace(repls,'')
+	obj.value= val
+}
+	function descriptions(){
+		window.open("$uttf?Descriptions","DESC","top=0,left=0,width=575,height=500,resizable=1,scrollbars=1")
+	}
+
+</script>
+
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin5</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cs.submit() class=button_center><b>$GoToCustomSettings</b></td><td>$RBUT</td></tr></table></td></tr></table><br>
+
+<form name=deleteUser method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=deleteUser>
+<input type=hidden name=thisuser value="$user">
+</form>
+<form name=saveEditUser method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=writeUser>
+<input type=hidden name=thisuser value="$user">
+<input type=hidden name=opw value="$pw">
+<input type=hidden name=utype value="$utype">
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=3 align=center style="font-size:13px"><b>$text26 <u>$user</u></b><br><br></td></tr>
+<tr><td><b>$text24</b></td><td colspan=2><input onkeyup=fix_(this) style="width:100px;margin-right:20px" name=password value=""> $text25</td></tr>
+<tr><td><b>$text22</b></td><td colspan=2><input style="width:100px;margin-right:20px" name=useremail value="$useremail"> $text23</td></tr>
+<tr><td><b>$text21</b></td><td colspan=2>$ut</td></tr>
+
+
+<tr valign=top><td><b>$text54</b></td><td colspan=2><table border=0 cellpadding=0 cellspacing=0><tr><td>
+<input style="width:400px" readonly name=imgfldr id=imgfldr value="$imgfldr"><DIV id=fldrNote>$text20</DIV></td><td style="padding-left:10px" valign=top>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefolder() $button_class id=locfldbut>$LocateFolderButton</td><td>$RBUT</td></tr></table>
+</td></tr></table></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfolder style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow6 onclick=upDIR6() src="$utif/up_arrow.png" width="16" height="16" border="0" title="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text19
+</td></tr></table>
+<iframe name=pad6 style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 ></iframe>
+</DIV></td></tr>~;
+
+if($utype ==1 || $utype==2){
+print qq~
+<tr><td><b>$text18</b></td><td align=right><input type=checkbox name=site_colors_only value="1" $sco1></td><td>$text15</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=nu_folders value="1" $sco2></td><td>$text14</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_folders value="1" $sco3></td><td>$text13</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_files value="1" $sco4></td><td>$text12</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_files value="1" $sco5></td><td>$text11</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_folders value="1" $sco6></td><td>$text11a</td></tr>
+<tr valign=top><td style="padding-top:10px;"><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table></td><td colspan=2><table border=0 cellpadding=3 cellspacing=0>$TOOLS</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveEditUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=delete_user() $button_class>$DeleteThisUserButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+~;
+}
+
+if($utype ==3 || $utype ==4){
+print qq~<tr valign=top><td style="padding-top:10px;">$text17<BR><BR>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefiles() $button_class title="Locate Files" id=locfilbut>$LocateFilesButton</td><td>$RBUT</td></tr></table>
+</td><td colspan=2><textarea style="width:500px;height:100px" id=urls name=urls>$URLS</textarea></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfiles style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow7 onclick=upDIR7() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text16
+</td></tr></table>
+<iframe name=pad7 style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=find_files"></iframe>
+</DIV></td></tr></table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td align=right colspan=2><input type=checkbox name=site_colors_only value="1" $sco1></td><td>$text15</td></tr></table>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr valign=top><td style="padding-top:10px;" colspan=2><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table></td><td><table border=0 cellpadding=3 cellspacing=0>$TOOLS</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveEditUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=delete_user() $button_class>$DeleteThisUserButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+~;
+}
+if($utype==5 || $utype==6){
+print qq~
+<tr><td align=right colspan=2><input type=checkbox name=site_colors_only value="1" $sco1></td><td>$text15</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=nu_folders value="1" $sco2></td><td>$text14</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_folders value="1" $sco3></td><td>$text13</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=del_files value="1" $sco4></td><td>$text12</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_files value="1" $sco5></td><td>$text11</td></tr>
+<tr><td align=right colspan=2><input type=checkbox name=ren_folders value="1" $sco6></td><td>$text11a</td></tr>
+<tr valign=top><td style="padding-top:10px;"><b>$text10</b>
+</td><td colspan=2>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+<input style="width:400px" id=fldrurls name=fldrurls value="$URLS"></td><td style="padding-left:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=locatefolders() $button_class id=locfolbut>$LocateFolderButton</td><td>$RBUT</td></tr></table></td></tr></table></td></tr>
+<tr><td></td><td colspan=2>
+<DIV id=locfoles style="display:none;"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px"><img id=up_arrow7a onclick=upDIR7a() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td><td>$text9 
+</td></tr></table>
+<iframe name=pad7a style="margin:0px 0px 5px 0px;width:400px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=find_folders"></iframe>
+</DIV></td></tr>
+<tr valign=top><td style="padding-top:10px;" colspan=2><b>$text8</b>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=descriptions() $button_class>$Descriptions</td><td>$RBUT</td></tr></table>
+
+</td><td><table border=0 cellpadding=3 cellspacing=0>$TOOLS</table></td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.saveEditUser.submit() $button_class>$SaveUserSetupButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+<tr><td style="padding-top:10px;" colspan=3 align=center>
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=delete_user() $button_class>$DeleteThisUserButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+~;
+}
+print qq~
+</table></form>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+<form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+</body></html>~;
+}#editUser
+
+if($cycle eq "deleteUser"){
+open(US,"$users_txt");
+while(<US>){
+	if(/^$thisuser=/){
+		($a,$b,$c,$d,$e,$f,$g)=split(/=/);
+		$_="";
+	}
+	$SAVE.=$_;
+}
+if($change_permissions>0){chmod(0666,"$users_txt")}
+open(US,">$users_txt");
+print US "$SAVE";
+close(US);
+chmod(0600,"$users_txt");
+open(UE,"$txts_folder_PATH/emails.txt");
+while(<UE>){
+	if(/^$thisuser=/){
+		$_="";
+	}
+	$SAVEM.=$_;
+}
+if($change_permissions>0){chmod(0666,"$txts_folder_PATH/emails.txt")}
+open(UE,">$txts_folder_PATH/emails.txt");
+print UE "$SAVEM";
+close(UE);
+chmod(0600,"$txts_folder_PATH/emails.txt");
+
+if($c =~ /$thisuser$/ && ($f==3 || $f==4)){
+	$dfolder=$root.$c;
+	&getUserFolder;
+	foreach $f (@AFILES){
+		unlink($f);
+	}
+	@ADIRS=sort(@ADIRS);
+	@ADIRS=reverse(@ADIRS);
+	foreach $d (@ADIRS){
+		$d=~s!/$!!;
+		rmdir($d);
+	}
+	rmdir($dfolder);	
+}
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$SiteSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin4</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>$text7 - $thisuser - $text7_</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table></center>
+</body></html>~;
+}#deleteUser
+
+if($cycle eq "writeUser"){
+if($password){$opw=crypt($password,"ce");}
+push(@TOOLS,@saves);
+push(@TOOLS,@tools);
+$TOOLS=join(",",@TOOLS);
+
+if($utype ==1 || $utype == 2){$urls="all"}
+if(!$site_colors_only){$site_colors_only=0}
+if(!$nu_folders){$nu_folders=0}
+if(!$del_folders){$del_folders=0}
+if(!$del_files){$del_files=0}
+if(!$ren_files){$ren_files=0}
+if(!$ren_folders){$ren_folders=0}
+if($fldrurls){$urls=$fldrurls}
+$urls=~s`[\n]+$``;
+$urls=~s`[\n]`,`g;
+$urls=~s`http://[^/]+``g;
+$imgfldr=~s`http://[^/]+``g;
+
+open(US,"$users_txt");
+while(<US>){
+	if(/^$thisuser=/){
+		$_="$thisuser=$opw=$urls=$TOOLS=$imgfldr=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n";
+	}
+	$SAVE.=$_;
+}
+if($change_permissions>0){chmod(0666,"$users_txt")}
+open(US,">$users_txt");
+print US "$SAVE";
+close(US);
+chmod(0600,"$users_txt");
+open(UE,"$txts_folder_PATH/emails.txt");
+while(<UE>){
+	if(/^$thisuser=/){
+		$_="$thisuser=$useremail\n";
+		$efnd=1;
+	}
+	$SAVEM.=$_;
+}
+if($change_permissions>0){chmod(0666,"$txts_folder_PATH/emails.txt")}
+if($efnd){
+	open(UE,">$txts_folder_PATH/emails.txt");
+	print UE "$SAVEM";
+	close(UE);
+}else{
+	open(UE,">>$txts_folder_PATH/emails.txt");
+	print UE "$thisuser=$useremail\n";
+	close(UE);
+}
+chmod(0600,"$txts_folder_PATH/emails.txt");
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$SiteSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin12</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>User Setup For - $thisuser - Was Saved</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center>
+</body></html>~;
+}#writeUser
+
+sub auser{
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$Admin3</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">
+function fix_(obj){
+	var repls = /[^a-zA-Z0-9_.]/;
+	var pls = ""
+	val=obj.value.replace(repls,'')
+	obj.value= val
+}
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin2</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cs.submit() class=button_center><b>$GoToCustomSettings</b></td><td>$RBUT</td></tr></table></td></tr></table><br>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=writeAdmin>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td>$text6</td><td><input type=password onkeyup=fix_(this) style="width:100px" name=password value=""></td></tr>
+<tr><td>$text5</td><td><input type=password style="width:100px" name=password2 value=""></td></tr>
+<tr><td colspan=2 align=center>$text4<br><br><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class><b>$SaveAdminPasswordButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</form></table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center>
+<form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+</body></html>~;
+exit
+}#auser
+
+if($cycle eq "writeAdmin"){
+	if($password ne $password2){&no_match}
+	$PW=crypt($password,"ce");
+	open(US,"$users_txt");
+	while(<US>){
+	if(/admin=/){
+		$_="admin=$PW\n";
+	}
+	$SAVE.=$_;
+}
+if($change_permissions>0){chmod(0666,"$users_txt")}
+open(US,">$users_txt");
+print US "$SAVE";
+close(US);
+chmod(0600,"$users_txt");
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$AdminTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin1</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>$text3</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center>
+</body></html>~;
+}
+sub test2{for(@test2){if($_ eq $_[0]){return true}}}
+if($cycle eq "customSetup"){
+	$isIM=eval { require Image::Magick; } ? 1 : 0;
+	$isGD=eval { require GD; } ? 1 : 0;
+	&customWords;
+	&customDef;
+	push(@test2,@CUSTOM1);push(@test2,@CUSTOM2);
+	open(CUS,"$txts_folder_PATH/custom.txt");
+	while(<CUS>){
+		s`\s+$``;
+		s`^#``;
+		if(/feature is/){next}
+		unless(/\w+/){next}
+		($n,$v)=split(/=/);
+		#if($v =~ /^\d$/){push(@N,$n)}else{push(@NN,$n)}	
+		push(@test,$n);
+		$CUS{$n}=$v;
+		$$n=$v;
+	}
+	if($CUS{'smtp_password'}=~/\w+/ && $CUS{'smtp_password'}.length>20){
+			denc($CUS{'smtp_password'},$CUS{'smtp_username'});
+			$CUS{'smtp_password'}=$decrypted;
+		}
+	foreach $c (@CUSTOM2){
+		if(!test($c)){
+			#push(@NN,$c);
+			$CUS{$c}=$DEF{$c};
+			$cc=$DEF{$c};
+		}
+	}
+	foreach $c (@CUSTOM1){
+		if(!test($c)){
+			#push(@N,$c);
+			$CUS{$c}=$DEF{$c};
+			$cc=$DEF{$c};
+		}
+	}
+	foreach $n (@CUSTOM2){
+		$display="table-row";
+		if($n eq "max_image_upload_size"){next}
+		if($^O ne 'MSWin32' && $n =~ /smtp_server|smtp_username|smtp_password/){$display="none"}
+		if($^O eq 'MSWin32' && $n =~ /change_permission/){$display="none"}
+		if($^O eq 'MSWin32' && $n =~ /path_to_sendmail/){$display="none"}
+		$TR.=qq~<tr style="display:$display"><td align=left>$WRD{$n}</td><td colspan=3 align=left><input name="$n" style="width:140px" value="$CUS{$n}"></td></tr>~; 
+	}
+	if($isIM || $isGD){
+		$TR.=qq~<tr><td align=left>$WRD{'max_image_upload_size'}</td><td colspan=3 align=left><input name="max_image_upload_size" style="width:140px" value="$CUS{'max_image_upload_size'}"></td></tr>~;
+	}else{
+		$TR.=qq~<tr style="display:none"><td align=left>$WRD{'max_image_upload_size'}</td><td colspan=3 align=left><input name="max_image_upload_size" style="width:140px" value="$CUS{'max_image_upload_size'}"></td></tr>~;
+	}
+	$TR.=qq~<tr><td align=left></td><td align=center>Yes</td><td align=center>No</td><td align=center>Default</td></tr>~;
+	foreach $n (@CUSTOM1){
+		$no='';$yes='';
+		if($CUS{$n}!~/\d/){$CUS{$n}=$DEF{$n}}
+		if($CUS{$n}==0){$no="checked"}else{$yes="checked"}
+		if($DEF{$n}==0){$def="no"}elsif($DEF{$n}==1){$def="yes"}
+		$id_=$n;
+		if($n eq "relative_urls"){$id_="relative_urlsN";$oncl=qq~onclick=setURL("absolute_urlsN")~}
+		if($n eq "absolute_urls"){$id_="absolute_urlsN";$oncl=qq~onclick=setURL("relative_urlsN")~}
+		$TR.=qq~<tr><td align=left>$WRD{$n}</td>
+			<td align=center><input name="$n" $oncl value="1" type=radio $yes></td><td align=center><input name="$n" id=$id_ value="nocustom" type=radio $no></td><td align=center>$def</td></tr>~;
+	}
+	foreach $t (@test){
+		if(!test2($t)){push(@extra,$t)}
+	}
+	foreach $ex (@extra){
+		$no='';$yes='';
+		if($ex =~ /change_permission/){next}
+		if($CUS{$ex}=~/^\d$/){
+			if($CUS{$ex}==0){$no="checked"}else{$yes="checked"}
+			$TR.=qq~<tr><td align=left>extra $ex</td>
+			<td align=center><input name="$n" value="1" type=radio $yes></td><td align=center><input name="$n" value="nocustom" type=radio $no></td><td align=center></td></tr>~; 
+		}else{
+			$TR.=qq~<tr><td align=left>extra $ex</td><td colspan=3 align=left><input name="$n" style="width:140px" value="$CUS{$ex}"></td></tr>~; 
+		}
+	}
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$CustomSetupTitle</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+<script type="text/javascript">
+function byId(_id){return document.getElementById(_id)}
+function setURL(whch){
+	byId(whch).checked=true
+}
+</script>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $Admin14</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td>
+<table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.ss.submit() class=button_center><b>$GoToSiteSetup</b></td><td>$RBUT</td></tr></table></td><td><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.us.submit() class=button_center><b>$GoToUserSetup</b></td><td>$RBUT</td></tr></table></td></td></tr></table><br>
+<form name=us method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form name=ss method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form name=cs method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<form name=cu method=post $uttf?adminLogin>
+<input type=hidden name=cycle value=saveCustom>
+<table align=center border=0 cellpadding=5 cellspacing=0>
+$TR
+<tr><td align=center colspan=4><br><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.cu.submit() class=button_center><b>$SaveCustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</form>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center></body></html>~;
+}#customSetup
+
+if($cycle eq "saveCustom"){
+	&customDef;
+	if($CUSTOM{'smtp_password'} =~ /\w+/){
+		enc($CUSTOM{'smtp_password'});
+		$CUSTOM{'smtp_password'}=$encrypted;
+	}
+	open(CUS,">$txts_folder_PATH/custom.txt");
+	foreach $cust (@CUSTOM2){
+		print CUS qq~$cust=$CUSTOM{$cust}\n~;
+	}
+	foreach $cust (@CUSTOM1){
+		print CUS qq~$cust=$CUSTOM{$cust}\n~;
+	}
+	print CUS qq~
+#feature is active if value == 1, inactive if value == 0
+~;
+print "Content-type: text/html\n\n";
+print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title>$text89</title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<style type="text/css">TD{font-size:11px;font-family:tahoma}</style>
+</head><BODY class=adminBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td><img src="$utif/spacer.png" class=widgetImg1 width="7" height="26" border="0" alt=""></td>
+<td class="widgetImg8 widgetTitle">
+<img src="$utif/admin.png" width="16" height="16" border="0" alt="" align=absmiddle> $text89</td>
+<td><img src="$utif/spacer.png" class=widgetImg7 width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr>
+<td class=widgetImg2><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetBody style="padding:20px" align=center>
+
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=siteSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=userSetup></form>
+<form method=post action=$uttf?adminLogin>
+<input type=hidden name=cycle value=customSetup></form>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2 align=center style="padding-bottom:20px"><b>Custom Featrues Were Saved</b></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[0].submit() $button_class style="width:75px"><b>$SiteSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[1].submit() $button_class style="width:75px"><b>$UserSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=document.forms[2].submit() $button_class style="width:75px"><b>$CustomSetupButton</b></td><td>$RBUT</td></tr></table></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=location="$uttf" class=button_center><b>$BackToLoginButton</b></td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</td><td class=widgetImg6><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td></tr>
+<tr>
+<td><img src="$utif/spacer.png" class=widgetImg3 width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td><img src="$utif/spacer.png" class=widgetImg5 width="10" height="10" border="0" alt=""></td></tr></table>
+</center></body></html>~;
+}#saveCustom
+
+sub awrong{
+unless($passw eq "start" && $pw eq "start"){
+	print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<br><br><center><b>$text2</b></center>~;
+	exit
+}
+}#awrong
+
+sub no_match{
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<br><br><center><b>$text1</b></center>~;
+	exit
+}#no_match
+
+sub sendPassword{
+if($path_to_sendmail){$found_sendmail=$path_to_sendmail}else{
+  if(-e "/usr/sbin/sendmail"){ $found_sendmail="/usr/sbin/sendmail"; }
+  elsif(-e "/usr/lib/sendmail"){ $found_sendmail="/usr/lib/sendmail"; }
+  elsif(-e "/usr/bin/sendmail"){ $found_sendmail="/usr/bin/sendmail"; }
+  elsif(-e "/usr/local/sbin/sendmail"){ $found_sendmail="/usr/local/sbin/sendmail"; }
+  elsif(-e "/usr/local/lib/sendmail"){ $found_sendmail="/usr/local/lib/sendmail"; }
+  elsif(-e "/usr/local/bin/sendmail"){ $found_sendmail="/usr/local/bin/sendmail"; }
+  elsif(-e "/sendmail/sendmail.exe"){ $found_sendmail="/sendmail/sendmail.exe"; }
+}
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;
+		if(/default_email=(.+)/){$default_email=$1;last}
+	}
+
+if($found_sendmail){
+		open(MAIL,"|$found_sendmail -i -t -f $default_email");
+		print MAIL qq~From: $host_<$default_email>
+To: $_[0]
+Subject: $EMsubject - $host_
+
+$EM1
+$_[1]
+$EM2
+
+$EM3
+==================
+~;
+}else{
+		$sm_recipient=$_[0];
+		$sm_from="$host_<$_[0]>";
+		$sm_subject="$EMsubject - $host_";
+		$sm_message=qq~$EM1
+$_[1]
+$EM2
+
+$EM3
+==================
+		~;
+		&sendmail;
+}
+}#sendPassword
+
+sub get_input{
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ tr/+/ /;
+		$value =~ s/ ~!/  ~!/g;
+		$value =~ s/[\r]//g;
+		if($name =~ /^fn\d/ && $value =~ /\w+/){push(@faces,$name)}
+ 		if ($value =~ /\<\!--\#(.*)\s+(.*)\s?=\s?(.*)--\>/) { &kill_input; }
+  		if($value =~ /[;><\*`\|]/){ &kill_input; }
+		if($name =~ /^tool/ && $name !~ /toolbar_on_bottom/){$name=~s`tool``;push(@saves,$name)}
+		if($name =~ /^1font_/){$name=~s`1``;push(@fonts,$name)}
+		if($name =~ /^2font_/){$name=~s`2``;push(@fontz,$name)}
+		if($name =~ /1block_tags/){$name=~s`1``;push(@fonts,$name)}
+		if($name =~ /2block_tags/){$name=~s`2``;push(@fontz,$name)}
+		$$name=$value;
+		$value=~s`nocustom`0`;
+		$CUSTOM{$name}=$value;
+	}
+	
+	#print X "$input";
+}#get_input
+
+sub getUserFolder{
+$AU = "a";
+$AV = 1;
+$AW = $AU.$AV;
+@Athings=<$dfolder*>;
+foreach $thing (@Athings){
+	if(-f $thing){push(@AFILES,$thing)}
+	if(-d $thing){
+		push(@ADIRS,$thing);
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@Adir=<$THNG/*>;
+		push(@$AW,@Adir);
+	}
+}
+&Bcycle;
+}#getUserFolder
+sub Bcycle{
+	foreach $thing (@$AW){
+	if(-f $thing){push(@AFILES,$thing)}
+	if(-d $thing){
+			$hta=$thing.'/.htaccess';
+			if(-f $hta){unlink($hta)}
+			$htp=$thing.'/.htpasswd';
+			if(-f $htp){unlink($htp)}		
+		push(@ADIRS,$thing);
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@Adir=<$THNG/*>;
+		push(@AX,@Adir);
+		}
+	}
+if($#AX > -1){++$AV;$AW = $AU.$AV;@$AW=@AX;@AX=();&Bcycle}
+}#bcycle
+
+sub kill_input {
+$value=~s`\W``g;
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~
+<HTML><HEAD>
+</HEAD><BODY>
+<CENTER><H1><FONT COLOR="#FF0000">CGI Alert</FONT></H1></CENTER>
+<CENTER><H3>THE SERVER REJECTED<br>
+THE CHARACTER<P><B>$&</B><P>IN YOUR SUBMISSION<br>
+Field input = $value<P>
+Please Click <form><input type=button 
+value=&nbsp;&nbsp;Here&nbsp;&nbsp; onClick="history.go(-1)"></form>
+to try again<p>
+Thank You!</H3></CENTER></BODY></HTML>~;
+exit;
+}#kill_input
+
+sub customWords{
+$WRD{"CSSfile"}="Editor's css file /incs/css/nameOfFile (do not include path or .css)";
+$WRD{"email_source"}="Email site admin the page's source when saving";
+$WRD{"allow_autologin"}="Allow auto-login links (edit.cgi?getLogin=username|password|/page.ext)";
+$WRD{"demo"}="Make this installation a demo only - forbids saving any changes";
+$WRD{"copy_backup"}="Put edited page in Windows Copy/Paste while saving";
+$WRD{"backup_all"}="Create backup file whether <u>Save backup ...</u> is checked or not";
+$WRD{"no_backup"}="Do not display <u>Save backup ...</u> checkbox on Save prompt";
+$WRD{"log_saves"}="Log edits made in /txts/log.txt (number equals days to save entry - 0 disables)";
+$WRD{"edit_non_titled_pages"}="Allow editing of text/html files that do not have a title tag";
+$WRD{"edit_non_body_pages"}="Allow editing of text/html files that do not have a body tag";
+$WRD{"no_email_password_change"}="Do not allow users to change their passwords";
+$WRD{"toolbar_on_bottom"}="Place editor toolbar on bottom of screen";
+$WRD{"max_image_upload_size"}="Max width x height of image uploads - will be resized by server (empty=noresize)";
+$WRD{"relative_urls"}="Force relative urls in links, image src, etc (default is virtual urls)";
+$WRD{"absolute_urls"}="Force absolute urls in links, image src, etc (default is virtual urls)";
+$WRD{"default_file_name"}="The name of the file your server delivers if no file name is in the URL";
+$WRD{"path_to_sendmail"}="Path to sendmail if not standard Linux location";
+$WRD{"smtp_server"}="SMTP Sever for Windows IIS Server (if editor sends email)";
+$WRD{"smtp_username"}="SMTP Username for Windows IIS Server (if editor sends email)";
+$WRD{"smtp_password"}="SMTP Password for Windows IIS Server (if editor sends email)";
+$WRD{"exclude_folders"}="Folders to exclude from file lists (separate with comma)";
+$WRD{"prompt_top"}="Login prompt position (number of pixels from top)";
+$WRD{"defaultLang"}="Default Language (two character folder name at /editor/incs/lang)";
+$WRD{"noRememberPassword"}="Remove checkbox to <u>Remember Password</u> from login";
+$WRD{"noEmailPassword"}="Remove checkbox to <u>Send New Password</u> from login";
+$WRD{"change_permission"}="Custom CHMOD setting (change only if advised by support)";
+$WRD{"disableHref"}="Disable links on page outside of editblocks while editing";
+$WRD{"borderAllTables"}="Place dashed border on hidden tables while editing";
+$WRD{"promptKeys"}="Alertnate KeyCode for Login Prompt (<u>&edit</u> &nbsp;instead of <u>Enter X 3</u>)";
+$WRD{"ignore_underscore"}="Include folders & files beginning with underscore in file list dialogs";
+$WRD{"noTableCellWord"}="Do not insert the word <u>CELL</u> when creating table cells";
+$WRD{"reload_confirm_after_save"}="Show confirm to reload page after saving (page will reload regardless)";
+$WRD{"body_attributes"}="Allow editing of body attributes (Head & Body Tags in User Setup)";
+$WRD{"meta_tags"}="Allow editing of meta tags in head section (Head & Body Tags in User Setup)";
+$WRD{"external_css"}="Allow adding CSS external links in head section (Head & Body Tags in User Setup)";
+$WRD{"exclude_extensions"}="Exclude files with these extensions from file lists (separate with comma)";
+$WRD{"prohibit_base64_images"}="Prohibit embedding images inline as Base64";
+}
+
+sub customDef{
+@CUSTOM2=qw(CSSfile default_file_name defaultLang max_image_upload_size exclude_folders exclude_extensions prompt_top log_saves promptKeys path_to_sendmail change_permission smtp_server smtp_username smtp_password);
+
+@CUSTOM1=qw(allow_autologin demo copy_backup backup_all no_backup reload_confirm_after_save email_source edit_non_titled_pages edit_non_body_pages no_email_password_change toolbar_on_bottom relative_urls absolute_urls noRememberPassword noEmailPassword disableHref borderAllTables ignore_underscore noTableCellWord body_attributes meta_tags external_css prohibit_base64_images);
+
+$DEF{"email_source"}=0;
+$DEF{"allow_autologin"}=1;
+$DEF{"demo"}=0;
+$DEF{"copy_backup"}=0;
+$DEF{"backup_all"}=0;
+$DEF{"no_backup"}=0;
+$DEF{"log_saves"}=0;
+$DEF{"edit_non_titled_pages"}=0;
+$DEF{"edit_non_body_pages"}=0;
+$DEF{"no_email_password_change"}=0;
+$DEF{"toolbar_on_bottom"}=0;
+$DEF{"relative_urls"}=0;
+$DEF{"absolute_urls"}=1;
+$DEF{"noRememberPassword"}=0;
+$DEF{"noEmailPassword"}=0;
+$DEF{"change_permission"}=0;
+$DEF{"disableHref"}=1;
+$DEF{"borderAllTables"}=0;
+$DEF{"ignore_underscore"}=0;
+$DEF{"noTableCellWord"}=0;
+$DEF{"reload_confirm_after_save"}=1;
+$DEF{"body_attributes"}=1;
+$DEF{"meta_tags"}=1;
+$DEF{"external_css"}=1;
+$DEF{"promptKeys"}=38101100105116;
+$DEF{"exclude_extensions"}="css,cgi,js,pl";
+$DEF{"prompt_top"}=100;
+$DEF{"prohibit_base64_images"}
+}
+sub enc{
+	$key=$CUSTOM{'smtp_password'}.$ENV{'HTTP_HOST'};
+	use Crypt::Lite;
+	$crypt = Crypt::Lite->new( debug => 0 );
+	$encrypted = $crypt->encrypt($_[0], $key);
+}
+sub denc{
+	$key=$_[1].$ENV{'HTTP_HOST'};
+	use Crypt::Lite;
+	$crypt = Crypt::Lite->new( debug => 0 );
+	$decrypted = $crypt->decrypt($_[0], $key);
+}
+1;

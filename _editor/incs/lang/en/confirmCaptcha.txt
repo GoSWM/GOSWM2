@@ -1,0 +1,1 @@
+confirm=WRONG LETTERS!\n\nGet A New Set Of Letters?

@@ -1,0 +1,4 @@
+sm1=To
+sm2=From
+sm3=Subject
+sm4=Message

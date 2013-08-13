@@ -1,0 +1,4 @@
+htmlalert1=The thumbnail<br>
+htmlalert2=<br>was created
+demoalert=DEMO NOTE<BR><BR>The thumbnail was not created<br>Insert the selected thumbnail image
+select=Select Image

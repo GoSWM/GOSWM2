@@ -1,0 +1,226 @@
+use CGI qw/:standard :html3/;
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+lang("doSubmission");
+if($demo == 1){&skip}
+
+&get_param_input;
+if($comments_x ne ''){exit}
+if($comments_z){&check_for_cookie;}
+if($folder_to_upload_to ne ''){&upload_file;}
+&dekrypt;
+&find_mail;
+
+foreach $n (@names){
+	if($n ne "upload" && $n !~ /redirectURL|folder_to_upload_to|comments_x|doSubmission|secnum|sec_key|submitButton/ ){
+$values.=qq~$n = $$n
+~;	
+	}
+}
+
+if($values !~ /\w+/){exit}
+
+$values.=$long_name;
+$host=~s`https*://``;
+	open(UE,"$txts_folder_PATH/emails.txt");
+	while(<UE>){
+		s`\s+$``;
+		if(/default_email=(.+)/){$default_email=$1;last}
+	}
+
+if($found_sendmail && !$use_sendmailpm){
+		open(MAIL,"|$found_sendmail -i -t -f $default_email");
+		print MAIL qq~From: $host_ <$default_email>
+To: $krypt
+Subject: $subject - $host
+
+$values
+~;
+}else{
+		$sm_recipient=$krypt;
+		$sm_from="$host_ <$default_email>";
+		$sm_subject="$subject - $host";
+		$sm_message=qq~$values
+		~;
+		&sendmail;
+}
+
+
+$url = $redirectURL;
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~<html> <head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"><title></title>
+<meta http-equiv="refresh" content="30; URL=$host$url">
+<script type="text/javascript">location="$url"</script></head>
+<BODY bgcolor=ffffff text=000000>
+</body></html>~;
+
+
+
+sub upload_file {
+    if(param('upload')){$file = param('upload')}
+	if(param('rEq_upload')){$file = param('rEq_upload')}
+    if (!$file) {&no_file}
+    $file =~ m!([^/:\\]*)$!; 
+    $short_name = $1;
+	$short_name=~s`rEq_``;
+	$long_name=$root.$folder_to_upload_to;
+	$long_name=~s`/$``;$long_name.="/";
+	$long_name.=$short_name;
+    open (UPLOAD,">$long_name") || &not_open;
+    while ($size = read($file,$data,1024)) {
+		binmode UPLOAD if $^O eq 'MSWin32';
+        print UPLOAD $data;
+        $total_size += $size;
+    }
+    close UPLOAD;
+    if ($total_size < 1) {unlink($file_name);&nothing}
+	$long_name=~s`\Q$root\E`$host`;
+	$long_name=qq~File Upload At
+$long_name
+~;
+} 
+
+sub dekrypt{
+	$alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	$mess="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX";
+	@alf=split(//,$alf);
+	$alf_=@alf;
+	@mess=split(//,$mess);
+	$mess_=@mess;
+	$params=~s`\.com$``;$params=~s`\.net$``;$params=~s`\.org$``;
+	@chars=split(//,$params);
+	$chars_=@chars;
+	foreach $c (@chars){
+		$xx=$c;
+		for($m=0;$m<$mess_;++$m){
+			if($c eq $mess[$m]){
+				$xx=$alf[$m];
+			}		
+		}
+		$krypt.=$xx;
+	}
+}#dekrypt
+
+sub get_param_input{
+	foreach $name (param()){
+		$value=param($name);
+		$value =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		$value =~ tr/+/ /;
+		$value =~ s/ ~!/  ~!/g;
+		$value =~ s/[\r]//g;
+ 		if ($value =~ /\<\!--\#(.*)\s+(.*)\s?=\s?(.*)--\>/) { &kill_input; }
+  		if($value =~ /[;><\*`\|]/){ &kill_input; }
+		if($name=~m`rEq_` && $value eq ""){&required}
+		$name=~s`rEq_``;
+		$$name=$value;
+		push(@names,$name);
+	}
+}#get_param_input
+
+sub find_mail{
+if($path_to_sendmail){$found_sendmail=$path_to_sendmail}else{
+  if(-e "/usr/sbin/sendmail"){ $found_sendmail="/usr/sbin/sendmail"; }
+  elsif(-e "/usr/lib/sendmail"){ $found_sendmail="/usr/lib/sendmail"; }
+  elsif(-e "/usr/bin/sendmail"){ $found_sendmail="/usr/bin/sendmail"; }
+  elsif(-e "/usr/local/sbin/sendmail"){ $found_sendmail="/usr/local/sbin/sendmail"; }
+  elsif(-e "/usr/local/lib/sendmail"){ $found_sendmail="/usr/local/lib/sendmail"; }
+  elsif(-e "/usr/local/bin/sendmail"){ $found_sendmail="/usr/local/bin/sendmail"; }
+  elsif(-e "/sendmail/sendmail.exe"){ $found_sendmail="/sendmail/sendmail.exe"; }
+}
+}#find_mail
+
+
+sub required{
+$name=~s`rEq_``;
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$required1 $name $required2<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}#required
+
+sub no_file{
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$nofile<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}
+sub nothing{
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$emptyfile<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}
+sub not_open{
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$notopen1 $long_name $notopen2<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}
+
+sub kill_input {
+$value=~s`\W``g;
+$illegal=~s`\W``g;
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$illegal<BR>$value<BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}#kill_input
+
+sub check_for_cookie{
+	&get_cookie;
+	$cookie{'editSessionID'}=~m`Mt(\d{7})kR69(.+)`;
+	$session=$1;$krp=$2;
+	$session=crypt($session,"ez");
+	$session=~s`\W``g;
+	$session=substr($session,2);
+	if($session ne $krp){&no_cookie}
+}#check_for_cookie
+
+sub no_cookie{
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<html><META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <head><title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$nocookie<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}#no_cookie
+
+sub skip{
+	print "Content-type: text/html\n\n";
+	print qq~<html><META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> <head><title></title></head>
+	<BODY bgcolor=ffffff text=000000><br><br>
+	<center><SPAN style="font-family:Verdana">$disabled<BR><BR>
+	<a href=javascript:history.back()><b>[$goback]</b></a></SPAN></center>
+	</body></html>~;
+	exit;
+}#skip
+
+1;

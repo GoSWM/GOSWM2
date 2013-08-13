@@ -1,0 +1,217 @@
+&get_Cookie;
+if($params=~/\|/ && $allow_autologin){&autologin}
+if($Cookie{'ceremem'}){$cerem="checked"}
+if(!$demo){
+	$un=qq~$Cookie{'ceuser'}~;
+	$pw=qq~$Cookie{'cepword'}~;
+}else{
+	$un=q~demo~;
+	$pw=q~guest~;
+}
+lang("getLogin");
+if(!$CSSfile){$CSSfile="default"}
+$CSSfile=$incs_folder_PATH."/css/".$CSSfile.".css";
+open(CSS,"$CSSfile");
+while(<CSS>){
+	if(/^\.widget/){
+		s`\s+$``;s/\.//;s/\}//;($n,$v)=split(/\{/);$v=~s/\$(\w+)/${$1}/eg;$$n=$v;
+	}
+	if(/^\.button/){
+		s`\s+$``;s/\.//;s/\}//;($n,$v)=split(/\{/);$v=~s/\$(\w+)/${$1}/eg;$$n=$v;
+	}
+	if(/^\.modal_/){
+		s`\s+$``;s/\.//;s/\}//;($n,$v)=split(/\{/);$v=~s/\$(\w+)/${$1}/eg;$$n=$v;
+	}
+}
+if($noRememberPassword){$noREM=qq~style="display:none"~}
+if($noEmailPassword){$noEML=qq~style="display:none"~}
+$KRF=$incs_folder_PATH."/krypt.htm";
+open(KR,$KRF);
+while(<KR>){
+	$KRYPT.=$_;
+}
+
+&get_cookie;
+$commfolder=$incs_folder_PATH."/lang";
+@commfolder=<$commfolder/*>;
+foreach $comm (@commfolder){
+	$comm=~m`/lang/(.+)`;$commF=$1;
+	$commfile=$comm."/common.txt";
+	open(COMM,"$commfile");
+	$commName=<COMM>;
+	chomp($commName);
+	($n,$v)=split(/=/,$commName);$$n=$v;
+	if($commF ne $defaultLang){$COPTS.=qq~<option value="$commF">$langName~;}else{$COPTS_=qq~<option value="$commF">$langName~;}
+	++$copts;
+}
+if($copts>1){
+	$CSEL=qq~<tr><td colspan=2 align=center><select style="border:1px solid #999999;font-family:tahoma,arial;font-size:11px;" onchange=setLang(this.options[this.selectedIndex].value)>$COPTS_$COPTS</select></td></tr>~;
+	$setLang=qq~document.cookie = "lang=$defaultLang;domain=."+location.hostname+";expires="+expires+";path=/"~;
+}else{
+	$setLang=qq~document.cookie = "lang=en;domain=."+location.hostname+";expires="+expires+";path=/"~;
+}
+
+if($demo){$dem=qq~ style="display:none"~}
+if($no_email_password_change){$dem=qq~ style="display:none"~}
+$RETURN=qq~
+function byId(_id){return document.getElementById(_id)}
+nuDiv='<DIV style="display:block;left:1px;top:1px;position:absolute">
+<table align=center align=center border=0 cellpadding=0 cellspacing=0><tr>
+	<td style="padding:0px;background-image:url($imgs_folder_URL/modal_1.png);">
+	<img width=1 height=1 src="$utif/spacer.png" style="float:none" border="0"></td>
+	<td style="$widgetImg8;padding:0px" align=center>
+	<table width=100% style="border-bottom:1px solid #6C6C74" border=0 cellpadding=0 cellspacing=0><tr>
+		<td style="vertical-align: middle;text-align:left;padding:0px 0px 0px 2px;$widgetTitle">
+			<img style="$widgetLogoImg;float:none" align=$abs src="$utif/spacer.png" width=16 height=16 title="">
+			<SPAN style="padding-left:7px">$widgettitle</SPAN>
+		</td>
+		<td style="background-image:url($imgs_folder_URL/modal_close_.png);width:42px;height:24px;border-top:1px solid #6C6C74;padding :0px;">
+			<img style="cursor:pointer;float:none" src="$utif/spacer.png" width="42" height="16" border="0" title="$closetitle" onclick=byId("loginplace").style.display="none"></td>
+	</tr></table>	
+	</td>
+	<td style="background-image:url($imgs_folder_URL/modal_7.png);padding:0px" align=center>
+	<img style="float:none" width=1 height=1 src="$utif/spacer.png" border="0"></td></tr>
+<tr>
+	<td style="width:4px;$widgetImg2;padding:0px" align=center>
+	<img style="float:none" src="$utif/spacer.png" width="7" height="1" border="0" alt=""></td>
+	<td style="$widgetBody;padding:0px" align=center>
+		<DIV style="border-top:1px solid #FFFFFF;border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid  #bfbfbf;padding-top:10px">
+			<img src="$utif/brand.png" width="125" height="145" style="$widgetBrandBorder;float:none"  hspace=7><br>
+			<DIV style="overflow:hidden;padding-bottom:10px">
+				<table align=center border=0 cellpadding=0 cellspacing=0>
+					<tr><td colspan=2; style=";padding:0px;text-align:center" align=center><input id=editorusername style="background-image:url($utif/hd.png);background-repeat:no-repeat;margin-top:12px;font-family:tahoma,arial;font-size:11px;border:1px solid #999999;width:70px;padding:2px 0px 2px 20px" value="$un"></td></tr>
+					<tr><td colspan=2 align=center style="font-family:tahoma,arial;font-size:11px;padding:0px;text-align:center;">$username</td></tr>
+					<tr><td colspan=2 align=center style="text-align:center;padding:0px"><input id=editorpassword style="background-image:url($utif/keys.png);background-repeat:no-repeat;margin-top:12px;font-family:tahoma,arial;font-size:11px;border:1px solid #999999;width:70px;padding:2px 0px 2px 20px" value="$pw" type=password></td></tr>
+					<tr><td colspan=2 align=center style="font-family:tahoma,arial;font-size:11px;padding:0px;text-align:center;">$password</td></tr>
+					<tr><td colspan=2 align=center style=";padding:12px;text-align:center;">
+		
+						<center><table align=center style="width:20%" border=0 cellpadding=0 cellspacing=0><tr>
+							<td style="padding:0px;background-image:url($imgs_folder_URL/but_lt.png);background-repeat:no-repeat;width:5px;">
+								<img style="float:none" src=$utif/spacer.png width=5 height=1></td><td align=center onclick=login() style="white-space:nowrap;font-family:tahoma,arial;font-size:11px;cursor:pointer;color:#000000;background-image:url($imgs_folder_URL/but_cr.png);background-repeat:repeat-x;padding:0px 5px 0px 5px;text-align:center;vertical-align: middle;height:18px" title="$buttontitle">$buttonlogin</td>
+				 			<td style="padding:0px;background-image:url($imgs_folder_URL/but_rt.png);background-repeat:no-repeat;width:5px">
+		 						<img style="float:none" src=$utif/spacer.png width=5 height=1></td>
+						</tr></table></center>
+					</td></tr>
+					$CSEL
+					<tr $noREM><td style="padding:0px;text-align:right" align=right><input type=checkbox id=editorremember $cerem></td><td align=left style="font-family:tahoma,arial;font-size:10px;padding:0px 0px 0px 4px"> $remember</td></tr>
+					<tr$dem $noEML><td style="padding:0px;text-align:right" align=right><input type=checkbox id=sendPw></td><td align=left style="font-family:tahoma,arial;font-size:10px;padding:0px 0px 0px 4px"> $send</td></tr>
+				</table></DIV></DIV></td>
+	<td style="width:4px;$widgetImg6;padding:0px">
+		<img style="float:none" src="$utif/spacer.png" width="10" height="1" border="0" alt=""></td>
+	</tr>
+<tr>
+	<td style="padding:0px;background-image:url($imgs_folder_URL/modal_3.png);background-repeat:no-repeat;width:7px;"><img style="float:none" src="$imgs_folder_URL/spacer.png" width="7" height="1"></td>
+	<td style="background-image:url($imgs_folder_URL/modal_4.png);padding:0px;background-repeat:repeat-x"><img style="float:none" src="$imgs_folder_URL/spacer.png" width="1" height="10" border="0"></td>
+	<td style="padding:0px;background-image:url($imgs_folder_URL/modal_5.png);background-repeat:no-repeat;width:10px;"><img style="float:none" src="$imgs_folder_URL/spacer.png" width="10" height="1" border="0" alt=""></td>
+</tr>
+</table>
+</DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+if($prompt_top eq "middle"){
+	$promptTop=qq~pgHei=document.documentElement.clientHeight||document.body.clientHeight;
+	pgScr=document.documentElement.scrollTop||document.body.scrollTop;
+	pgHei+=pgScr;
+	~;
+	$TopPos=qq~(pgHei-260)/2~;
+}elsif($prompt_top=~m`\d+`){
+	$TopPos=$prompt_top;
+}else{
+	$TopPos=100;
+}
+$RETURN.=qq~when=new Date();when.setMonth(when.getMonth()+12);expires=when.toGMTString();
+byId('loginplace').style.zIndex=10000;
+byId('loginplace').innerHTML=nuDiv;
+byId('loginplace').style.display="block";
+LeftPos = (document.body.clientWidth-170)/2
+$promptTop
+TopPos = $TopPos
+byId('loginplace').style.position="absolute"
+byId('loginplace').style.left=LeftPos+"px";
+byId('loginplace').style.top=TopPos+"px"
+function JITc(url){
+	if(document.getElementById('JQX')){document.getElementsByTagName('head')[0].removeChild(document.getElementById('JQX'))};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JQX';	
+	script.src=url 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}	
+function setLang(val){
+	document.cookie = "lang="+val+";domain=."+location.hostname+";expires="+expires+";path=/"
+}
+$setLang
+function login(){
+	if(document.getElementById("sendPw").checked==true){
+			if(document.getElementById("editorusername").value==""){alert("$alertusername");return false}
+			if(document.getElementById("editorusername").value=="admin"){alert("$adminnot");return false}
+			url="$uttf?adminLogin=sendPw="+document.getElementById("editorusername").value
+			JITc(url)
+			return false;
+	}
+	locpathname=location.pathname
+	if(location.pathname.lastIndexOf("/")==location.pathname.length-1){
+		if(default_file_name!=""){
+			locpathname=location.pathname+default_file_name;
+		}
+	}
+	krypt()	
+	strng=byId('editorusername').value+'|'+PWORD+'|'+byId('editorremember').checked+'|'+locpathname
+	document.cookie="loginParams="+strng+";path=/"
+	if(document.getElementById("editorremember").checked==true){
+		if(localStorage){
+			localStorage.setItem("cepword",document.getElementById("editorpassword").value)
+		}else{
+			document.cookie = "cepword="+document.getElementById("editorpassword").value+";domain=."+location.hostname+";expires="+expires+";path=/"
+		}
+	}
+	location="$uttf"
+}
+if(localStorage){if(localStorage.getItem("cepword")){byId('editorpassword').value=localStorage.getItem("cepword")}}
+$KRYPT
+~;
+
+sub autologin{
+	($un,$pw,$loc)=split(/\|/,$params);
+	$SLT=time;
+	$SaLT=substr($SLT,0,2);
+	open(USRS,"$users_txt");
+	while(<USRS>){
+		if(/$un=/){s`\s+$``;$usr=$_;last}
+	}
+	close(USRS);
+	($ceuser,$upw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+	$PW=crypt($pw,"ce");
+	$PWRD=crypt($upw,$SaLT);
+	if($loc eq ''){$loc = "none"}
+	if($loc eq 'JITc'){
+		if($utype == 5 || $utype == 6){
+			$loc=$urls.'/'.$default_file_name;
+		}
+		if($upw ne $PW){
+			print "Content-type: text/html\n\n";
+			print qq~alert("Your login failed\\n\\nCheck the username and password submitted.")~;
+		}else{
+			print "Set-Cookie: loginParams=$un|$PWRD|false|$loc;path=/\n";
+			print "Content-type: text/html\n\n";				
+			print qq~location="$uttf"~;
+		}
+		exit;
+	}
+	if($upw ne $PW){exit}
+	print "Set-Cookie: loginParams=$un|$PWRD|false|$loc;path=/\n";
+	print "Location: $uttf\n\n";
+	exit;
+}#autologin
+
+sub get_Cookie{
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie);
+		$name =~ s/^\s*//;
+		if($name =~ /^\D/){$Cookie{$name}=$value}
+	}
+}#get_cookie
+
+1;

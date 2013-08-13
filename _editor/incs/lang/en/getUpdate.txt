@@ -1,0 +1,8 @@
+widgettitle=Update Available
+text1=An Update  To Version
+text2=Is Available
+ViewDetailsbutton=View Details
+InstallUpdatebutton=Install Update
+ReloadTheEditorbutton=Reload The Editor
+InstallLaterbutton=Install Later
+text3=Update Is Complete

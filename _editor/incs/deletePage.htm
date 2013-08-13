@@ -1,0 +1,12 @@
+lang("deletePage");
+$file=$params;
+$file=~s`$host`$root`;
+
+unlink($file);
+
+$RETURN=qq~byId('yesBut').innerHTML="$OK"
+active_alert="$htmlalert1&nbsp;&nbsp;$params$htmlalert2"
+doAlert("alert")
+active_function = new Function("byId('openURL').value='';unButtonPT();pad1.reloader();closeAlert()")
+	~;
+1;

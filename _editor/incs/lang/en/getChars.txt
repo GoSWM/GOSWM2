@@ -1,0 +1,3 @@
+widgettitle=Character Widget
+title1=ReApply Text Content Changes
+title2=UnApply Text Content Changes

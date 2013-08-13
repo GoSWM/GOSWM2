@@ -1,0 +1,190 @@
+lang("getFlash");
+$main="flashMain";
+$place="flashplace";
+$title="$widgettitle";
+$wigWid="480";
+$ico="flash";
+require 'widgetBody.htm';
+
+
+&parseUser;
+$imgfldr=$root.$imgfldr;
+
+&get_img_folder;
+	foreach $f (@things){
+		$f =~ m!([^/:\\]*)$!;$f_=$1;
+		$f_=~m`\.(\w+)$`;$ext=$1;
+		if($image_extensions=~m`\b$ext\b` && $f_!~m`_th\.$ext`){
+			$f=~s`\Q$root\E``;
+			$fx=$f;$fx=~s`$imgfldr``;
+			$OPTS.=qq~<option value="$f" title="$f_">$fx~;
+		}
+	}
+if($isIE){
+$BTN=qq~<table align=center border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReApplyTextContentChangestitle" $unz onclick=;ceCopies("Redo")></td><td align=center><table align=center style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=ceinsertFlash() $button_class title="Insert Image" $uns>$InsertObjectbutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$UnApplyTextContentChangestitle" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>~;
+}else{
+$BTN=qq~<table align=center style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=ceinsertFlash() $button_class title="$InsertImagetitle" $uns>$InsertObjectbutton</td><td>$RBUT</td></tr></table>~;
+}
+
+if($demo==1){
+	$FUNC2=qq~demoing()~;
+}else{
+	$FUNC2=qq~cedeleteFlash()~;
+}
+$RETURN=qq~flashTbl='$BODY_TOP
+<form style="margin:0px" name=ceflashForm>
+<input type=hidden id=csflashurl name=csflashurl value="">
+<table style="table-layout:fixed" align=center width=480 border=0 cellpadding=5 cellspacing=0>
+<tr><td $uns align=center style="height:16px">
+<table width=470 border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=cerUseOther() $button_class title="" $uns>
+$UseSWFFlashFromOtherWebsitebutton</td><td>$RBUT</td></tr></table>
+</td><td align=center>
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr>
+<td>$LBUT</td><td align=center onclick=cerUseThis() $button_class title="" $uns>
+$UseSWFFlashFromThisWebsitebutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr>
+
+<tr id=ftd1 style="display:none"><td width=480 $uns style="height:16px">
+<table width=470 border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:8px"><img id=up_arrow9 onclick=upDIR9() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+<td style="width:0px;padding-left:0px">&nbsp;</td>
+<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text1
+<img align=absbottom onclick=ceProperties3() id=propImg3 style="margin-left:10px;visibility:hidden" src="$utif/properties.png" width="16" height="16" border="0" title="$Properties" $unz></td>
+<td align=right>&nbsp;
+</td>
+<td align=right style="$reFi">
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=cerenameFlash() $button_class $uns>$RenameSWFbutton</td><td>$RBUT</td></tr></table>
+</td>
+<td align=right style="$delFi">
+<table style="margin-right:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=$FUNC2 $button_class $uns>$DeleteSWFbutton</td><td>$RBUT</td></tr></table>
+</td>
+</tr></table></td></tr>
+<tr id=ftd2 style="display:none"><td width=480 align=center style="padding:0px">
+<iframe name=pad9 style="margin:0px 0px 5px 0px;width:460px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=embed_flash"></iframe>
+</td></tr>
+<tr id=ftd3 style="display:none"><td width=480 align=center>
+<DIV id=ftdv1 style="display:none;text-align:left;padding-left:20px;font-family:tahoma;font-size:11px">$text2</DIV>
+<DIV id=ftdv2 style="display:none;text-align:left;padding-left:20px;font-family:tahoma;font-size:11px">$text3</DIV>
+<textarea id=cethecode rows=6 cols=50 style="width:430;height:120" wrap=virtual></textarea>
+
+</td></tr>
+<tr id=ftd4 style="display:none"><td width=480 style="padding-bottom:10px">
+$BTN
+</td></tr></table>
+</form>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function cerUseThis(){
+	byId('ftd1').style.display="block"
+	byId('ftd2').style.display="block"
+	byId('ftd3').style.display="block"
+	byId('ftd4').style.display="block"
+	byId('ftdv2').style.display="block"
+	byId('ftdv1').style.display="none"
+	byId('cethecode').value=''
+}
+function cerUseOther(){
+	byId('ftd1').style.display="none"
+	byId('ftd2').style.display="none"
+	byId('ftd3').style.display="block"
+	byId('ftd4').style.display="block"
+	byId('ftdv1').style.display="block"
+	byId('ftdv2').style.display="none"
+	byId('cethecode').value=''
+}
+function ceinsertFlash(){
+	ceFlash=''
+	cecheck_selected()
+	if(ceinside==0){basicAlert("$notinside");return false}	
+	if(byId('ftd1').style.display=="block"){
+		regex=escape(byId('cethecode').value)+'='+escape(byId('csflashurl').value)
+		url="$uttf?flashRegex="+regex
+		JITc(url)
+	}else{
+		regex=escape(byId('cethecode').value)
+		url="$uttf?flashRegex="+regex
+		JITc(url)
+	}
+}
+function selection9(dir,path,url){
+	if(dir == "dir"){
+		pad9.location="$uttf?pathTree=x=embed_flash="+path
+	}
+	if(dir=="bin"){		
+		byId('propImg3').style.visibility="visible"
+		byId('csflashurl').value=url
+	}
+}
+function upDIR9(){
+	pad9.location="$uttf?pathTree=up=embed_flash="+pad9.updir
+	byId('propImg3').style.visibility="hidden"
+}
+function ceProperties3(){
+	var URL="$uttf?getProperties="+byId('csflashurl').value
+	JITc(URL)
+}
+function cedeleteFlash(){
+	if(ceflashForm.csflashurl.value==""){
+		selectSomething()
+		return false
+	}
+	active_alert="$Deletethefilefortheobject<BR>"+ceflashForm.csflashurl.value+"?"
+	doAlert("confirm")
+	ceflashUrl=ceflashForm.csflashurl.value.replace(/https*:\\/\\//,"")
+	URL='$uttf?deleteImage=9='+ceflashUrl
+	active_function = new Function("JITc(URL)")
+	cancel_function = new Function("closeAlert()")
+}
+function cerenameFlash(){
+	if(ceflashForm.csflashurl.value==""){
+		selectSomething()
+		return false
+	}
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=flash="+ceflashForm.csflashurl.value
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+
+byId('flashplace').innerHTML=flashTbl
+csEmbedFlash()
+~;
+
+
+sub get_img_folder{
+$imgfldr_=$imgfldr;$imgfldr_=~s`\Q$root\E``;
+$U = "a";
+$V = 1;
+$W = $U.$V;
+@things=<$imgfldr/*>;
+foreach $thing (@things){
+if(-d $thing){
+	push(@dirs,$thing);
+	@dir=<$thing/*>;
+	push(@$W,@dir);
+	}
+}
+&cycle;
+}#get_img_folder
+
+sub cycle{
+	foreach $thing (@$W){
+	if(-d $thing){
+		push(@dirs,$thing);
+		@dir=<$thing/*>;
+		push(@X,@dir);
+		}else{
+		push(@things,$thing);
+		}
+	}
+if($#X > -1){++$V;$W = $U.$V;@$W=@X;@X=();&cycle}
+}#cycle
+
+
+1;

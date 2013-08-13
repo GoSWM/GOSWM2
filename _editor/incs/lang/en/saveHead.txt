@@ -1,0 +1,2 @@
+htmlalert=The Head Section Edits Were Saved
+htmlalert2=The Body Attributes Were Saved<BR><BR>Reload The Page?

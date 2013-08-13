@@ -1,0 +1,11 @@
+widgettitle=Upload Widget
+text=Open Folder To Upload Into
+text2=Number of files to upload
+UploadFilebutton=Upload File
+UploadFilesbutton=Upload Files
+htmlalert1=Number of files left to upload
+htmlalert2=Files Were Uploaded
+htmlalert3=File Was Uploaded
+text3=Number of files to upload
+UploadFiles=Upload Files
+UploadFile=Upload File

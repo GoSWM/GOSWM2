@@ -1,0 +1,111 @@
+&check_cookie;
+lang("checkUser");
+if(!$urls){&not_loggedin}
+$params=~s`/$``;
+if(($utype==3 || $utype==4) && ($params =~m/^\Wblank/ || $params eq '')){
+	$return=qq~userList();~;
+}
+
+if($utype==3 || $utype==4){
+	@urls=split(/,/,$urls);
+	foreach $url (@urls){
+		if($params eq $url){$fnd=1}
+		if($basic =~ /auth/){
+			if($params =~ /_pending/){
+				$pend="_pending";
+				$url_=$url;$url_=~s`(.+)(\.\w+)$`$1$pend$2`;
+				if($params eq $url_){$fnd=1}				
+			}
+		}		
+	}
+}
+if($utype==5 || $utype==6){
+		if($params =~ /^$urls/ || $params  =~m/^\W*blank/ || $params  eq ''){$fnd=1}
+}
+
+if($urls eq "all"){$fnd=1}
+if($fnd==1){
+	$return.=qq~editorOn=1;ceonOff(1);~;
+}else{
+	if($utype==5 || $utype==6){
+		$return.=qq~editorOn=0;ceonOff(1);basicAlert("$htmlalert");editPad.location="$urls"~;
+	}else{
+		$return.=qq~editorOn=0~;
+	}
+}
+
+if($params !~ m/$ENV{'SCRIPT_NAME'}/ && $params !~m/^\Wblank/ && $params ne ''){
+$page_file=$root.$params;
+open(PF,"$page_file");
+while(<PF>){
+	$PAGE_FILE.=$_;
+}
+close(PF);
+$blok=0;
+if($PAGE_FILE =~ m`<\s*body`i){
+	@PAGE_FILE=split(/\n/,$PAGE_FILE);
+	foreach $line (@PAGE_FILE){
+		if($line =~ m`<\s*body`i){$sbody=1}
+		if($sbody==1){
+			$_PAGE_FILE.=$line."\n";
+		}
+	}
+	
+}else{
+	$_PAGE_FILE=$PAGE_FILE;
+}
+
+if($_PAGE_FILE !~ m`excludeblock` && $_PAGE_FILE !~ m`editblock|userblock|includeblock`){
+while($_PAGE_FILE =~ m!(<script[^>]*>.*?</script>)!sig){
+		$capture=$1;
+		if($capture =~ /getCaptcha/){$capture='';next}
+		++$blok;
+		$ding=qq~<span class="excludeblock-$blok">$capture</span>~;
+		$DINGS{$blok}=$ding;
+		$BLOCKS{$blok}=$capture;
+	}
+while($_PAGE_FILE =~ m!(<object[^>]*>.*?<param.*?</object>)!sig){	
+		$capture=$1;$_capture=$capture;
+		++$blok;
+		$ding=qq~<span class="excludeblock-$blok">$_capture</span>~;
+		$DINGS{$blok}=$ding;
+		$BLOCKS{$blok}=$capture;
+	}
+}
+if($capture){
+	$alert=qq~	
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$noticeAlert"
+		doAlert("confirm")
+		URL="$uttf?rewritefile=$params"
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("excludeNote()")
+		~;
+	$return="";
+}
+
+if($_PAGE_FILE !~ m`editblock|excludeblock`){
+	while($_PAGE_FILE =~ m`InstanceBeginEditable name="([^"]+)" -->(.+?)<!-- InstanceEndEditable`sig){
+		$capture2=$1;
+	}		
+}
+if($capture2){
+	$alert=qq~	
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$noticeAlert2"
+		doAlert("confirm")
+		URL="$uttf?rewritefile=$params"
+		active_function = new Function("JITc(URL);closeAlert()")
+		cancel_function = new Function("editblockNote();")
+		~;
+	$return="";
+}
+
+
+
+}#not cgi file
+
+
+$RETURN=qq~$alert$return;~;
+
+1;

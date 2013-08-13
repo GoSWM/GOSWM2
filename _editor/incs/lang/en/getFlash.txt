@@ -1,0 +1,14 @@
+widgettitle=Flash Widget
+ReApplyTextContentChangestitle=ReApply Text Content Changes
+UnApplyTextContentChangestitle=UnApply Text Content Changes
+InsertObjectbutton=Insert Object
+InsertImagetitle=Insert Image
+UseSWFFlashFromOtherWebsitebutton=Use SWF Flash From Other Website
+UseSWFFlashFromThisWebsitebutton=Use SWF Flash From This Website
+text1=Select Flash (SWF) File
+Properties=Properties
+RenameSWFbutton=Rename SWF
+DeleteSWFbutton=Delete SWF
+text2=Paste Flash Object-Embed Code From Other Website
+text3=Paste Flash Object-Embed Code From Flash Software For This SWF
+Deletethefilefortheobject=Delete the file for the object

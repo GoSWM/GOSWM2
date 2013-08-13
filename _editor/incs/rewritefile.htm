@@ -1,0 +1,85 @@
+lang("checkUser");
+$page_file=$root.$params;
+open(PF,"$page_file");
+while(<PF>){
+	if(/<\s*body/i){$bodfnd=1}
+	if($bodfnd==1){$PAGE_FILE.=$_;}else{$BEFORE.=$_}
+}
+close(PF);
+$blok=0;
+if($PAGE_FILE =~ m`<\s*body`i){
+	@PAGE_FILE=split(/\n/,$PAGE_FILE);
+	foreach $line (@PAGE_FILE){
+		if($line =~ m`<\s*body`i){$sbody=1}
+		if($sbody==1){
+			$_PAGE_FILE.=$line."\n";
+		}
+	}
+	
+}else{
+	$_PAGE_FILE=$PAGE_FILE;
+}
+if($_PAGE_FILE !~ m`excludeblock`){
+while($_PAGE_FILE =~ m!(<script[^>]*>.*?</script>)!sig){
+		$capture=$1;
+		++$blok;
+		$ding=qq~<span class="excludeblock-$blok">$capture</span>~;
+		$DINGS{$blok}=$ding;
+		$BLOCKS{$blok}=$capture;
+	}
+while($_PAGE_FILE =~ m!(<object[^>]*>.*?<param.*?</object>)!sig){	
+		$capture=$1;$_capture=$capture;
+		if($capture !~ m`wmode="*transparent"*`i){
+			$_capture=~s`(<embed[^>]+?)(></embed>)`$1 wmode="transparent"$2`si;
+		}
+		++$blok;
+		$ding=qq~<span class="excludeblock-$blok">$_capture</span>~;
+		$DINGS{$blok}=$ding;
+		$BLOCKS{$blok}=$capture;
+	}
+
+
+foreach $key (keys %BLOCKS){
+	$PAGE_FILE =~ s`\Q$BLOCKS{$key}\E`$DINGS{$key}<!-- "excludeblock-$key" -->`si;
+}
+if($capture){
+	open(PF,">$page_file");
+	print PF qq~$BEFORE
+	$PAGE_FILE~;
+	$alert=qq~
+		byId('yesBut').innerHTML="$OK"
+		active_alert="$confirmAlert"
+		doAlert("alert")
+		active_function = new Function("editPad.location.reload(true);closeAlert()")
+		~;
+}
+}#if not excludeblock
+
+
+if($_PAGE_FILE !~ m`editblock`){
+	while($_PAGE_FILE =~ m`InstanceBeginEditable name="([^"]+)" -->(.+?)<!-- InstanceEndEditable`sig){
+		$capname=$1;
+		$capcontent=$2;
+		$EDITS{$capname}=$capcontent;
+	}	
+	foreach $key (keys %EDITS){
+	$PAGE_FILE =~ s`\QInstanceBeginEditable name="$key" -->$EDITS{$key}<!-- InstanceEndEditable\E`InstanceBeginEditable name="$key" --><span class="editblock-$key">$EDITS{$key}</span><!-- editblock-$key --><!-- InstanceEndEditable`si;
+}
+	if($capname){
+	open(PF,">$page_file");
+	print PF qq~$BEFORE
+	$PAGE_FILE~;
+	$alert=qq~
+		byId('yesBut').innerHTML="$OK"
+		active_alert="$confirmAlert2"
+		doAlert("alert")
+		active_function = new Function("editPad.location.reload(true);closeAlert()")
+		~;
+}
+
+}#if not editblock
+
+
+$RETURN=qq~$alert~;
+
+1;

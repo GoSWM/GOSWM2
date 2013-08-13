@@ -1,0 +1,9 @@
+($stamp,$fname,$type)=split(/=/,$params);
+
+
+if($type==1){
+$RETURN= qq~parent.uploadCompleted("$stamp","$fname");location="about:blank"~;
+}else{
+$RETURN= qq~parent.stopUpload("$stamp","$fname");location="about:blank"~;
+}
+1;

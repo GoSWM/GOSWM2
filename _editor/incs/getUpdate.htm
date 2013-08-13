@@ -1,0 +1,102 @@
+lang("getUpdate");
+$main="updateMain";
+$place="updateplace";
+$title="$widgettitle";
+$wigWid="400";
+$ico="updates";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+$uttf_=$uttf;
+$uttf_=~s`https*://``;
+@langs_=<$incs_folder_PATH/lang/*>;
+foreach $lang_ (@langs_){
+	$lang_=~s`$incs_folder_PATH/lang/``;
+	push(@LANGS_,$lang_);
+}
+$LANGS_=join(",",@LANGS_);
+
+$RETURN=qq~updateTbl='$BODY_TOP
+	<DIV><table style="width:380px;margin:10px" align=center border=0 cellpadding=0 cellspacing=0>
+	<tr ><td style="font-family:tahoma;font-size:11px;font-weight:bold" align=center id=mainMess>$text1 $params $text2</td></tr>
+	<tr id=updateProgress style="display:none;"><td style="padding:10px 10px">
+	<DIV style="border:1px solid #000000;background-color:#FFFFFF">
+	<DIV id=updateProgressDIV style="font-size:1px;height:10px;background-color:#4169e1;width:0px">&nbsp;</DIV></DIV>
+	</td></tr>
+	<tr id=updateDetails style="display:none;"><td style="padding-top:10px">
+	<div id=updateDetailsDiv style="height:200px;overflow:auto;font-family:tahoma;font-size:11px;padding:5px;background-color:#FFFFFF;border:1px solid #000000">details</DIV>
+	</td></tr>
+			<tr><td>
+			<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td width=33% align=center>
+	<table id=viewBut style="margin:10px 5px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=view_update() $button_class>$ViewDetailsbutton</td><td>$RBUT</td></tr></table>
+</td><td width=34% align=center>
+	<table id=installButtonTbl style="visibility:hidden;margin:10px 5px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=install_update() $button_class id=installButton>$InstallUpdatebutton</td><td>$RBUT</td></tr></table>
+	
+	<table id=completeButtonTbl style="display:none;margin:10px 5px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=location.reload(true) $button_class style="font-weight:bold;color:#dc143c;">$ReloadTheEditorbutton</td><td>$RBUT</td></tr></table>
+</td><td width=33% align=center>
+	<table id=laterBut style="margin:10px 0px 5px 5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=byId("updateplace").style.display="none" $button_class>$InstallLaterbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+	</td></tr></table></DIV>
+	
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function view_update(){
+	byId('laterBut').style.display="none"
+	var URL="http://www.gphrs.com/updater/list.cgi?"+version
+	JITc(URL)
+}
+updateProgressBar=0
+function install_update(){
+	if(demo==1){
+		alert("$disabled")
+		return false
+	}
+	byId('barricade').style.display="block"
+	byId('viewBut').style.visibility="hidden"
+	byId('laterBut').style.visibility="hidden"
+	var URL="http://www.gphrs.com/updater/current/update_list.cgi?$uttf_=$LANGS_"
+	JITc(URL)
+}
+num=-1
+function run_list(){
+	byId('updateProgress').style.display="block"
+	byId('updateDetails').style.display="none"
+	if(files.length>0){
+		++num
+		if(num>0){
+			wid=num*inc
+		 	byId('updateProgressDIV').style.width=wid+"px"
+		 }
+		file=files.pop()
+		byId('installButton').innerHTML=file
+		install(file)
+	}else{
+		byId('updateProgress').style.display="none"
+		byId('installButtonTbl').style.display="none"
+		byId('mainMess').innerHTML="$text3"
+		byId('completeButtonTbl').style.display="block"
+		byId('barricade').style.display="none"
+	}
+}
+function install(file){
+	if(isLWP){
+		url='$uttf?update_file_get='+file
+	}else{
+		url='http://www.gphrs.com/updater/current/update_file.cgi?$uttf_='+file
+	}
+	window.status="Updating"
+	JITc(url)
+	window.status="Updating"
+}
+
+byId('updateplace').innerHTML=updateTbl
+byId('img_$main').style.display="none"
+availUpdates()
+~;
+
+1;

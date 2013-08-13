@@ -1,0 +1,689 @@
+lang("getPhotos");
+$main="photoMain";
+$place="photosplace";
+$title="$widgettitle";
+$wigWid="530";
+$ico="picture";
+require 'widgetBody.htm';
+
+if(!$notinsideplace){$notinsideplace=$notinside}
+&parseUser;
+$imgfldr=$root.$imgfldr;
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+
+
+if($isIM!=1 && $isGD!=1){$imgreduce=qq~display:none"~;$irpx="10px"}
+if($isIM==1 || $isGD==1){$irpx="5px"}
+
+
+if($demo==1){
+	$FUNC2=qq~demoing()~;
+	$FUNC3=qq~demoing()~;
+	$FUNC4=qq~demoing()~;
+}else{
+	$FUNC2=qq~cedeleteImage()~;
+	$FUNC3=qq~ceReWrite()~;
+	$FUNC4=qq~createThumb()~;
+}
+
+if($isFF){$fds=qq~style="border:1px solid #999999"~}
+if($isIE){$fds=qq~style="border:2px grooved #999999"~}
+$RETURN=qq~photoTbl='$BODY_TOP
+<form style="margin:0px" name=ceimgForm>
+<input type=hidden id=csimgurl name=csimgurl value="">
+<table align=center width=100% border=0 cellpadding=5 cellspacing=0>
+<tr><td $uns style="height:16px" $uns>
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:18px"><img id=up_arrow4 onclick=upDIR4() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden" $uns></td>
+<td style="width:0px;padding-left:0px" $uns>&nbsp;</td>
+<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$SelectImage
+<img onclick=ceCopyMove2() id=treeImg2 style="visibility:hidden;margin-left:10px" src="$utif/tree.png" width="16" height="16" border="0" title="$CopyMoveFiletitle" $unz align=absmiddle>
+<img align=absbottom onclick=ceProperties2() id=propImg2 style="margin-left:10px;visibility:hidden" src="$utif/properties.png" width="16" height="16" border="0" title="$Propertiestitle" $unz></td>
+<td align=right $uns>
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=cerUseOnlineImage() $button_class $uns>$UseOnlineImagebutton</td><td>$RBUT</td></tr></table>
+</td>
+<td align=right style="$reFi" $uns>
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=cerenameImage() $button_class $uns>$RenameImagebutton</td><td>$RBUT</td></tr></table>
+</td>
+<td align=right style="$delFi" $uns>
+<table id=ytDelete style="margin-right:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=$FUNC2 $button_class $uns>$DeleteImagebutton</td><td>$RBUT</td></tr></table>
+</td>
+</tr></table></td></tr>
+<tr><td align=center style="padding:0px" $uns>
+<iframe name=pad4 id=pad4 style="margin:0px 0px 5px 0px;width:500px;height:150px;border:1px solid #999999" frameborder=0
+ src="$uttf?pathTree=x=insert_image" $uns></iframe>
+</td></tr><tr><td align=center $uns>
+<table align=center border=0 cellpadding=2 cellspacing=0>
+<tr valign=top><td style="width:200px" $uns>
+<div id=displayofimage style="text-align:left;border:4px double #999999;background-color:#ffffff;overflow:auto;width:200px;height:130px;margin:0px 0px" $uns></div>
+</td><td style="width:250px" align=left valign=top>
+<table style="width:285px;margin-left:10px;height:18px" border=0 cellpadding=0 cellspacing=0>
+<tr><td class=tab_ onclick=swup(this.id,"attTBL") id=attTD $uns>$Attributestab</td>
+<td class=tab onclick=swup(this.id,"resTBL") id=resTD $uns>$Resizetab</td>
+<td class=tab onclick=swup(this.id,"thmTBL") id=thmTD $uns><SPAN id="thmTD_">$Thumbnailtab</SPAN></td>
+<td class=tab onclick=swup(this.id,"popTBL") id=popTD $uns><SPAN id="popTD_">$PopupLinktab</SPAN></td>
+<td class=tab onclick=swup(this.id,"targTBL") id=targTD $uns><SPAN id="targTD_">$TargetLinktab</SPAN></td>
+<td width=96% style="border-bottom:#FFFFFF solid 1px;padding:0px 0px 0px 3px" $uns>&nbsp;</td></tr></table>
+<table style="width:285px;height:115px;border-left:1px solid #FFFFFF;border-bottom:1px solid #999999;border-right:1px solid #999999;margin-left:10px" border=0 cellpadding=0 cellspacing=0>
+<tr><td valign=top $uns>
+<table id=attTBL style="display:anone;margin-top:10px" align=center border=0 cellpadding=1 cellspacing=0>
+<tr><td align=left class=widgetText11 $uns>$ImageAlignment:</td><td><select class=input style="font-family:tahoma,arial;font-size:11px" name="ceimgalign" id="ceimgalign" $uns>
+<option value="">$optionNotSet
+<option value="left">$optionleft
+<option value="right">$optionright
+<option value="texttop">$optiontexttop
+<option value="absmiddle">$optionabsmiddle
+<option value="baseline">$optionbaseline
+<option value="absbottom">$optionabsbottom
+<option value="bottom">$optionbottom
+<option value="middle">$optionmiddle
+<option value="top">$optiontop
+</select></td></tr>
+<tr><td align=left class=widgetText11 $uns>$BorderThickness:</td>
+<td align=left>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=left class=widgetText11>
+<input class=input style="width:22px" onfocus=this.select() name=ceimgborder id=ceimgborder value="0"></td>
+<td align=center style="padding-left:10px" class=widgetText11><input name=brType id=brType1 type=radio checked><div style="font-size:9px">$Style</div></td>
+<td align=center style="padding-left:10px" class=widgetText11><input id=brType2 name=brType type=radio><div style="font-size:9px">$HTML</div></td></tr></table>
+</td></tr>
+<tr><td align=left class=widgetText11 $uns>$VerticalMargin:</td>
+<td><input class=input style="width:22px" onfocus=this.select() name=ceimgvspace id=ceimgvspace value="0">
+<tr><td align=left class=widgetText11 $uns>$HorizontalMargin:</td>
+<td><input class=input style="width:22px" onfocus=this.select() name=ceimghspace id=ceimghspace value="0">
+</td></tr>
+</table>
+<table id=resTBL style="display:none;margin-top:$irpx" align=center border=0 cellpadding=2 cellspacing=0>
+<tr><td align=center $uns>
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center class=widgetText11 $uns>$Width:</td><td style="padding-left:5px">
+<input class=input style="width:30px" onfocus=this.select() id=ceresizetowid name=ceresizetowid value="0" onkeyup=prorat("wid",this.value)></td>
+<td id=ceresizetowidtxt class=widgetText11 style="font-size:10px" $uns></td>
+</td><td align=center style="padding-left:20px" class=widgetText11>$Height:</td><td style="padding-left:5px">
+<input class=input style="width:30px" onfocus=this.select() id=ceresizetohei name=ceresizetohei value="0" onkeyup=prorat("hei",this.value)></td>
+<td id=ceresizetoheitxt class=widgetText11 style="font-size:10px" $uns>
+</td></tr></table>
+<tr><td align=center>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=right><input id=ceimgretain type=checkbox checked></td>
+<td style="padding-left:5px" class=widgetText11>$MaintainSizeRatio</td></tr>
+<tr id=imgreduce style="$imgreduce"><td align=right><select id=ceimgreduce class=input><option value="100">100%<option value="80">80%<option value="70">70%<option value="60">60%<option value="50">50%<option value="40">40%<option value="30">30%<option value="20">20%</select></td>
+<td style="padding-left:5px" class=widgetText11>$RewriteByteSize</td></tr></table>
+</td></tr>
+<tr><td align=center $uns>
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns id=previewIMG onclick=cePreview()>$PreviewResizebutton</td><td>$RBUT</td></tr></table>
+
+
+<center><table id=ytRewrite align=center style="margin-top:5px" border=0 cellpadding=0 cellspacing=0><tr>
+<td>$LBUT</td><td align=center $button_class $uns id=rewriteIMG onclick=$FUNC3>
+$RewriteTheFileToResizedSizebutton</td><td>$RBUT</td></tr></table></center>
+
+</td></tr>
+</table>
+<table id=thmTBL style="display:none;margin-top:5px" align=center border=0 cellpadding=2 cellspacing=0>
+<tr><td align=center class=widgetText11 $uns>$CreateThumbnailForSelectedImage</td></tr>
+<tr><td align=center><table border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center class=widgetText11 $uns>$Width:</td><td style="padding-left:5px">
+<input class=input style="width:30px" onfocus=this.select() id=ceresizetowidth name=ceresizetowidth value="0" onkeyup=proratTH("wid",this.value)></td>
+<td id=ceresizetowidtxtth class=widgetText11 style="font-size:10px"></td>
+</td><td align=center style="padding-left:20px" class=widgetText11 $uns>$Height:</td><td style="padding-left:5px">
+<input class=input style="width:30px" onfocus=this.select() id=ceresizetoheith name=ceresizetoheith value="0" onkeyup=proratTH("hei",this.value)></td>
+<td id=ceresizetoheitxtth class=widgetText11 style="font-size:10px">
+</td></tr></table>
+<tr><td align=center $uns>
+<table border=0 cellpadding=0 cellspacing=0><tr><td><input id=ceimgretainth type=checkbox checked></td>
+<td style="padding-left:5px" class=widgetText11>$MaintainSizeRatio</td></tr></table>
+</td></tr>
+<tr><td align=center $uns>
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns id=previewIMGth onclick=cePreviewTH()>$PreviewThumbnailbutton</td><td>$RBUT</td></tr></table>
+
+<table style="margin-top:2px;visibility:$vis1" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=$FUNC4 id=csReWriteTH>
+$CreateThumbnailbutton</td><td>$RBUT</td></tr></table>
+
+</table>
+
+<table id=popTBL style="display:none;margin-top:20px" align=center border=0 cellpadding=2 cellspacing=0>
+<tr><td align=center $uns>
+
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center class=widgetText11 $uns><input id=linkthumbCaption style="width:200px" class=input value=""><br>
+$text1</td></tr>
+<tr><td align=center $uns>
+<table style="margin-top:20px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center class=button_center title="" $uns id=linkthumb onclick=insertThumb()>$InsertLinkedThumbnailbutton</td><td>$RBUT</td></tr></table></td></tr></table>
+
+</td></tr></table>
+<table id=targTBL style="display:none;margin-top:20px" align=center border=0 cellpadding=2 cellspacing=0>
+<tr><td align=center $uns>
+<DIV id=targetMenu></DIV>
+<table style="margin-top:20px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center class=button_center title="" $uns id=insImgBut2 onclick=ceinserttargeted()>$InsertLinkedThumbnailbutton2</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr></table>
+
+
+</td></tr>
+<tr valign=top><td align=center style="width:200px" $uns>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center $uns>
+<table style="margin-right:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns id=actualsize onclick=refit(0)>$ActualSizebutton</td><td>$RBUT</td></tr></table>
+</td><td align=center $uns>
+<table style="margin-left:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns id=fitpreview onclick=refit(1)>$FitPreviewbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td><td align=center style="width:250px;font-family:tahoma,arial;font-size:10px" $uns>$MouseoverText: <input class=input style="width:120px" value="" id=ceimgtitle>
+</td></tr>
+</table>
+</td></tr><tr><td align=center style="padding-bottom:10px" $uns>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center id=clasesIMGapply>
+
+</td><td id=xclasesIMGapply align=center>
+
+<table id=insertButton style="margin-bottom:2px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceinsertImage() $button_class $uns id=insImgBut>$InsertImagebutton</td><td>$RBUT</td></tr></table>
+<div align="center" id=doubleclickNote style="display:none" class=widgetText11>$doubleclickProperties</div>
+</td></tr></table>
+</td></tr></table>
+</form>
+<DIV id=chkThmb style="display:none"></DIV>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+activePhotoTab=''
+function setinsImgBut2(){
+	if(byId('CEOPTS').selectedIndex!=0){
+		byId('insImgBut2').className="button_center"
+	}else{
+		byId('insImgBut2').className="button_centerD"
+	}
+}
+function swup(tab,dv){
+	tab_=tab+"_"
+	if(byId(tab_) && byId(tab_).style.visibility=="hidden"){return false}
+	byId('insImgBut').className="button_center"
+	if(dv=="popTBL"){
+		if(byId('csimgurl').value=='' || !byId('csimgurl').value.match(/_th\./)){
+			basicAlert("$htmlalert2")
+			return false
+		}else{ 
+			byId('insImgBut').className="button_centerD"
+			getSrcActiveThumb()
+		}
+	}
+	if(dv=="thmTBL"){
+		if(byId('csimgurl').value=='' || byId('csimgurl').value.match(/_th\./)){
+			basicAlert("$htmlalert1")
+			if(activePhotoTab=="popTD"){byId('insImgBut').className="button_centerD"}
+			return false
+		}
+	}
+	if(dv=="targTBL"){
+		if(byId('csimgurl').value=='' || !byId('csimgurl').value.match(/_th\./)){
+			basicAlert("$htmlalert3")
+			return false
+		}else{ 
+			CEOPT=''
+			for(i=0;i<doc().images.length;++i){
+				if(doc().images[i].id && doc().images[i].id.match(/img_/)){
+					CEOPT+='<option value="'+doc().images[i].id+'">'+doc().images[i].src.substring(doc().images[i].src.lastIndexOf("/")+1)
+				}
+			}
+			byId('targetMenu').innerHTML='<select onchange=setinsImgBut2() id=CEOPTS class=input style="font-family:tahoma,arial;font-size:11px">'+
+			'<option>$SelectImageTarget'+CEOPT+'</select><br>'
+			byId('insImgBut2').className="button_centerD"
+		}
+	
+	}
+	activePhotoTab=tab
+	byId('attTBL').style.display="none"
+	byId('resTBL').style.display="none"
+	byId('thmTBL').style.display="none"
+	byId('popTBL').style.display="none"
+	byId('targTBL').style.display="none"
+	byId('attTD').className="tab"
+	byId('resTD').className="tab"
+	byId('thmTD').className="tab"
+	byId('popTD').className="tab"
+	byId('targTD').className="tab"
+	byId(dv).style.display=""
+	byId(tab).className="tab_"
+	$chkThm
+	
+	if(dv=="resTBL"){
+		if(byId('csimgurl').value.match(/\\.jpg\$/)){
+			byId('imgreduce').style.display=""
+			byId('ceimgreduce').selectedIndex=0
+		}else{
+			byId('imgreduce').style.display="none"
+			byId('ceimgreduce').selectedIndex=0
+		}
+	}
+}
+function getSrcActiveThumb(){
+	activeFullURL=byId('csimgurl').value.replace(/_th/g,"")
+	srcActiveThumb=new Image()
+	srcActiveThumb.name = activeFullURL;
+	srcActiveThumb.onload = findHHandWW;
+	srcActiveThumb.src = activeFullURL;
+}
+function findHHandWW(){
+	activeFullWidth=srcActiveThumb.width;
+	activeFullHeight=srcActiveThumb.height
+}
+activeThumbURL=''
+function insertThumb(){
+	if(byId('classesIMGapply') && byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value!=''){
+		CLS='class="'+byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value+'"'
+	}else{
+		CLS=''
+	}
+	ceimgalignment=byId('ceimgalign')[byId('ceimgalign').selectedIndex].value
+	if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0){
+		imgBRD='style="border:#000000 solid '+byId('ceimgborder').value+'px"'
+	}else{imgBRD=""}
+	
+	if(activeThumbURL==''){activeThumbURL=byId('csimgurl').value.replace(/ /g,"_")}
+	activeFullURL=byId('csimgurl').value.replace(/_th/g,"")
+	ceimg='<img '+CLS+' src="'+activeThumbURL+'" title="$ClickToEnlargetitle" align="'+ceimgalignment+'" '+
+	imgBRD+' vspace="'+byId('ceimgvspace').value+'" hspace="'+byId('ceimghspace').value+'"'+
+	' width="'+byId('ceresizetowid').value+'" height="'+byId('ceresizetohei').value+'" '+
+	' onclick=enlargeTH("'+activeFullURL+'","'+activeFullWidth+'","'+activeFullHeight+'",this.alt) style="cursor:pointer" '+
+	'alt="'+byId('linkthumbCaption').value+'"/>'		
+	
+	if(!doc().getElementById("thumbJS")){
+		ceimg+='\\n<script id=thumbJS type="text/javascript" src="'+uttf+'?getThumbJS"></script>'
+		script =editPad.document.createElement('script');	
+		script.type = 'text/javascript';	
+		script.defer = true;	
+		script.id = 'thumbJS';	
+		script.src="$uttf?getThumbJS" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+	}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(ceimg)
+		}else{
+			doc().execCommand("InsertHTML", false, ceimg); 
+		}
+		ceimg=""
+		ceonOff(0)
+		ceonOff(1)
+	}
+	activeThumbURL=''
+}
+function cerUseOnlineImage(){
+	if(byId('inputimgplace').innerHTML==""){
+		swup("attTD","attTBL")
+		var URL="$uttf?getImgUrl"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputImgMain','inputimgplace',340)
+	}
+}
+function ceReWrite(){
+	var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+	var url="$uttf?rewriteImgSize="+ceimgURL+"="+byId('ceresizetowid').value+"="+byId('ceresizetohei').value+"="+byId('ceimgreduce').value
+	JITc(url)
+}
+function ceinsertAS(){
+	if(byId('classesIMGapply') && byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value!=''){
+		CLS='class="'+byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value+'"'
+	}else{
+		CLS=''
+	}
+	ceimgalignment=byId('ceimgalign')[byId('ceimgalign').selectedIndex].value
+	if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0){
+		imgBRD='style="border:#000000 solid '+byId('ceimgborder').value+'px"'
+	}else{imgBRD=""}
+	if(byId('csimgurl').value.match(byId('ceimgtitle').value)){capti=''}else{capti=byId('ceimgtitle').value}
+	csimgurl_=byId('csimgurl').value.replace(/ /g,"%20")
+	ceimg='<img '+CLS+' src="'+csimgurl_+'" title="$ClickToEnlargetitle" align="'+ceimgalignment+'" '+
+	imgBRD+' vspace="'+byId('ceimgvspace').value+'" hspace="'+byId('ceimghspace').value+'"'+
+	' width="'+byId('ceresizetowid').value+'" height="'+byId('ceresizetohei').value+'" '+
+	' onclick=enlargeTH("'+byId('csimgurl').value+'","'+actWid+'","'+actHei+'",this.alt) style="cursor:pointer" '+
+	'alt="'+capti+'"/>'		
+	if(!doc().getElementById("thumbJS")){
+		ceimg+='\\n<script id=thumbJS type="text/javascript" src="'+uttf+'?getThumbJS"></script>'
+		script =editPad.document.createElement('script');	
+		script.type = 'text/javascript';	
+		script.defer = true;	
+		script.id = 'thumbJS';	
+		script.src="$uttf?getThumbJS" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+	}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(ceimg)
+		}else{
+			doc().execCommand("InsertHTML", false, ceimg); 
+		}
+		ceimg=""
+		ceonOff(0)
+		ceonOff(1)
+	}
+}
+function ceinserttargeted(){
+	targetID=byId('CEOPTS').options[byId('CEOPTS').selectedIndex].value
+		if(byId('ceimgtitle').value==''){basicAlert("Enter Mouseover Text");return false}
+		ceimgalignment=byId('ceimgalign')[byId('ceimgalign').selectedIndex].value
+		if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0 && byId('brType1').checked==true){
+			imgBRD='style="border:#000000 solid '+byId('ceimgborder').value+'px"'
+		}else if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0 && byId('brType2').checked==true){
+			imgBRD='border='+byId('ceimgborder').value
+		}else{imgBRD=""}
+	if(byId('classesIMGapply') && byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value!=''){
+		CLS='class="editable '+byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value+'"'
+	}else{
+		CLS='class="editable"'
+	}
+	csimgurl_=byId('csimgurl').value.replace(/ /g,"%20")
+	csimgurl_full=csimgurl_.replace(/_th/,"")
+	ceimg='<img '+CLS+' src="'+csimgurl_+'" title="'+byId('ceimgtitle').value+'" '+
+	'alt="'+byId('ceimgtitle').value+'" align="'+ceimgalignment+'" '+
+	imgBRD+' vspace="'+byId('ceimgvspace').value+'" hspace="'+byId('ceimghspace').value+'"'+
+	' width="'+byId('ceresizetowid').value+'" height="'+byId('ceresizetohei').value+'" / style="cursor:pointer" '+
+	'onclick=document.getElementById("'+targetID+'").src="'+csimgurl_full+'">'		
+	
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(ceimg)
+		}else{
+			doc().execCommand("InsertHTML", false, ceimg); 
+		}
+		ceimg=""
+		ceonOff(0)
+		ceonOff(1)
+	}
+
+}
+function ceinsertImage(){
+	if(activePhotoTab=="popTD"){byId('insImgBut').className="button_centerD";return false}
+		if(byId('ceimgtitle').value==''){basicAlert("Enter Mouseover Text");return false}
+		ceimgalignment=byId('ceimgalign')[byId('ceimgalign').selectedIndex].value
+		if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0 && byId('brType1').checked==true){
+			imgBRD='style="border:#000000 solid '+byId('ceimgborder').value+'px"'
+		}else if(byId('ceimgborder').value!='' && byId('ceimgborder').value!=0 && byId('brType2').checked==true){
+			imgBRD='border='+byId('ceimgborder').value
+		}else{imgBRD=""}
+	if(byId('classesIMGapply') && byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value!=''){
+		CLS='class="editable '+byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value+'"'
+	}else{
+		CLS='class="editable"'
+	}
+	csimgurl_=byId('csimgurl').value.replace(/ /g,"%20")
+	csimgnom=csimgurl_.substring(csimgurl_.lastIndexOf("/")+1)
+	ceimg='<img id="img_'+csimgnom+'" '+CLS+' src="'+csimgurl_+'" title="'+byId('ceimgtitle').value+'" '+
+	'alt="'+byId('ceimgtitle').value+'" align="'+ceimgalignment+'" '+
+	imgBRD+' vspace="'+byId('ceimgvspace').value+'" hspace="'+byId('ceimghspace').value+'"'+
+	' width="'+byId('ceresizetowid').value+'" height="'+byId('ceresizetohei').value+'" />'		
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinsideplace")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(ceimg)
+		}else{
+			doc().execCommand("InsertHTML", false, ceimg); 
+		}
+		ceimg=""
+		ceonOff(0)
+		ceonOff(1)
+		byId('insertButton').style.display="none"
+		byId('doubleclickNote').style.display="block"
+		setTimeout("resetButton()",10000)		
+	}
+}
+function resetButton(){
+	byId('insertButton').style.display="block"
+	byId('doubleclickNote').style.display="none"
+}
+ceimgwid=0
+ceimghei=0
+actWid=0
+ceimgID=''
+
+function cedisplayphoto(isrc,w,h){
+	if(w == undefined){
+		imgtag='<img onload=showresizetoFun(this.src,this.width,this.height) id=cedisplayIMG src="'+isrc+'" $uns>'
+	}else{
+		imgtag='<img onload=showresizetoFun(this.src,this.width,this.height) width='+w+' height='+h+' id=cedisplayIMG src="'+isrc+'" $uns>'
+	}
+	byId('displayofimage').innerHTML=imgtag
+}
+
+function showresizetoFun(imgsrc,w,h){
+	byId('csimgurl').value=imgsrc;
+	actWid=w
+	actHei=h
+	byId('ceresizetowidtxt').innerHTML="("+w+")"
+	byId('ceresizetoheitxt').innerHTML="("+h+")"
+	ceimgwid=w
+	ceimghei=h
+	byId('ceresizetohei').value=ceimghei
+	byId('ceresizetowid').value=ceimgwid
+	if(byId('ceresizetowidtxtth')){
+		byId('ceresizetowidtxtth').innerHTML="("+w+")"
+		byId('ceresizetoheitxtth').innerHTML="("+h+")"
+		ceimgwidth=w
+		ceimgheith=h
+		byId('ceresizetoheith').value=ceimghei
+		byId('ceresizetowidth').value=ceimgwid
+	}
+	byId("actualsize").disabled=true;byId("fitpreview").disabled=false
+}
+function cedeleteImage(){
+	//if(byId('csimgurl').value.indexOf("$host")==-1){return false}
+	if(byId('csimgurl').value.indexOf("$host")==-1){byId('csimgurl').value="$host"+byId('csimgurl').value}
+	if(byId('csimgurl').value==""){
+		selectSomething()
+		return false
+	}
+	active_alert="$Deletethefilefortheimage<BR>"+byId('csimgurl').value+"?"
+	doAlert("confirm")
+	var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+	URL='$uttf?deleteImage=4='+ceimgURL
+	active_function = new Function("JITc(URL)")
+	cancel_function = new Function("closeAlert()")
+}
+function cerenameImage(){
+	//if(byId('csimgurl').value.indexOf("$host")==-1){return false}
+	if(byId('csimgurl').value.indexOf("$host")==-1){byId('csimgurl').value="$host"+byId('csimgurl').value}
+
+	if(byId('csimgurl').value==""){
+		selectSomething()
+		return false
+	}
+	if(byId('inputplace').innerHTML==""){
+		var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+		var URL="$uttf?getInput=img="+ceimgURL
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+function resizetoFun(){
+	if(byId('ceresizetowidth').checked==true){
+		byId('cedisplayIMG').width=byId('ceresizeto').value
+		ratio=ceimgwid/byId('ceresizeto').value
+		byId('cedisplayIMG').height=parseInt(ceimghei/ratio)
+	}
+	if(byId('ceresizetoheight').checked==true){
+		byId('cedisplayIMG').height=byId('ceresizeto').value
+		ratio=ceimghei/byId('ceresizeto').value
+		byId('cedisplayIMG').width=parseInt(ceimgwid/ratio)
+	}
+}
+function selection4(dir,path,url){
+	if(dir == "dir"){
+		pad4.location="$uttf?pathTree=x=insert_image="+path
+		byId('propImg2').style.visibility="hidden"
+		byId('treeImg2').style.visibility="hidden"		
+	}
+	if(dir=="bin"){		
+		byId('csimgurl').value=url.replace("$host","")
+		byId('ceimgtitle').value=url.replace(pad4.urldir,"")
+		ceimgID=url.replace(pad4.urldir,"")
+		byId('ceimgtitle').value=byId('ceimgtitle').value.replace("/","")
+		byId('propImg2').style.visibility="visible"
+		byId('treeImg2').style.visibility="visible"
+		byId('ytDelete').style.visibility="visible";
+		byId('thmTD_').style.visibility="visible";
+		byId('popTD_').style.visibility="visible";
+		byId('targTD_').style.visibility="visible";
+		byId('ytRewrite').style.visibility="visible";
+		cedisplayphoto(url);
+		swup("attTD","attTBL")
+		resetButton()
+	}
+}
+function cePreview(){
+	var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+	var URL="$uttf?getPreview="+ceimgURL+"="+byId('ceresizetowid').value+"="+byId('ceresizetohei').value
+	JITc(URL)
+}
+function cePreviewTH(){
+	var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+	var URL="$uttf?getPreview="+ceimgURL+"="+byId('ceresizetowidth').value+"="+byId('ceresizetoheith').value
+	JITc(URL)
+}
+
+function upDIR4(){
+	pad4.location="$uttf?pathTree=up=insert_image="+pad4.updir
+	byId('propImg2').style.visibility="hidden"
+	byId('treeImg2').style.visibility="hidden"
+}
+function ceProperties2(){
+	var URL="$uttf?getProperties="+byId('csimgurl').value
+	JITc(URL)
+}
+function ceCopyMove2(){
+	if(byId('copyplace').innerHTML==""){
+		var URL="$uttf?getCopy=list="+byId('csimgurl').value
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('copyMain','copyplace',400)
+	}
+}
+function uploader(){
+	upload_frame.location="$url_to_editor?upload_file=wiz"
+	document.getElementById("upload_div").style.display=""
+ 	document.getElementById("imager").style.visibility="hidden" 
+ 	document.getElementById("flasher").style.visibility="hidden" 	
+}
+wratio=0
+hratio=0
+function prorat(n,v){
+	if(byId('ceimgretain').checked==true){
+		if(n=="wid"){
+			ratio=v/ceimgwid
+			byId('ceresizetohei').value=parseInt(ceimghei*ratio)
+		}
+		if(n=="hei"){
+			ratio=v/ceimghei
+			byId('ceresizetowid').value=parseInt(ceimgwid*ratio)
+		}
+	}
+}
+function proratTH(n,v){
+	if(byId('ceimgretainth').checked==true){
+		if(n=="wid"){
+			ratio=v/ceimgwid
+			byId('ceresizetoheith').value=parseInt(ceimghei*ratio)
+		}
+		if(n=="hei"){
+			ratio=v/ceimghei
+			byId('ceresizetowidth').value=parseInt(ceimgwid*ratio)
+		}
+	}
+}
+function createThumb(){
+	var ceimgURL=byId('csimgurl').value.replace(/https*:\\/\\//,"")
+	var url="$uttf?createThumbnail="+ceimgURL+"="+byId('ceresizetowidth').value+"="+byId('ceresizetoheith').value
+	JITc(url)
+}
+function refit(n){
+fit=n
+	if(n==0){
+		byId("actualsize").disabled=true;byId("fitpreview").disabled=false
+		byId("cedisplayIMG").width=actWid
+		byId("cedisplayIMG").height=actHei
+	}else{
+		byId("actualsize").disabled=false;byId("fitpreview").disabled=true
+		if(actWid >= 198){
+			byId("cedisplayIMG").width=198
+			ratio=198/actWid
+			byId("cedisplayIMG").height=parseInt(actHei*ratio)
+		}
+		if(byId("cedisplayIMG").height >= 127){
+			nu_h=byId("cedisplayIMG").height
+			nu_w=byId("cedisplayIMG").width
+			byId("cedisplayIMG").height=127
+			ratio=127/nu_h
+			byId("cedisplayIMG").width=parseInt(nu_w*ratio)
+		}
+	}
+}	
+
+byId('photosplace').innerHTML=photoTbl
+
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassOption'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+byId('clasesIMGapply').innerHTML='<select id=classesIMGapply class=input style="max-width:100px">'+sopts+'</select>'
+byId('clasesIMGapply').width="230"
+byId('xclasesIMGapply').width="230"
+}
+
+byId('propertyplace').style.display="none"
+cephoto()
+~;
+
+
+sub get_img_folder{
+$imgfldr_=$imgfldr;$imgfldr_=~s`\Q$root\E``;
+$U = "a";
+$V = 1;
+$W = $U.$V;
+@things=<$imgfldr/*>;
+foreach $thing (@things){
+if(-d $thing){
+	push(@dirs,$thing);
+	@dir=<$thing/*>;
+	push(@$W,@dir);
+	}
+}
+&cycle;
+}#get_img_folder
+
+sub cycle{
+	foreach $thing (@$W){
+	if(-d $thing){
+		push(@dirs,$thing);
+		@dir=<$thing/*>;
+		push(@X,@dir);
+		}else{
+		push(@things,$thing);
+		}
+	}
+if($#X > -1){++$V;$W = $U.$V;@$W=@X;@X=();&cycle}
+}#cycle
+
+
+1;

@@ -1,0 +1,58 @@
+use Crypt::Lite;
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+
+
+open(USRS,"$users_txt");
+$adm=<USRS>;$adm=~s`\s+$``;
+($x,$kryptKey)=split(/=/,$adm);
+$kryptKey=~s`\W``g;$kryptKey=~s`^ce``;
+
+$key=$params;
+$key=~s`Br_bR`\n`g;$key=~s/eQuAl/=/g;
+
+$crypt = Crypt::Lite->new( debug => 0 );
+$decrypted = $crypt->decrypt($key, $kryptKey);
+$decrypted=~s/(\d)+$//;$random=$1;
+print ("Content-type: image/gif\r\n\r\n"); 
+
+if($isIM==1){
+require 'useImageMagick.htm';
+@Fonts=("21 Kilobyte Salute.ttf","MATILDAB.TTF","Maiandb.TTF","BABCOCK.TTF","Grubby.ttf","HYPEWRI1.TTF","Olopus.ttf","HYPEWRI2.ttf","MATILDAN.TTF","SamismyName.ttf","HALDASMA.TTF","ALBAS___.TTF","CHILD_TR.TTF","JI-Gabled.ttf");
+
+@Size=qw(13 16 16 16 17 18 16 16 15 16 16 16 18 16 16);
+$emit=reverse(time);
+$emit=$emit.$emit;
+$xrand=substr($randx,4,1);
+
+$xxxrand=substr($randx,6,1);
+if($xrand>5){$rotate="-$xrand"}else{$rotate="+$xrand"}
+$rotate=~s`--`-`;
+
+if($xxxrand>5){$color="#bbbbbb";$point=14;}else{$color="#aaaaaa";$point=16;}
+$font=$incs_folder_PATH.'/Captcha/'.$Fonts[$random];
+$point=$Size[$random];
+
+
+$im = int(rand(6));
+++$im;
+$img="$incs_folder_PATH/Captcha/captcha_bg_$im.gif";
+my $q = Image::Magick->new; 
+$q->Read($img); 
+$q->Annotate(gravity=>'center', font=>$font, pointsize=>$point, rotate=>$rotate, fill=>$color, text=>$decrypted, antialias=>1); 
+binmode STDOUT;
+$q->Write('gif:-'); 
+exit;
+}else{
+	$isLWP=eval { require LWP::Simple } ? 1 : 0;
+	if($isLWP==1){	
+		require 'useLWPSimple.htm';
+		$decrypted=~s/=/::/g;$key=~s/=/::/g;
+		$qs="$decrypted=$key=$kryptKey=$domain_license";
+		$qs =~ s/([\W])/"%" . uc(sprintf("%2.2x",ord($1)))/eg; 
+		$get=get("http://www.gphrs.com/cgi/captcha.cgi?$qs");
+		binmode STDOUT;
+		print "$get";
+		
+	}
+}
+1;

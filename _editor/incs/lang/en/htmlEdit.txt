@@ -1,0 +1,5 @@
+widgettile=Edit HTML Code
+text1=Click the editable area to edit
+Resizetitle=Resize
+button1=Wrap Off
+button2=Apply HTML Edits To Page

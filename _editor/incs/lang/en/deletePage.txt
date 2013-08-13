@@ -1,0 +1,2 @@
+htmlalert1=The File<BR>
+htmlalert2=<BR>Was Deleted

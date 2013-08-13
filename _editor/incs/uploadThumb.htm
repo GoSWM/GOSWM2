@@ -1,0 +1,66 @@
+use CGI qw/:standard :html3/;
+use  Image::Size;
+	if ($^O =~ /MSWin32/i){	
+		$temp = $ENV{'TEMP'} || $ENV{'TMP'} || $ENV{'WINDIR'};
+		if($temp =~ /Temp/i){
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp";
+			}
+		}else{
+			$temp=$temp."/Temp";
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp"; 
+			}else{
+				$tmp="$path_to_domain/Temp";
+				mkdir($tmp,0755);
+				$TempFile::TMPDIRECTORY="$tmp"; 
+				$CGITempFile::TMPDIRECTORY="$tmp"; 
+			}
+		}
+	}
+
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+    $file = param('upload2');
+	$file=~m`\.(\w+)$`;$ext=$1;
+	$short_name = param('thumb_name');
+	$folder = param('thumb_folder');
+ 	$file_=$folder."/".$short_name.".".$ext;
+	
+   open (SAVE,">$file_") || die $!;
+	binmode SAVE if $^O eq 'MSWin32';
+    while ($size = read($file,$data,1024)) {
+        print SAVE $data;
+        $total_size += $size;
+    }
+    close SAVE;
+    if ($total_size < 1) {unlink($file_);$ret="NOT";}
+($width, $height) = imgsize("$file_");
+
+$thumb_name=$short_name.".".$ext;
+$uploadedURL=$file_;
+$root=~s`\w:``;
+$uploadedURL=~s`$root`$host`;
+
+print "Content-type: text/html\n\n";
+print qq~<script type="text/javascript">
+parent.byId('thumb_name').value="$thumb_name"
+parent.byId('UploadMovieFileToOpenedFolderbutton').style.display="table"
+parent.uploadedThumbURL="$uploadedURL"
+parent.pad11.location.reload(true)
+parent.byId('thumbWidth').value="$width"
+parent.byId('thumbHeight').value="$height"
+parent.byId('vidWidth').value="$width"
+parent.byId('vidHeight').value="$height"
+parent.byId('div4').style.display="none"
+parent.byId('thumbButt').style.display="block"
+parent.byId('thumbButt2').style.display="block"
+parent.byId('thumbButt2').style.visibility="visible"
+parent.ceimghei="$height"
+parent.ceimgwid="$width"
+parent.byId('vidCaption').value="$short_name"
+location="about:blank"
+</script>
+~;
+1;

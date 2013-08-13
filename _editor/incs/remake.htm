@@ -1,0 +1,37 @@
+
+
+$this_file=$ENV{'SCRIPT_NAME'};
+$this_file=~s`.+/``; 
+$end=1;
+open(THISFILE,"$this_file");
+while(<THISFILE>){
+	
+	if($end==1){
+		if(/push..INC,.incs_folder_PATH/){$_.="require 'routines.htm';\n";$LINE=$_}
+		$FILE.=$_;
+	}
+	if(m`\&\$action;`){$end=2}
+}
+
+open(THISFILE,">$this_file");
+print THISFILE "$FILE";
+
+open(CUS,">$txts_folder_PATH/custom.txt");
+print CUS qq~CSSfile=default
+~;
+close(CUS);
+
+unlink("$incs_folder_PATH/remake.htm");
+$remade="$incs_folder_PATH/remade.htm";
+open(R,">$remade");
+print R "$this_file";
+close(R);
+
+
+print "Content-type: text/html\n\n";
+print qq~<html><head><title></title>
+<script type="text/javascript">location.reload(true);</script>
+</head><BODY bgcolor=ffffff text=000000></body></html>~;
+
+exit;
+1;

@@ -1,0 +1,47 @@
+
+$urlfile=$params;
+$nufile=$params;
+$nufile=~s`$host``;
+$params=~s`$host`$root`;
+&get_cookie;
+if(-d $params){alert("No File Name Was Submitted")}
+open(USR,"$users_txt");
+while(<USR>){
+	if(/$cookie{'ceuser'}=/){
+		s`\s+$``;
+		($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+		if($urls ne "all" && $utype<5){
+			@urls=split(/,/,$urls);
+			foreach $u (@urls){if($u eq $nufile){$already=1}}
+			push(@urls,$nufile);
+			$urls=join(",",@urls);
+			$_=qq~$ceuser=$pw=$urls=$basic=$imgfldr=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n~;
+		}
+	}
+	$SAVEUSR.=$_;
+}
+if($nufile && !$already){
+	open(USR,">$users_txt");
+	print USR "$SAVEUSR";
+}
+if($change_permissions>0 && -f $params){chmod(0666,"$params")}
+open(NU,">$params");
+print NU "YADA";
+
+if($change_permissions==2 && -f $params){chmod(0644,"$params")}
+
+$RETURN=qq~byId('saveitas').value="$params";byId('savasplace').style.display="none";dosave()~;
+&respond;
+
+sub get_cookie{
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie);
+		$name =~ s/^\s*//;
+		$cookie{$name}=$value;
+	}
+}#get_cookie
+
+
+1;#

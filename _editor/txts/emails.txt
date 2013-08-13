@@ -1,0 +1,10 @@
+default_email=matt@goswm.com
+matt=info@goswm.com
+default=
+guideowner=googleany2
+businesspage=happy@goswm.com
+warrendunes=warrendunes@goswm.com
+happyfarming=farming@goswm.com
+splatter=
+Taco Bell Rules=
+NilesWaterfront=

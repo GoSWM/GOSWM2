@@ -1,0 +1,8 @@
+widgettitle=Properties
+FileProperties=File Properties
+FileName=File Name
+FileURL=File URL
+FilePath=File Path
+FileSize=File Size
+LastModified=Last Modified
+Permissions=Permissions

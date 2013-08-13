@@ -1,0 +1,29 @@
+lang("checkThumb");
+use  Image::Size;
+$file=$params;
+$img=$file;
+$img_=$file;
+$img_=~s`_th``;
+$img_=$root.$img_;
+
+($width, $height) = imgsize("$img_");
+$url=$params;	
+$url=~s`$host``;
+$URL=$url;
+$URL=~s`_th``;
+	$img_=~s`//`/`g;
+if(-e $img_){
+	$RETURN=qq~byId('linkthumb').className="button_center";
+	byId('linkthumbCaption').disabled=false
+	activeFullWidth="$width"
+	activeFullHeight="$height"
+	activeFullURL="$URL"
+	activeThumbURL="$url"
+	~;
+}else{
+	$RETURN=qq~basicAlert("$htmlalert1 $img_ $htmlalert2")~;
+}
+
+
+1;
+

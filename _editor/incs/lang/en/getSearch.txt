@@ -1,0 +1,14 @@
+widgettitle=Site Search Widget
+ReApplyTextContentChangestitle=ReApply Text Content Changes
+UnApplyTextContentChangestitle=UnApply Text Content Changes
+InsertSearchFormbutton=Insert Search Form
+text1=Open Folder to begin search in
+Basefoldertosearchin=Base folder to search in
+Listfolderstoexcludefromsearch=List folders to exclude from search
+Listextensionsoffilestosearch=List extensions of files to search
+Charactersaftermatchtodisplay=Characters after match to display
+Displayonlyfirstmatchonpage=Display only first match on page
+Heightofdisplay=Height of display
+Widthofdisplay=Width of display
+SiteSearchtitle=Site Search
+Widthofsearchfield=Width of search field on page

@@ -1,0 +1,76 @@
+lang("rewriteImgSize");
+($file,$wid,$hei,$quality)=split(/=/,$params);
+$url_=$file;
+$file="http://".$file;
+$url=$file;
+$file=~s`$host`$root`;
+$wh=$wid."x".$hei;
+
+if($quality<100){$QtY=qq~(Quality->$quality)~}
+use Image::Size;
+($width, $height) = imgsize("$file");
+$wh_=$width."x".$height;
+
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+if($isIM==1){	
+	require 'useImageMagick.htm';
+	$img = new Image::Magick;
+  	$img->Read("$file");
+	$img -> Resize($wh);
+	if($quality<100){$img ->Set(quality=>$quality)}
+	$img -> Write($file);
+	$ok=1;$x=1;
+}elsif($isGD){
+	require 'useGDLibrary.htm';
+	if($wid>$hei){$WH=$wid}else{$WH=$hei}
+	$file =~ m`\.(\w+)$`;$ext=$1;
+    open IN, "$file"  or die "Could not open.";
+	if($ext =~/png/i){
+        $srcImage = GD::Image->newFromPng(*IN);
+	}
+	if($ext =~/jpg/i){
+        $srcImage = GD::Image->newFromJpeg(*IN);
+	}
+    close IN;
+    ($thumb,$x,$y) = createGD($srcImage,$WH);
+    open OUT, ">$file" or die "Could not save ";
+    binmode OUT;
+	if($ext =~/jpg/i){
+		print OUT $thumb->jpeg;
+	}
+ 	if($ext =~/png/i){
+       	print OUT $thumb->png;
+	}
+    close OUT;
+	$ok=1;
+}else{
+	$ok=2;	
+}
+if($ok==1){
+	$RETURN=qq~basicAlert("$x$htmlalert1 $wh_ $htmlalert2 $wh $QtY")
+	cedisplayphoto("$url","$wid","$hei")
+~;
+}elsif($ok==2){
+	$uttf=~s`https*://``;
+	$url_=~s`//`/`g;
+	$RETURN=qq~JITc("http://gphrs.com/cgi/imagemagick_rewrite.cgi?resize=$url_=$wid=$hei=$domain_license=$uttf")~;
+}else{
+	$RETURN=qq~basicAlert("$htmlalert3<BR>&nbsp;&nbsp;$url<br>$htmlalert4 Quality->$quality")~;
+}
+1;
+
+sub createGD { my ($orig,$max) = (shift,shift);
+	($ox,$oy) = $orig->getBounds();
+	($maxx, $maxy);
+	if (($maxx, $maxy) = $max =~ /^(\d+)x(\d+)$/i){
+		$max = ($ox>$oy)? $maxx : $maxy;
+	} else {
+		$maxx = $maxy = $max;
+	}
+	$r = ($ox/$maxx) > ($oy/$maxy) ? ($ox/$maxx) : ($oy/$maxy);
+	$thumb = GD::Image->new($ox/$r,$oy/$r);
+	$thumb->copyResampled($orig,0,0,0,0,$ox/$r,$oy/$r,$ox,$oy);
+	if($quality<100){$thumb->jpeg($quality)}
+	return $thumb, sprintf("%.0f",$ox/$r), sprintf("%.0f",$oy/$r);
+}

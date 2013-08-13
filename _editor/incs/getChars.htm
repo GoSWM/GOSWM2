@@ -1,0 +1,57 @@
+lang("getChars");
+$main="charMain";
+$place="charplace";
+$title="$widgettitle";
+$wigWid="400";
+$ico="chars";
+require 'widgetBody.htm';
+
+if($isIE){
+$UN=qq~<table align=center border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+<img id=redoBTN class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$title1" $unz onclick=;ceCopies("Redo")></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$title2" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>~;
+}
+
+$i=1;
+open(CT,"$txts_folder_PATH/specialcharacters.txt");
+while(<CT>){
+	s`\s+$``;
+	($ch,$ent)=split(/=/);
+	$ENT=$ent;$ENT=~s/&//;$ENT=~s/(.)/$1 /g;
+	if($i==1){$chars.=qq~<tr style="height:20px">~;}
+	$chars.=qq~<td align=center class=charTD onclick=setChar(this) title="& $ENT" $uns>$ent</td>~;
+	if($i==14){$chars.=qq~</tr>~;$i=0}
+	++$i;
+}
+$CHARS.=qq~<table align=center border=1 cellpadding=0 borderColor=#bbbbbb cellspacing=2 bgcolor=#FFFFFF style="border:1px solid #bbbbbb;margin:1px">$chars</table>$UN~;
+
+$RETURN=qq~charTbl='$BODY_TOP
+	<div align=center style="border:0px;padding:0px 0px 10px 0px;width:400px;">
+	$CHARS
+</div>
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function setChar(obj){
+	cecheck_selected()
+		if(ceinside==0){
+			uncursor()
+		}else{
+		ceget_selected()
+		if(isIE){
+			txt=obj.innerText
+			if(txt == "<"){txt="&lt;"}
+			capture()
+			cesel.pasteHTML(txt);cesel.select()
+			byId('undoBTN').style.visibility="visible"
+			byId('redoBTN').style.visibility="hidden"
+		}
+		if(isFF){
+			txt=obj.innerHTML
+			doc().execCommand("InsertHTML", false, txt); 
+		}
+	}
+}
+byId('charplace').innerHTML=charTbl
+ceset_chars()
+~;
+1;

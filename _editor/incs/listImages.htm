@@ -1,0 +1,24 @@
+lang("getGallery");
+$fldr=$params;
+$imgTypes="gif,png,jpg,jpeg";$imgTypes=~s`,`|`g;
+@fldr=<$fldr/*>;
+
+$OPTS=qq~<option value="">$SelectImage~;
+foreach $file (@fldr){
+	if($file =~ /thumbs/i){next}
+	if($file !~ /$imgTypes/i){next}
+	if(-B $file){
+		if($file=~m`_th\.`){$thumto=1}
+		$file=~ m!([^/:\\]*)$!;$nm=$1;
+		$root=~s`\w:``;
+		$file_=$file;$file=~s`\Q$root\E`$host`;
+		$OPTS.=qq~<option value="$file_|$file">$nm~;
+		++$i;
+	}
+}
+if($thumto){$thumtouse=qq~byId('thumtouse').style.display="block"~}else{$thumtouse=qq~byId('thumtouse').style.display="none"~}
+$HTML=qq~<select onchange=checkForThumb(this.options[this.selectedIndex].text,this.options[this.selectedIndex].value) id=listImagesMenu class=input>$OPTS</select>~;
+
+$RETURN=qq~byId('cximg_list').innerHTML='$HTML';$thumtouse~;
+
+1;

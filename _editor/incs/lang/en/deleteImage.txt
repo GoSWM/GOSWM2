@@ -1,0 +1,2 @@
+htmlalert1=The Image<BR>&nbsp;&nbsp;$file_<BR>Was Deleted
+htmlalert2=The File<BR>&nbsp;&nbsp;$file_<BR>Was Deleted

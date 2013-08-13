@@ -1,0 +1,1 @@
+address=There is no file name & extension in the browser's address field\n\nTo edit a file, the file's full name must be in the browser's address field

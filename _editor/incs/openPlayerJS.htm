@@ -1,0 +1,102 @@
+lang("openPlayerJS");
+if($isIE){$opacity="filter='alpha(opacity:90)'"}
+if($isFF){$opacity="opacity='.9'"}
+
+$RETURN.=qq~
+	function rollVids(id,src,wid,hei){
+		document.getElementById(id).style.width=wid+"px";
+		document.getElementById(id).style.height=hei+"px";
+		\$f(id, {
+			src:'$flash_folder_URL/flowplayer.swf',
+			wmode: 'opaque'
+		},{
+			clip: {      
+				url:src,					     
+				autoPlay: true	
+			},
+			plugins: {     
+				controls: {      
+					bottom:0,  
+					height:26,   
+					backgroundColor: '#3C4352',         
+					backgroundGradient: 'none',                
+					durationColor: '#cccccc',           
+					timeColor: '#dddddd',     
+					bufferColor: '#444444',
+					bufferGradient: 'medium', 
+					progressColor: '#555555',
+					progressGradient: 'medium',
+					buttonColor:'#717171',
+					buttonOverColor: '#717171', 
+					sliderColor: '#717171' ,
+					sliderGradient: 'none',
+					autoHide: 'never',             
+					play:true,              
+					volume:true,         
+					mute:true,          
+					time:true,          
+					stop:false,         
+					playlist:false,          
+					fullscreen:true,                 
+					scrubber: true            
+				 } 
+			}
+		});\$f().play();
+	}
+	
+function playVid(src,w,h,cap){
+	wx=0;hx=0
+	if(document.getElementById("ViD")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("ViD"))}
+	if(document.getElementById("VDSHD")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("VDSHD"))}
+	var dcw=document.documentElement.clientWidth?document.documentElement.clientWidth:document.body.clientWidth
+	var dch=document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight
+	var dbst= document.documentElement.scrollTop?document.documentElement.scrollTop:document.body.scrollTop
+	var shad = document.createElement("DIV");
+		wx=w;wz=w;hx=h;hz=h
+	var LeftPos=eval(dcw-w)/2
+	var TopPos = eval(dbst+30)
+	shad.style.top="0px"
+	shad.style.left="0px"
+	shad.style.width= dcw+"px"
+	shad.style.height= dch+"px"
+	shad.id= "VDSHD"
+	shad.style.position="fixed"
+	shad.style.backgroundColor="#333"
+	shad.style.display="block"
+	shad.style.$opacity
+	document.getElementsByTagName('body')[0].appendChild(shad);
+	var ww=eval(w)+0
+	var element = document.createElement("DIV");
+	element.id = 'ViD';	
+	element.style.width=w+"px"
+	
+	element.style.border="4px double #222222"
+	element.style.padding="0px"
+	element.style.backgroundColor="#444444"
+	element.style.position="absolute"
+	element.style.zIndex="100"
+	element.style.top=TopPos+"px"
+	element.style.left=LeftPos+"px"
+	element.style.display="block"
+	document.getElementsByTagName('body')[0].appendChild(element);
+	if(cap==''){cap="&nbsp;"}
+	elViD='<div style="border:0px solid #444444"> '+
+	'<table id=imgTBL width="'+ww+'" border=0 cellpadding=0 cellspacing=0>'+
+	'<tr style="background-color:#3C4352">'+
+	'<td align=left style="font-family:trebuchet ms,Tahoma,Helvetica;font-size:12px;'+
+	'padding:2px 0px 0px 8px;font-weight:bold;color:#FFFFFF">'+cap+'</td><td align=right>'
+	elViD+='<img src="$flash_folder_URL/spot.jpg" width="22" height="22" border="0" title="$CloseVideotitle" '+
+	'style="cursor:pointer;margin:2px 5px 3px 0px;" onclick=document.getElementById("VDSHD").style.display="none";'+
+	'document.getElementById("ViD").style.display="none";\$f().unload();\$f().hide()>'+		
+	'</td></tr><tr><td colspan=2 align=left style="padding:0px" id=plaYer></td>'+
+	'</tr></table></div>'
+	document.getElementById("ViD").innerHTML=elViD;
+	rollVids("plaYer",src,w,h)
+	
+}
+window.onerror=unalert 
+function unalert(){return false}
+~;
+
+1;
+

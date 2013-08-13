@@ -1,0 +1,28 @@
+	($act,$fore,$aft)=split(/=/,$qs);
+	$fore=~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+	if($aft){
+		$aft=~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		$fore=~s`value="[^"]+swf"`value="$aft"`si;
+		$fore=~s`src="[^"]+"`src="$aft"`si;
+	}
+	if($fore =~ m`wmode`){
+		$fore=~s`wmode="[^"]+"`wmode="transparent"`sig;
+	}
+	if($fore !~ m`wmode`){
+		$fore=~s`<param name="*movie"*`<PARAM NAME="WMode" VALUE="transparent">\n<param name="movie"`i;
+		$fore=~s`<embed `<embed  wmode="transparent" `i;
+	}
+	$fore =~ s/([\W])/"%" . uc(sprintf("%2.2x",ord($1)))/eg; 
+	print "Content-type: text/javascript\n\n";
+	print qq~fore="$fore";ceFlash=unescape(fore);byId('cethecode').value=unescape(fore)
+	if(isIE){
+		capture()
+		cesel.pasteHTML(ceFlash)
+		byId('undoBTN').style.visibility="visible"
+		byId('redoBTN').style.visibility="hidden"
+	}else{
+		doc().execCommand("InsertHTML", false, ceFlash); 
+	}
+~;
+	exit;
+1;

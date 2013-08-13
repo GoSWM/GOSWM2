@@ -1,0 +1,63 @@
+lang("deleteFolder");
+$folder=$params;
+
+if($folder eq $root){alert("$alert")}
+
+$AU = "a";
+$AV = 1;
+$AW = $AU.$AV;
+@Athings=<$folder*>;
+foreach $thing (@Athings){
+	if(-f $thing){push(@AFILES,$thing)}
+	if(-d $thing){
+		push(@ADIRS,$thing);
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@Adir=<$THNG/*>;
+		push(@$AW,@Adir);
+	}
+}
+&Bcycle;
+foreach $f (@AFILES){
+	unlink($f);
+}
+sub Bcycle{
+	foreach $thing (@$AW){
+	if(-f $thing){push(@AFILES,$thing)}
+	if(-d $thing){
+			$hta=$thing.'/.htaccess';
+			if(-f $hta){unlink($hta)}
+			$htp=$thing.'/.htpasswd';
+			if(-f $htp){unlink($htp)}		
+		push(@ADIRS,$thing);
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@Adir=<$THNG/*>;
+		push(@AX,@Adir);
+		}
+	}
+if($#AX > -1){++$AV;$AW = $AU.$AV;@$AW=@AX;@AX=();&Bcycle}
+}#bcycle
+
+@ADIRS=sort(@ADIRS);
+@ADIRS=reverse(@ADIRS);
+foreach $d (@ADIRS){
+$d=~s!/$!!;
+rmdir($d);
+}
+rmdir($folder);
+
+
+$nuflder=$folder;
+$nuflder=~s`(.*?/)[^/]+/$`$1`;
+
+$folder=~s`\Q$root\E`$host`;
+$RETURN=qq~
+byId('yesBut').innerHTML="$OK"
+active_alert="$htmlalert"
+doAlert("alert")
+active_function = new Function("byId('openURL').value='';pad1.location='$uttf?pathTree=x=open_page=$nuflder';closeAlert()")
+	~;
+1;
+
+

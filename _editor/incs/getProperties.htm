@@ -1,0 +1,74 @@
+lang("getProperties");
+$url=$params;
+$params=~s`$host``;
+$file_name=$params;$file_name=~s`.*/``;
+$params=$root.$params;
+($size,$mod)=(stat("$params"))[7,9];
+$size=~s`(\d+)(\d{3})$`$1,$2`;
+$size=~s`(\d+)(\d{3}),(\d{3})$`$1,$2,$3`;
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($mod);
+++$mon;
+if($mon<10){$mon="0".$mon}
+if($mday<10){$mday="0".$mday}
+$year+=1900;
+$mod=qq~$mon/$mday/$year $hour:$min~;
+$mode = sprintf "%o", (stat("$params"))[2] & 07777;
+
+
+
+$RETURN=qq~nuDiv='<DIV style="display:block;left:1px;top:1px;position:absolute">
+<table align=center width=400 align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td style="-moz-user-select:none;text-align:left;padding-left:2px" class=widgetTitle $uns>
+			<DIV>
+				<img align=$abs src="$utif/properties.png" $uns title="">
+				<SPAN style="padding-left:7px">$widgettitle</SPAN>
+			</DIV>
+		</td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close" 
+				onclick=byId("propertyplace").style.display="none"
+				 style="margin:1px 0px 0px 0px;cursor:pointer"></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns align=center>
+	<DIV style="font-family:tahoma,arial;font-size:13px;margin:10px">$FileProperties</DIV>
+	<DIV style="overflow:hidden;">
+		<table align=center border=0 cellpadding=4 cellspacing=0 style="font-family:tahoma,arial;font-size:11px;white-space:nowrap">
+		<tr><td align=left>$FileName:</td><td align=left><input style="width:270;border:1px dotted #888888;font-family:tahoma,arial;font-size:11px;background-color:transparent" value="$file_name"></td></tr>
+		<tr><td align=left>$FileURL:</td><td align=left><input style="width:270;border:1px dotted #888888;font-family:tahoma,arial;font-size:11px;background-color:transparent" value="$url"></td></tr>
+		<tr><td align=left>$FilePath:</td><td align=left><input style="width:270;border:1px dotted #888888;font-family:tahoma,arial;font-size:11px;background-color:transparent" value="$params"></td></tr>
+		<tr><td align=left>$FileSize:</td><td align=left>$size</td></tr>
+		<tr><td align=left>$LastModified:</td><td align=left>$mod</td></tr>
+		<tr><td align=left>$Permissions:</td><td align=left>$mode</td></tr>
+		<tr><td colspan=2 align=center><table style="margin:12px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+		<td align=center onclick=byId("propertyplace").style.display="none" class=button_center>$Close</td><td>$RBUT</td></tr></table></td></tr>
+	</table></DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table>
+</DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('propertyplace').style.zIndex=10000;
+byId('propertyplace').innerHTML=nuDiv;
+byId('propertyplace').style.display="block";
+LeftPos = (document.body.clientWidth-400)/2
+byId('propertyplace').style.position="absolute"
+byId('propertyplace').style.left=LeftPos+"px";
+byId('propertyplace').style.top="100px"
+~;
+
+1;

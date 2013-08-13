@@ -1,0 +1,4 @@
+FLASHNOTE=You have a Flash element on the page that does not contain the wmode="transparent" PARAM tag. Editor Widgets will be behind your Flash until you add the wmode PARAM tag.<BR><BR>The OBJECT must include a <br><b>&lt;PARAM name="wmode" value="transparent"&gt;</b> tag.<BR><BR>The EMBED tag must include a<br><b>wmode="transparent"</b> value.
+SCRIPTNOTE=You have a Flash element on the page produced by the javascript function AC_FL_RunContent. Editor Widgets will be behind your Flash until you add wmode to the function's parameters.<BR><BR>Add <b>'wmode','transparent',</b> just before the <b>width</b> in the function's list of parameters.<br><br>The entire &lt;script&gt; ... &lt;/script&gt; block will need to be enclosed in an excludeblock to prevent the editor from duplicating the function when you save edits to the page.
+title=Flash Warning
+button=Close

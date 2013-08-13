@@ -1,0 +1,6 @@
+alert1=The User $user_name Was Added
+alert2=The Username
+alert3=Is Already In Use\n\nEnter A Different Username
+EMsubject=New User Signup
+alert4=The Username 
+alert5=was not the one you checked on before payment

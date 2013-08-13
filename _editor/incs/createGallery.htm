@@ -1,0 +1,303 @@
+lang("createGallery");
+($folder,$cells,$ww,$hh,$brdwid,$brdcolor,$pad)=split(/=/,$params);
+$brdwid=$brdwid."px";
+$folder=$root.'/'.$folder;
+$imgTypes="gif,png,jpg,jpeg";$imgTypes=~s`,`|`g;
+$tr=0;
+$space="%20";
+@dir_=<$folder/*>;
+foreach $fi (@dir_){
+	$fi_=$fi;$fi_=~s`$folder/``;
+	if($fi_=~m`$space` || $fi_=~m` `){
+		$fi_=~s`$space`_`g;$fi_=~s` `_`g;
+		$fi_=~s`\.`PERIoD`g;$fi_=~s`\-`DaSh`g;$fi_=~s`\W``g;$fi_=~s`PERIoD`.`g;$fi_=~s`DaSh`-`g;
+		$fix=$folder.'/'.$fi_;
+		rename($fi,$fix);
+		$fi=$fix;
+	}
+	push(@dir,$fi);
+}
+
+$HTML=qq~<table align=center border=0 cellpadding=$pad cellspacing=0>~;
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+use Image::Size;
+
+foreach $file (@dir){
+	if(-d $file){next}
+	if($file=~m`\.txt$` || $file =~/Thumbs/){next}
+	$image=$file;
+	$thumb=$image;
+	$thumb=~s`(.+)(\.\w+)$`$1_th$2`;
+	if($image !~ m`_th\.`){		
+		if(!-e $thumb){	
+			if($demo != 1){&shrink($image)}
+		}else{
+			($wx,$hx) =imgsize("$thumb");
+			if($wx>$ww || $hx > $hh){
+				if($demo != 1){&shrink($image)}
+			}
+		}
+		push(@IMGS,$image);
+	}
+}
+$rows=0;
+foreach $img (@IMGS){
+	if($img !~ /$imgTypes/i){next}
+	$thumb=$img;$txt=$img;
+	$thumb=~s`(.+)(\.\w+)$`$1_th$2`;
+	$txt=~s`\w+$`txt`;
+	$TXT='';
+	open(TXT,"$txt");$TXT=<TXT>;
+	if($TXT eq ''){$TXT="_"}
+	($wxz,$hxz) = imgsize("$thumb");
+	($wid,$hei) = imgsize("$img");
+	$img=~s`\Q$root\E`$host`;
+	$thumb=~s`\Q$root\E`$host`;
+	if($tr==0){
+		$HTML.=qq~<tr>~;	
+		++$rowsCreated;		
+	}
+	$HTML.=qq~<td align=center><img src="$thumb" onclick=enlargeTH("$img","$wid","$hei",this.alt) style="border:$brdwid solid $brdcolor;cursor:pointer" title="$ClickToEnlarge" alt="$TXT" width="$wxz" height="$hxz"></td>~;
+	++$cellsCreated;
+	
+	++$tr;
+	if($tr==$cells){
+		$HTML.=qq~</tr>~;
+		$tr=0;	++$rows;
+	}	
+	$opt=qq~$img|$wid|$hei|$TXT~;
+	push(@OPTS,$opt);
+}
+
+
+$totalcells=$rowsCreated*$cells;
+$rem=$totalcells-$cellsCreated;
+if($rem>0 && $rem<$cells){
+for($i=0;$i<$rem;++$i){
+	$HTML.=qq~<td>&nbsp;</td>~;
+	if($i==$rem){$HTML.=qq~</tr>~}
+}
+}
+
+$HTML.=qq~</table>~;
+&JS;
+
+$HTML=~s`[\n]``g;$HTML=~s`[\t]``g;#$HTML=~s`'`&#39;`g;
+$RETURN=qq~$JS document.getElementById("gallerySpot").innerHTML='$HTML'~;
+
+
+sub resize{
+	($w,$h) =imgsize("$image");
+	if($w > $ww){
+		$W=$ww;
+		$wratio=$ww/$w;
+		$H=$h*$wratio;
+	}else{$H=$h;$W=$w}
+	if($H > $hh && $hh !=0){
+		$hratio=$hh/$H;
+		$W=$W*$hratio;
+		$H=$hh;	
+	}
+	$W=int($W);$H=int($H);
+	$image=~s`\Q$root\E`$host`;
+	($wxz,$hxz) =imgsize("$thumb");
+	$IMG=qq~<img src="$image" onclick=enlargeTH("$image","$W","$H",this.alt) style="border:$brdwid solid $brdcolor;cursor:pointer" title="$ClickToEnlarge" width="$wxz" height="$hxz" alt="$TXT">~;
+	push(@IMGS,$IMG);
+}#resize
+
+sub shrink{
+	$isLWP=eval { require LWP::Simple } ? 1 : 0;
+	$isGD=eval { require GD; } ? 1 : 0;
+	if($isIM==1 && !$disableIM){
+		require 'useImageMagick.htm';
+		($w,$h) =imgsize("$_[0]");
+		if($w > $ww){
+			$W=$ww;
+			$wratio=$ww/$w;
+			$H=$h*$wratio;
+		}else{$H=$h;$W=$w}
+		if($H > $hh && $hh !=0){
+			$hratio=$hh/$H;
+			$W=$W*$hratio;
+			$H=$hh;	
+		}
+		if($w > $ww || $h > $hh){
+		$W=int($W);$H=int($H);
+			$wh=$W."x".$H;
+			$imgx = new Image::Magick;
+			$imgx->Read("$_[0]");
+			$imgx -> Resize($wh);
+			$imgx -> Write($thumb);
+			if($^O !~ /mswin32/i){chmod(0644,"$thumb")}
+		}
+	}elsif($isGD && !$disableGD){
+		require 'useGDLibrary.htm';
+		if($ww>$hh){$WH=$ww}else{$WH=$hh}
+		$file =~ m`\.(\w+)$`;$ext=$1;
+   	 	open IN, "$_[0]"  or die "Could not open.";
+		if($ext =~/png/i){
+   	     $srcImage = GD::Image->newFromPng(*IN);
+		}
+		if($ext =~/jpg/i){
+   	     $srcImage = GD::Image->newFromJpeg(*IN);
+		}
+   		close IN;
+   		($thumbvar,$x,$y) = createGD($srcImage,$WH);
+	    open OUT, ">$thumb" or die "Could not save ";
+ 	   binmode OUT;
+		if($ext =~/jpg/i){
+			print OUT $thumbvar->jpeg;
+		}
+ 		if($ext =~/png/i){
+ 	      	print OUT $thumbvar->png;
+		}
+ 	   close OUT;
+	}elsif($isLWP==1){	
+		if(!$reqLWP){$reqLWP=1;require 'useLWPSimple.htm'}
+		($w, $h) = imgsize("$_[0]");
+		if($w > $ww){
+			$W=$ww;
+			$wratio=$ww/$w;
+			$H=$h*$wratio;
+		}else{$H=$h;$W=$w}
+		if($H > $hh && $hh !=0){
+			$hratio=$hh/$H;
+			$W=$W*$hratio;
+			$H=$hh;	
+		}
+		if($w > $ww || $h > $hh){
+			$W=int($W);$H=int($H);
+			$wh=$W."x".$H;
+			$url=$_[0];$url=~s`\Q$root\E`$host`;
+			$url=~s`https*//``;
+			$get=get("http://gphrs.com/cgi/imagemagick_createGallery.cgi?resize=$url=$W=$H=$domain_license");
+			if($get =~ m/^OK=/){
+				$ok=1;$get =~ s/^OK=//;
+				getstore("http://gphrs.com/cgi/$get","$thumb");
+				get("http://gphrs.com/cgi/imagemagick_createGallery.cgi?delete=$get");
+				if($^O !~ /mswin32/i){chmod(0644,"$thumb")}
+			}
+		}
+	}
+}#shrink
+
+sub JS{
+if($isIE){$opacity="filter='alpha(opacity:90)'"}
+if($isFF){$opacity="opacity='.9'"}
+
+$OPTS=join("&",@OPTS);
+#open(X,">x.txt");print X "cg=$OPTS";
+$JS=qq~
+galleryList="$OPTS"
+galleryArray=galleryList.split("&")
+galleryProg=0
+function showGallery(nn){
+	galleryProg=galleryProg+eval(nn)
+	gimg=galleryArray[galleryProg].split("|")
+	im=gimg[0];w=gimg[1];h=gimg[2];alt=gimg[3]
+	document.getElementById("priorSpan").style.visibility="visible";document.getElementById("nextSpan").style.visibility="visible"
+	enlargeTH(im,w,h,alt)
+}
+function enlargeTH(im,w,h,alt){
+	alt=alt.replace(/_/g,"&nbsp;")
+	wx=0;hx=0
+	if(document.getElementById("IMJ")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("IMJ"))}
+	if(document.getElementById("IMSHD")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("IMSHD"))}
+	gal_dcw=document.documentElement.clientWidth?document.documentElement.clientWidth:document.body.clientWidth
+	var dch=document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight
+	var dbst= document.documentElement.scrollTop?document.documentElement.scrollTop:document.body.scrollTop
+	var shad = document.createElement("DIV");
+	if(h>(dch-40)){
+		wx=w;w=w*((dch-40)/h);wz=parseInt(w);hx=parseInt(h);h=parseInt(dch)-40;hz=parseInt(h);noChn=0
+	}else{
+		wx=w;wz=w;hx=h;hz=h;noChn=1
+	}
+	var LeftPos=(gal_dcw-w)/2
+	var TopPos = dbst
+	shad.style.top="0px"
+	shad.style.left="0px"
+	shad.style.width= gal_dcw+"px"
+	shad.style.height= dch+"px"
+	shad.id= "IMSHD"
+	shad.style.position="fixed"
+	shad.style.backgroundColor="#dcdcdc"
+	shad.style.$opacity
+	document.getElementsByTagName('body')[0].appendChild(shad);
+	//var hh=eval(h)+10
+	var ww=eval(w)+4
+	var element = document.createElement("DIV");
+	element.id = 'IMJ';	
+	element.style.width=eval(w)+2+"px"
+	element.style.border="1px solid #aaaaaa"
+	element.style.padding="2px 2px 2px 2px"
+	element.style.backgroundColor="#f5f5dc"
+	element.style.position="absolute"
+	element.style.zIndex="100"
+	element.style.top=TopPos+"px"
+	element.style.left=LeftPos+"px"
+	document.getElementsByTagName('body')[0].appendChild(element);
+	elIMJ='<div style="border:1px solid #888888;background-color:#ffffff" '+
+	'onmouseover=document.getElementById("ThumbEnlarged").style.display="block">'+
+	'<table id=imgTBL width="'+ww+'" border=0 cellpadding=0 cellspacing=0>'+
+	'<tr><td align=left style="font-family:trebuchet ms,Tahoma,Helvetica;font-size:11px;padding:5px;'+
+	'font-weight:bold;">'+alt+'</td>'+	
+	//'<td align=right style="padding-right:5px">'
+	
+	'<td align=right style="padding-right:5px">'+
+	'<img id=priorSpan src="$utif/prior.png" style="visibility:visible;cursor:pointer" width="16" height="16" border="0" title="$PriorImage" '+
+	'onclick=showGallery(-1) align=absmiddle hspace=4>'+
+	'<img id=nextSpan src="$utif/next.png" style="visibility:visible;cursor:pointer" width="16" height="16" border="0" title="$NextImage" '+
+	'onclick=showGallery(1) align=absmiddle hspace=4>'
+	
+	if(wx!=0){
+	elIMJ+='<img id=shrinkSpan src="$utif/shrink.png" style="display:none;cursor:pointer" width="16" height="16" border="0" title="$ShrinkImage" '+
+	'onclick=this.style.display="none";document.getElementById("expandSpan").style.display="inline";'+
+	'shrinkIMG() align=absmiddle hspace=4>'+
+	'<img id=expandSpan src="$utif/expand.png" style="cursor:pointer" width="16" height="16" border="0" title="$ExpandImage" '+
+	'onclick=this.style.display="none";document.getElementById("shrinkSpan").style.display="inline";'+
+	'expandIMG() align=absmiddle hspace=4>'
+	}	
+	elIMJ+='<img src="$utif/close.png" style="cursor:pointer" width="16" height="16" border="0" title="$Close" '+
+	'onmousedown=document.getElementsByTagName("body")[0].removeChild(document.getElementById("IMSHD"));'+
+	'document.getElementsByTagName("body")[0].removeChild(document.getElementById("IMJ")) align=absmiddle hspace=4>'+	
+	'</td></tr><tr><td colspan=2 align=left style="padding:0px"><img id=ThumbEnlarged '+
+	'src="'+im+'" width="'+w+'" height="'+h+'" title="'+alt+'" style="border-top:1px solid #888888" onmousedown=this.style.display="none"></td>'+
+	'</tr></table></div>'
+	document.getElementById("IMJ").innerHTML=elIMJ
+	if(noChn==1){document.getElementById("expandSpan").style.visibility="hidden"}
+	if(galleryProg==0){document.getElementById("priorSpan").style.visibility="hidden"}
+	if(galleryProg==galleryArray.length-1){document.getElementById("nextSpan").style.visibility="hidden"}
+}
+function expandIMG(){
+	document.getElementById("ThumbEnlarged").width=parseInt(wx)
+	document.getElementById("IMJ").style.width=parseInt(wx)+2+"px"
+	document.getElementById("imgTBL").width=parseInt(wx)+2
+	document.getElementById("IMJ").style.left=parseInt((gal_dcw-parseInt(wx))/2)+"px"
+	document.getElementById("ThumbEnlarged").height=parseInt(hx)
+	
+}
+function shrinkIMG(){
+	document.getElementById("ThumbEnlarged").width=parseInt(wz)
+	document.getElementById("IMJ").style.width=parseInt(wz)+2+"px"
+	document.getElementById("imgTBL").width=parseInt(wz)+2
+	document.getElementById("IMJ").style.left=parseInt((gal_dcw-parseInt(wz))/2)+"px"
+	document.getElementById("ThumbEnlarged").height=parseInt(hz)
+}
+~;
+}#JS
+
+1;
+
+sub createGD { my ($orig,$max) = (shift,shift);
+	($ox,$oy) = $orig->getBounds();
+	($maxx, $maxy);
+	if (($maxx, $maxy) = $max =~ /^(\d+)x(\d+)$/i){
+		$max = ($ox>$oy)? $maxx : $maxy;
+	} else {
+		$maxx = $maxy = $max;
+	}
+	$r = ($ox/$maxx) > ($oy/$maxy) ? ($ox/$maxx) : ($oy/$maxy);
+	$thumbvar = GD::Image->new($ox/$r,$oy/$r);
+	$thumbvar->copyResized($orig,0,0,0,0,$ox/$r,$oy/$r,$ox,$oy);
+	return $thumbvar, sprintf("%.0f",$ox/$r), sprintf("%.0f",$oy/$r);
+}

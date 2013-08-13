@@ -1,0 +1,28 @@
+
+
+use CGI qw/:standard :html3/;
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+	$ret="OK";$space="%20";
+    $file = param('upload1');
+	$file_ = $params;
+
+	$file_=~s`$ENV{'HTTP_HOST'}`$root`;
+	$file_=~s` `_`g;$file_=~s`$space";`_`g;
+	$file_=~s`/`SLaSH`g;$file_=~s`\.`PERIoD`g;$file_=~s`\-`DaSh`g;$file_=~s`\W``g;
+	$file_=~s`PERIoD`.`g;$file_=~s`DaSh`-`g;$file_=~s`SLaSH`/`g;
+
+    open (SAVE,">$file_") || die $! ;
+	binmode SAVE if $^O eq 'MSWin32';
+    while ($size = read($file,$data,1024)) {
+        print SAVE $data;
+        $total_size += $size;
+    }
+    close SAVE;
+    if ($total_size < 1) {unlink($file_name);$ret="NOT";}
+
+print "Content-type: text/html\n\n";
+print "$ret";
+
+
+
+1;

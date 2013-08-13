@@ -1,0 +1,14 @@
+widgettitle=Font Widget
+ColorTexttitle=Color Text
+HighlightTexttitle=Highlight Text
+IncreaseFontSizetitle=Increase Font Size
+DecreaseFontSizetitle=Decrease Font Size
+RemoveFontFormattingtitle=Remove Font Formatting
+Boldtitle=Bold
+Italictitle=Italic
+Underlinetitle=Underline
+StrikeThroughtitle=Strike Through
+SuperScripttitle=Super Script
+SubScripttitle=Sub Script
+Applybutton=Apply
+Removebutton=Remove

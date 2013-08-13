@@ -1,0 +1,2 @@
+widgettitle=Preview
+ClickToClose=Click To Close

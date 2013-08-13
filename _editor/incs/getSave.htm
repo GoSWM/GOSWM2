@@ -1,0 +1,51 @@
+lang("getSave");
+$main="savingMain";
+$place="savingplace";
+$title="$widgettitle";
+$wigWid="230";
+$ico="save";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+
+if($demo==1){
+	$FUNC=qq~demoing()~;
+}else{
+	$FUNC=qq~dosave()~;
+}
+if($no_backup){$nobackup=qq~byId('backupTR').style.display="none";~}
+$RETURN=qq~savTbl='$BODY_TOP
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+	<table align=center border=0 cellpadding=0 cellspacing=0>
+	<tr><td rowspan=2 valign=top><img style="margin-right:10px" src="$utif/confirm.png" width="32" height="32" border="0" alt=""></td>
+	<td colspan=2 style="font-family:tahoma;font-size:11px;font-weight:bold">$text1?</td></tr>
+	<tr><td align=right>
+	<table style="margin:10px 5px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=$FUNC $button_class style="width:40px" id=saveitbutton>$YES</td><td>$RBUT</td></tr></table>
+	</td><td align=left>
+	<table style="margin:10px 0px 5px 5px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=byId("savingplace").style.display="none" $button_class style="width:40px">$Cancel</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr><tr><td align=center>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+	<tr id=backupTR><td style="font-family:tahoma;font-size:11px;padding-left:2px;padding-bottom:6px"><input id=savebackup type=checkbox> $text2</td></tr>
+	<tr id=pendingTR style="display:none"><td colspan=3 style="font-family:tahoma;font-size:11px;padding:10px 2px 6px 2px">
+	<table width=100% border=0 cellpadding=0 cellspacing=0><tr><td align=left valign=top>
+	<input id=deletepending type=checkbox>&nbsp;&nbsp; </td><td align=left style="font-weight:bold;font-size:11px">$text3</td></tr></table></td></tr>
+</td></tr></table></table>
+	
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+byId('savingplace').innerHTML=savTbl
+byId('img_$main').style.display="none"
+if(iscomments=="author"){byId('backupTR').style.display="none"}
+if(iscomments=="publisher"){
+	byId('backupTR').style.display="none";
+	if(editPad.location.pathname.match(/_pending\./)){
+		byId('pendingTR').style.display="block"
+	}
+}
+$nobackup
+cesave()
+~;
+
+1;

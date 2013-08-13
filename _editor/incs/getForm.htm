@@ -1,0 +1,594 @@
+lang("getForm");
+$main="formMain";
+$place="formplace";
+$title="$widgettitle";
+$wigWid="476";
+$ico="form";
+require 'widgetBody.htm';
+require 'menus.htm';
+
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+if($isIM){
+	$isCap=qq~<td id=TRG9 onclick=trgSwap(9) class=tab $uns>$Captchatab</td>~;
+}else{
+	$isCap=qq~<td id=TRG9 $uns style="border-bottom:#fff">&nbsp;</td>~;
+}
+
+&get_cookie;
+open(USRS,"$users_txt");
+while(<USRS>){
+	if(/$cookie{'ceuser'}=/){s`\s+$``;$usr=$_;last}
+}
+($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+$root=~s`^[^/]+``;
+$imgfldr=$root.$imgfldr;
+$if=$imgfldr;$if=~s`$root/``;
+if($if !~ m`^/`){$slash="$slash"}else{$slash=""}
+$FOLDERS.=qq~<option value="/$if">$if~;
+
+@imgfldrs=<$imgfldr/*>;
+foreach $f (@imgfldrs){
+	if(-d $f){
+		$if=$f;$if=~s`$root/``;
+		if($if =~ m`^/`){$slash=""}else{$slash="/"}
+		$FOLDERS.=qq~<option value="$slash$if">$if~;
+	}
+}
+if($isFF){$ffHid="display:none"}
+if($isIE){$ieHid="display:none"}
+$FOLDERS=qq~<select id=ceSpecialFolder style="font-family:tahoma,arial;font-size:10px;">$FOLDERS</select>~;
+$RETURN=qq~formTbl='$BODY_TOP
+	
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr>
+<td id=TRG1 onclick=trgSwap(1) class=tab_ $uns>$Formtab</td>
+<td id=TRG2 onclick=trgSwap(2) class=tab $uns>$Inputtab</td>
+<td id=TRG3 onclick=trgSwap(3) class=tab $uns>$Textareatab</td>
+<td id=TRG4 onclick=trgSwap(4) class=tab $uns>$Uploadtab</td>
+<td id=TRG5 onclick=trgSwap(5) class=tab $uns>$SelectMenutab</td>
+<td id=TRG6 onclick=trgSwap(6) class=tab $uns>$Radiotab</td>
+<td id=TRG7 onclick=trgSwap(7) class=tab $uns>$Checkboxtab</td>
+<td id=TRG8 onclick=trgSwap(8) class=tab $uns>$Buttontab</td>
+$isCap
+<td width=91% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td>
+</tr>
+<tr><td colspan=10>
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:1px">
+<DIV id=DRV1 style="display:block;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0><tr><td class=widgetText11 style="padding-right:5px">$FormHandler:</td>
+<td colspan=2><select id=ceTheHandler onchange=ceSetHandler(this.options[this.selectedIndex].value) style="font-family:tahoma,arial;font-size:10px">
+	<option value="email">$Emailthesubmissionoption<option value="custom">$CustomCGIPHPorASP</select></td></tr>
+	<tr id=ceFormEmailTR ><td id=ceFormEmailT style="color:#000000;font-family:tahoma,arial;font-size:11px">$EmailAddress:</td>
+<td colspan=2><input onkeyup=ceSetEmail(this.value) id=ceFormEmail style="font-family:tahoma,arial;font-size:10px;width:340px" value=""></td></tr>
+<tr><td id=ceFormActionT style="color:#888888;font-family:tahoma,arial;font-size:11px">$FormAction:</td>
+<td colspan=2><input id=ceFormAction disabled style="font-family:tahoma,arial;font-size:10px;width:340px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$RedirectURL:</td>
+<td colspan=2><input id=ceRedirectUrl style="font-family:tahoma,arial;font-size:10px;width:340px" value="$host/"></td></tr>
+<tr><td id=ceFormMethodT style="color:#888888;font-family:tahoma,arial;font-size:11px">$FormMethod:</td>
+<td><select id=ceFormMethod disabled style="width:60px;font-family:tahoma,arial;font-size:10px"><option value="post">$Postoption<option value="get">$Getoption</select></td><td rowspan=3 valign=top style="padding:10px 3px 3px 5px">
+<DIV style="width:260px;border:4px double green;background-color:#FFFFFF;padding:5px;font-family:tahoma,arial;font-size:10px;text-align:justify;display:block">
+$text1 <SPAN style="$ffHid">$text2</SPAN>
+</DIV></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$Target:</td>
+<td><input id=ceFormTarget style="font-family:tahoma,arial;font-size:10px;width:60px" value=""></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=ceInsertForm() $button_class $uns>$InsertFormbutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+
+<DIV id=DRV2 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:30px" valign=top>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceInputName style="font-family:tahoma,arial;font-size:10px;width:100px"></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$InitialValue:</td>
+	<td><input id=ceInputInitialValue style="font-family:tahoma,arial;font-size:10px;width:100px"></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$MaxLength:</td>
+	<td><input id=ceInputMaxLen style="font-family:tahoma,arial;font-size:10px;width:30px"></td></tr>
+<tr style="height:26px;$ieHid"><td class=widgetText11 style="padding-right:5px">$Size:</td>
+	<td><input id=ceInputSize style="font-family:tahoma,arial;font-size:10px;width:30px"></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FieldType:</td>
+	<td><select id=ceInputType style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="text">$Textoption<option value="password">$Passwordoption<option value="hidden">$Hiddenoption</select></td></tr></table>
+</td><td valign=top style="padding-top:0px">
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FontFamily:</td>
+	<td><select id=ceInputFontFace style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_FACE</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FontSize:</td>
+<td><select id=ceInputFontSize style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_PIX</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$DisplayStyle:</td>
+	<td><select id=ceInputStyle onchange=ceshowInputFieldStyle(this.options[this.selectedIndex].value) style="font-family:tahoma,arial;font-size:10px;width:80px">
+	<option value="default">$Defaultoption<option value="flush">$Flushoption</select></td></tr>
+<tr id=frmCLStr1 style="height:26px"><td class=widgetText11 style="padding-right:5px">$CSSClass:</td>
+	<td id=frmCLStd1></td></tr>
+<tr style="height:26px;display:none" id=inputColors><td class=widgetText11 style="padding-right:5px">$BorderColor:</td>
+	<td><select id=ceInputColor style="font-family:tahoma,arial;font-size:10px;width:80px">
+	$FORM_BORDER_COLORS
+	</select></td></tr></table>	
+</td></tr>
+<tr><td colspan=2 class=widgetText11 style="padding-right:5px">$RequiredField: <input id=ceInputRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInsertInput() $button_class $uns>$InsertFieldbutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+
+<DIV id=DRV3 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:30px" valign=top>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceTaName style="font-family:tahoma,arial;font-size:10px;width:100px"></td></tr>
+<tr style="height:56px"><td valign=top class=widgetText11 style="padding-top:6px;padding-right:5px">$InitialValue:</td>
+	<td><textarea id=ceTaInitialValue style="font-family:tahoma,arial;font-size:10px;width:160px;height:50px"></textarea></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$MaxLength:</td>
+	<td><input id=ceTaMaxLen style="font-family:tahoma,arial;font-size:10px;width:30px"></td></tr>
+<tr style="height:26px;$ieHid"><td class=widgetText11 style="padding-right:5px">$Cols:</td>
+	<td><input id=ceTaCols style="font-family:tahoma,arial;font-size:10px;width:30px"></td></tr>
+<tr style="height:26px;$ieHid"><td class=widgetText11 style="padding-right:5px">$Rows:</td>
+	<td><input id=ceTaRows style="font-family:tahoma,arial;font-size:10px;width:30px"></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$Wrap:</td>
+	<td><select id=ceTaWrap style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="off">$NoWrapoption<option value="hard">$Hardoption<option value="soft">$Softoption</select></td></tr></table>
+</td><td valign=top>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FontFamily:</td>
+	<td><select id=ceTaFontFace style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption$FONT_FACE</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FontSize:</td>
+<td><select id=ceTaFontSize style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_PIX</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$DisplayStyle:</td>
+	<td><select id=ceTaStyle onchange=ceshowTaFieldStyle(this.options[this.selectedIndex].value) style="font-family:tahoma,arial;font-size:10px;width:80px">
+	<option value="default">$Defaultoption<option value="flush">$Flushoption</select></td></tr>
+<tr id=frmCLStr2 style="height:26px"><td class=widgetText11 style="padding-right:5px">$CSSClass:</td>
+	<td id=frmCLStd2></td></tr>
+<tr style="height:26px;display:none" id=taColors><td class=widgetText11 style="padding-right:5px">$BorderColor:</td>
+	<td><select id=ceTaColor style="font-family:tahoma,arial;font-size:10px;width:80px">
+	$FORM_BORDER_COLORS
+	</select></td></tr></table>	
+</td></tr>
+<tr><td colspan=2 class=widgetText11 style="padding-right:5px">$RequiredField:<input id=ceTaRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInserttextarea() $button_class title="" $uns>$InsertTextareabutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+
+<DIV id=DRV4 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:30px" valign=top>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="color:#888888;padding-right:5px">$FieldName:</td>
+	<td><input id=ceUpName style="font-family:tahoma,arial;font-size:10px;width:80px" readonly value="upload"></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$UploadToFolder:</td>
+	<td><select onchange=if(this.selectedIndex==1){byId("ceIUpFolderTr").style.display=""}else{byId("ceIUpFolderTr").style.display="none"} id=ceUpFolder style="font-family:tahoma,arial;font-size:10px;">
+	<option value=regular>$RegularImageFolderoption<option value=special>$SpecialUploadFolderoption</select></td></tr>
+<tr style="height:26px;display:none" id=ceIUpFolderTr valign=top><td class=widgetText11 style="padding-right:5px">$SelectFolder:</td>
+	<td>$FOLDERS</td></tr>
+<tr style="height:26px;$ieHid"><td class=widgetText11 style="">Size (width):</td>
+	<td><input id=ceUpSize style="font-family:tahoma,arial;font-size:10px;width:30px" value=""></td></tr>	
+	
+	</table>
+</td><td valign=top>
+<table style="$ffHid" align=center border=0 cellpadding=0 cellspacing=0>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$FontFamily:</td>
+	<td><select id=ceUpFontFace style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption$FONT_FACE</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">Font Size:</td>
+<td><select id=ceUpFontSize style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_PIX</select></td></tr>
+<tr style="height:26px"><td class=widgetText11 style="padding-right:5px">$DisplayStyle:</td>
+	<td><select id=ceUpStyle onchange=ceshowUpFieldStyle(this.options[this.selectedIndex].value) style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption<option value="flush">$Flushoption</select></td></tr>
+<tr id=frmCLStr3 style="height:26px"><td class=widgetText11 style="padding-right:5px">$CSSClass:</td>
+	<td id=frmCLStd3></td></tr>
+<tr id=upColors style="height:26px;display:none"><td class=widgetText11 style="padding-right:5px">$BorderColor:</td>
+	<td><select id=ceUpColor style="font-family:tahoma,arial;font-size:10px;width:80px">
+	$FORM_BORDER_COLORS
+	</select></td></tr></table>	
+	</td></tr>
+<tr><td colspan=2 class=widgetText11 style="padding-right:5px">$RequiredField:<input id=ceUpRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInsertUpload() $button_class $uns>$InsertFileUpload</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+
+<DIV id=DRV5 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=0 cellspacing=0><tr valign=top><td style="padding-right:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceSelName style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldType:</td>
+	<td><select onchange=ceshowSelType(this.options[this.selectedIndex].value) id=ceSelType style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="single">$Singleoption<option value="multiple">$Multipleoption</select></td></td></tr>
+<tr id=ceSelRowsTr style="display:none"><td class=widgetText11 style="padding-right:5px">$RowsOpen:</td>
+<td><input id=ceSelRows  style="font-family:tahoma,arial;font-size:10px;width:30px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FontFamily:</td>
+	<td><select id=ceSelFontFace style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_FACE</select></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FontSize:</td>
+<td><select id=ceSelFontSize style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_PIX</select></td></tr>
+<tr id=frmCLStr4 style="height:26px"><td class=widgetText11 style="padding-right:5px">$CSSClass:</td>
+	<td id=frmCLStd4></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$RequiredField:</td>
+	<td><input id=ceSelRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInsertSelectMenu() $button_class $uns>$InsertSelectMenubutton</td><td>$RBUT</td></tr></table></td></tr>
+</table></td>
+<td style="padding-left:10px" align=center>
+<table style="width:220px" border=0 cellpadding=3 cellspacing=0>
+<tr><td align=right width=110 class=widgetText11 style="padding-right:5px">$NumberOfOptions</td><td width=110><input id=ceOptsLen onkeyup=ceDrawOpts(this.value) style="font-family:tahoma,arial;font-size:10px;width:30px">
+</td></tr>
+<tr><td align=center colspan=2 id=ceOptList>
+</td></tr>
+</table></td></tr></table>
+</DIV>
+
+<DIV id=DRV6 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceRadioName style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldValue:</td>
+	<td><input id=ceRadioValue style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$InitialState:</td>
+	<td>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td><input id=ceRadioChecked type=checkbox></td>
+	<td style="padding-left:5px;font-family:tahoma,arial;font-size:11px">$Checked</td></tr></table>
+	</td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$RequiredField:</td>
+	<td><input id=ceRadioRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr>
+<td>$LBUT</td><td align=center onclick=ceInsertRadio() $button_class title="" $uns>$InsertRadiobutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+<DIV id=DRV7 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceBoxName style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldValue:</td>
+	<td><input id=ceBoxValue style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$InitialState:</td>
+	<td>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td><input id=ceBoxChecked type=checkbox></td>
+	<td style="padding-left:5px;font-family:tahoma,arial;font-size:11px">$Checked</td></tr></table>
+	</td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$RequiredField:</td>
+	<td><input id=ceBoxRequired type=checkbox></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInsertCheckbox() $button_class title="" $uns>$InsertCheckboxbutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+</DIV>
+<DIV id=DRV8 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0>
+<tr><td class=widgetText11 style="padding-right:5px">$FieldName:</td>
+	<td><input id=ceButtonName style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$ButtonText:</td>
+	<td><input id=ceButtonValue style="font-family:tahoma,arial;font-size:10px;width:100px" value=""></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$ButtonType:</td>
+	<td><select id=ceButtonType style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="submit">$Submit<option value="reset">$Reset</select></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FontFamily:</td>
+	<td><select id=ceButtonFontFace style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_FACE</select></td></tr>
+<tr><td class=widgetText11 style="padding-right:5px">$FontSize:</td>
+<td><select id=ceButtonFontSize style="font-family:tahoma,arial;font-size:10px;width:80px"><option value="default">$Defaultoption $FONT_PIX</select></td></tr>
+<tr id=frmCLStr5 style="height:26px"><td class=widgetText11 style="padding-right:5px">$CSSClass:</td>
+	<td id=frmCLStd5></td></tr>
+<tr><td colspan=2><table style="margin:2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceInsertButton() $button_class title="" $uns>$InsertButtonbutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+
+</DIV>
+<DIV id=DRV9 style="display:none;margin-top:20px;margin-bottom:10px">
+<table align=center border=0 cellpadding=3 cellspacing=0>
+<tr><td align=center><DIV style="width:320px;font-family:tahoma,arial;font-size:11px;text-align:justify">$CaptchaText1<br><BR>
+<center><input class=input id=buttonWord value="$SubmitWord" style="width:100px"><br>$CaptchaText2</center><BR></DIV>
+<table style="margin:12px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=activateRobot() $button_class title="" $uns>$InsertCaptchabutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV>
+
+</td></tr></table>
+</div>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+TRGz="TRG1,TRG2,TRG3,TRG4,TRG5,TRG6,TRG7,TRG8"
+TRGA=TRGz.split(",")
+function trgSwap(n){
+	for(i=1;i<10;++i){
+		Trg="TRG"+i
+		byId(Trg).className="tab"
+		Drv="DRV"+i
+		byId(Drv).style.display="none"
+	}
+	ceFid="TRG"+n
+	ceFidd="DRV"+n
+	byId(ceFid).className="tab_"
+	byId(ceFidd).style.display="block"
+}
+function ceSetHandler(val){
+	if(val=="email"){
+		byId('ceFormAction').disabled=false
+		byId('ceFormAction').value=""
+		byId('ceFormMethod').selectedIndex=0
+		byId('ceFormMethod').disabled=true
+		byId('ceFormMethodT').style.color="#888888"
+		byId('ceFormAction').disabled=true
+		byId('ceFormEmailTR').style.display=""
+	}
+	else if(val == "custom"){
+		byId('ceFormAction').disabled=false
+		byId('ceFormAction').value="$host/"
+		byId('ceFormActionT').style.color="#000000"
+		byId('ceFormMethod').disabled=false	
+		byId('ceFormMethodT').style.color="#000000"
+		byId('ceFormEmailTR').style.display="none"
+	}
+}
+function kryptF(val){
+	alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	mess_="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX"
+	mess=mess_.split("")
+	xkrypt=''
+	chars=val.split("")
+	for(i=0;i<chars.length;++i){
+		if(alf.indexOf(chars[i])!=-1){
+			xkrypt+=mess[alf.indexOf(chars[i])]
+		}else{
+			xkrypt+=chars[i]
+		}
+	}
+}
+
+function ceSetEmail(val){
+	byId('ceFormAction').disabled=false
+	kryptF(val)
+	byId('ceFormAction').value="$uttf?doSubmission="+xkrypt+".com"
+	byId('ceFormAction').disabled=true
+}
+function ceshowInputFieldStyle(val){
+	if(val == "flush"){byId('inputColors').style.display=''}else{byId('inputColors').style.display='none'}
+}
+function ceshowTaFieldStyle(val){
+	if(val == "flush"){byId('taColors').style.display=''}else{byId('taColors').style.display='none'}
+}
+function ceshowUpFieldStyle(val){
+	if(val == "flush"){byId('upColors').style.display=''}else{byId('upColors').style.display='none'}
+}
+function ceshowSelType(val){
+	if(val == "multiple"){byId('ceSelRowsTr').style.display=''}else{byId('ceSelRowsTr').style.display='none'}
+}
+function activateRobot(){
+	czbuttonWord=byId('buttonWord').value.replace(/ /g,"_")
+	czRobot='<div id="captchaSpot">Save Edits To Activate Captcha</div><SCRAPTW src="$uttf?getCaptcha='+czbuttonWord+'" type="text/javascript"></SCR'+'APTW>'
+	insertFormElem(czRobot)
+}
+function ceInsertButton(){
+	var czButtonStyle=' style="'
+	if(byId('ceButtonFontFace').value!="default"){
+		czButtonStyle+=';font-family:'+byId('ceButtonFontFace').value
+	}
+	if(byId('ceButtonFontSize').value!="default"){
+		czButtonStyle+=';font-size:'+byId('ceButtonFontSize').value
+	}
+	czButtonStyle+='"'	
+	if(byId('clasFRMmenu5') && byId('clasFRMmenu5').selectedIndex!=0){
+		czBUTCls=' class="'+byId('clasFRMmenu5').options[byId('clasFRMmenu5').selectedIndex].value+'"'
+	}else{czBUTCls=''}
+	
+	var czButton='<input type="'+byId('ceButtonType').value+'" name="'+byId('ceButtonName').value+'" '+
+	'value="'+byId('ceButtonValue').value+'"'+czBUTCls+czButtonStyle+'/>'
+	insertFormElem(czButton)
+}
+function ceInsertCheckbox(){
+	 if(byId('ceBoxRequired').checked==true){ceBoxNameREQ="rEq_"+byId('ceBoxName').value}else{ceBoxNameREQ=byId('ceBoxName').value}	
+	 if(byId('ceBoxChecked').checked==true){czBoxCh=" checked"}else{czBoxCh=""}
+	 var czBox='<input type=checkbox name="'+ceBoxNameREQ+'" value="'+byId('ceBoxValue').value+'"'+czBoxCh+'>'
+	insertFormElem(czBox)	
+}
+function ceInsertRadio(){
+	 if(byId('ceRadioRequired').checked==true){ceRadioNameREQ="rEq_"+byId('ceRadioName').value}else{ceRadioNameREQ=byId('ceRadioName').value}	
+	 if(byId('ceRadioChecked').checked==true){czRadCh=" checked"}else{czRadCh=""}
+	 var czRad='<input type=radio name="'+ceRadioNameREQ+'" value="'+byId('ceRadioValue').value+'"'+czRadCh+'>'
+	insertFormElem(czRad)	
+}
+function ceInsertSelectMenu(){
+	var czSelStyle=' style="'
+	if(byId('ceSelFontFace').value!="default"){
+		 czSelStyle+=';font-family:'+byId('ceSelFontFace').value
+	}
+	if(byId('ceSelFontSize').value!="default"){
+		 czSelStyle+=';font-size:'+byId('ceSelFontSize').value
+	}
+	if(byId('ceSelType').value=="multiple"){czType=' multiple size='+byId('ceSelRows').value}else{czType=" single"}
+	 czSelStyle+='"'	
+	 if(byId('ceSelRequired').checked==true){ceSelNameREQ="rEq_"+byId('ceSelName').value}else{ceSelNameREQ=byId('ceSelName').value}	
+	if(byId('clasFRMmenu4') && byId('clasFRMmenu4').selectedIndex!=0){
+		czMUCls=' class="'+byId('clasFRMmenu4').options[byId('clasFRMmenu4').selectedIndex].value+'"'
+	}else{czMUCls=''}
+	 var czMen='<select name="'+ceSelNameREQ+'"'+czMUCls+czType+czSelStyle+' >'
+	for(i=1;i<=byId('ceOptsLen').value;++i){
+		czval="ceMenVal"+i;cztxt="ceMenTxt"+i;czsel="ceMenSel"+i
+		if(byId(czsel).checked==true){czSEL=" selected"}else{czSEL=""}
+		czMen+='<option value="'+byId(czval).value+'"'+czSEL+'>'+byId(cztxt).value
+	}
+	czMen+='</select>'
+	insertFormElem(czMen)
+}
+function ceInsertUpload(){
+	var czUpStyle=''
+	if(byId('ceUpFontFace').value!="default"){
+		 czUpStyle+=';font-family:'+byId('ceUpFontFace').value
+	}
+	if(byId('ceUpFontSize').value!="default"){
+		 czUpStyle+=';font-size:'+byId('ceUpFontSize').value
+	}
+	if(byId('ceUpStyle').value=="flush"){
+		 czUpStyle+=';border:1px solid '+byId('ceUpColor').value
+	}
+	 czUpStyle+='"'
+	if(byId('ceUpRequired').checked==true){ceUpNameREQ="rEq_"+byId('ceUpName').value}else{ceUpNameREQ=byId('ceUpName').value}	
+	if(byId('clasFRMmenu3') && byId('clasFRMmenu3').selectedIndex!=0){
+		czUPCls=' class="'+byId('clasFRMmenu3').options[byId('clasFRMmenu3').selectedIndex].value+'"'
+	}else{czUPCls=''}
+	var czUp='<input name="'+ceUpNameREQ+'" type="file"'+czUPCls+'  style="'+czUpStyle+' size="'+byId('ceUpSize').value+'">'+
+	'<input type=hidden name="folder_to_upload_to" value="'+byId('ceSpecialFolder').value+'">'	
+	insertFormElem(czUp);
+	for(i=0;i<doc().forms.length;++i){
+		upElem='doc().forms[i].'+ceUpNameREQ
+		if(upElem){doc().forms[i].enctype="multipart/form-data"}
+	}
+	
+}
+function ceInserttextarea(){
+	var czTaStyle='style="'
+	if(byId('ceTaFontFace').value!="default"){
+		czTaStyle+=';font-family:'+byId('ceTaFontFace').value
+	}
+	if(byId('ceTaFontSize').value!="default"){
+		czTaStyle+=';font-size:'+byId('ceTaFontSize').value
+	}
+	if(byId('ceTaStyle').value=="flush"){
+		czTaStyle+=';border:1px solid '+byId('ceTaColor').value
+	}
+	czTaStyle+='"'	
+	if(byId('ceTaRequired').checked==true){ceTaNameREQ="rEq_"+byId('ceTaName').value}else{ceTaNameREQ=byId('ceTaName').value}
+	if(byId('clasFRMmenu2') && byId('clasFRMmenu2').selectedIndex!=0){
+		czTACls=' class="'+byId('clasFRMmenu2').options[byId('clasFRMmenu2').selectedIndex].value+'"'
+	}else{czTACls=''}
+	var czTa='<textarea name="'+ceTaNameREQ+'" wrap="'+byId('ceTaWrap').value+'" '+
+	'maxlength="'+byId('ceTaMaxLen').value+'"'+czTACls+' '+czTaStyle+' cols="'+byId('ceTaCols').value+'" rows="'+byId('ceTaRows').value+'">'+byId('ceTaInitialValue').value+'</textarea>'
+	insertFormElem(czTa)
+}
+	
+function ceInsertInput(){
+	var czInputStyle='style="'
+	if(byId('ceInputFontFace').value!="default"){
+		czInputStyle+=';font-family:'+byId('ceInputFontFace').value
+	}
+	if(byId('ceInputFontSize').value!="default"){
+		czInputStyle+=';font-size:'+byId('ceInputFontSize').value
+	}
+	if(byId('ceInputStyle').value=="flush"){
+		czInputStyle+=';border:1px solid '+byId('ceInputColor').value
+	}
+	czInputStyle+='"'	
+	if(byId('ceInputRequired').checked==true){ceInputNameREQ="rEq_"+byId('ceInputName').value}else{ceInputNameREQ=byId('ceInputName').value}
+	if(byId('clasFRMmenu1') && byId('clasFRMmenu1').selectedIndex!=0){
+		czInputCls=' class="'+byId('clasFRMmenu1').options[byId('clasFRMmenu1').selectedIndex].value+'"'
+	}else{czInputCls=''}
+	var czInput='<input type="'+byId('ceInputType').value+'" name="'+ceInputNameREQ+'" '+
+	'value="'+byId('ceInputInitialValue').value+'" size="'+byId('ceInputSize').value+'"'+czInputCls+' maxlength="'+byId('ceInputMaxLen').value+'" '+czInputStyle+' />'
+	insertFormElem(czInput)
+}
+function ceInsertForm(){
+	if(byId('ceFormTarget').value==''){ceFormTarget_=''}else{ceFormTarget_=' target="'+byId('ceFormTarget').value+'"'}
+	if(byId('ceTheHandler').options[byId('ceTheHandler').selectedIndex].value=="email"){
+		var czForm='<form style="margin:0px" class=formblock enctype="application/x-www-form-urlencoded" method="post" '+
+		' action="'+byId('ceFormAction').value+'"'+ceFormTarget_+'>'
+		czForm+='<input type=hidden name=redirectURL value="'+byId('ceRedirectUrl').value+'">'+
+		'</form>'
+	}else{
+		czForm='<form style="margin:0px" class=formblock '+
+		' method="'+byId('ceFormMethod').options[byId('ceFormMethod').selectedIndex].value+'"'+
+		' action="'+byId('ceFormAction').value+'"'+ceFormTarget_+' enctype="application/x-www-form-urlencoded">'
+		czForm+='<input type=hidden name=redirectURL value="'+byId('ceRedirectUrl').value+'">'+
+		'</form>'
+	}
+	insertForm(czForm)
+}
+function insertFormElem(htm){
+	cecheck_form_selected()
+	if(ceFinside==0){
+		activeHtM=htm
+		unform()
+	}else{
+		if(isIE){
+			cesel.pasteHTML(htm)
+		}else{
+			doc().execCommand("InsertHTML", false, htm); 
+		}
+	}
+}
+function unform(){
+	byId('yesBut').innerHTML="$YES"
+	active_alert="$htmlalert1"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")
+}
+function cecheck_form_selected(){
+ 	if(doc().getSelection){
+       cesel= byId('editPad').contentWindow.getSelection(); 
+	   ceFinside=0
+	   if(!cesel.anchorNode){return false}
+	   upEL=cesel.anchorNode
+	   while(upEL.tagName != "BODY"){
+			if(upEL.className && upEL.className.match(/formblock/)){
+				ceFinside=1
+				break
+			}else{
+				upEL=upEL.parentNode
+			}
+	   }
+	}else if (doc().selection && doc().selection.createRange){
+       cesel=doc().selection.createRange();
+	   ceFinside=0
+	   upEL=cesel.parentElement()
+		while(upEL.tagName != "BODY"){
+			if(upEL.className && upEL.className.match(/formblock/)){
+				ceFinside=1
+				break
+			}else{
+				upEL=upEL.parentElement
+			}
+		}
+	}
+}
+
+function insertForm(htm){
+	cecheck_selected()
+	if(ceinside==0){
+		uncursor()
+	}else{
+		if(isIE){
+			cesel.pasteHTML(htm)
+		}else{
+			doc().execCommand("InsertHTML", false, htm); 
+		}
+	}
+}
+function ceDrawOpts(val){
+	optList='<table align=center border=0 cellpadding=0 cellspacing=0><tr>'+
+	'<td>&nbsp;</td><td align=center style="font-family:tahoma,arial;font-size:10px">$OptionValue</td>'+
+	'<td align=center style="font-family:tahoma,arial;font-size:10px">$DisplayText</td><td style="font-family:tahoma,arial;font-size:9px">$Select</td></tr>'
+	for(v=1;v<=val;++v){
+		optList+='<tr><td style="font-family:tahoma,arial;font-size:10px;padding-right:5px;text-align:right">'+v+'</td>'+
+		'<td><input style="font-family:tahoma,arial;font-size:10px;width:80px" id="ceMenVal'+v+'" name="ceMenVal'+v+'" value=""></td>'+
+		'<td><input style="font-family:tahoma,arial;font-size:10px;width:80px" id="ceMenTxt'+v+'" name="ceMenTxt'+v+'" value=""></td>'+
+		'<td><input type=radio name=ceMenSel id=ceMenSel'+v+' value='+v+'></td></tr>'
+	}
+	optList+='</table>'
+	byId('ceOptList').innerHTML=optList
+}
+folderz_=new Array("$FLDS");
+
+function ceopenUpfolder(obj){
+	byId('uploadnewfolder').value=''
+	obj_=obj.split("/");
+	ilen=obj_.length+2;
+	for(i=0;i<folderz_.length;++i){
+		fld_=folderz_[i].split("/");
+		if(folderz_[i].match(obj)){
+			if(fld_.length<ilen){byId(folderz_[i]).style.display="";}
+		}
+	}
+	obj=obj.replace("$host","")
+	byId('uploadnewfolder').value=obj
+}
+byId('formplace').innerHTML=formTbl
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassoption'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+byId('frmCLStd1').innerHTML='<select id=clasFRMmenu1 style="font-family:tahoma,arial;font-size:10px" style="max-width:100px">'+sopts+'</select>'
+byId('frmCLStd2').innerHTML='<select id=clasFRMmenu2 style="font-family:tahoma,arial;font-size:10px" style="max-width:100px">'+sopts+'</select>'
+byId('frmCLStd3').innerHTML='<select id=clasFRMmenu3 style="font-family:tahoma,arial;font-size:10px" style="max-width:100px">'+sopts+'</select>'
+byId('frmCLStd4').innerHTML='<select id=clasFRMmenu4 style="font-family:tahoma,arial;font-size:10px" style="max-width:100px">'+sopts+'</select>'
+byId('frmCLStd5').innerHTML='<select id=clasFRMmenu5 style="font-family:tahoma,arial;font-size:10px" style="max-width:100px">'+sopts+'</select>'
+}else{
+byId('frmCLStr1').style.display="none"
+byId('frmCLStr2').style.display="none"
+byId('frmCLStr3').style.display="none"
+byId('frmCLStr4').style.display="none"
+byId('frmCLStr5').style.display="none"
+}
+
+ceform();
+~;
+1;

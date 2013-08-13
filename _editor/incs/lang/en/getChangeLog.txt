@@ -1,0 +1,5 @@
+heading=Publisher&rsquo;s Change Log
+Page=Page
+ChangedBy=Changed By
+Date=Date
+Click=Click File Path To Review

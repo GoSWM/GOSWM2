@@ -1,0 +1,122 @@
+lang("getAudio");
+$main="audioMain";
+$place="audioplace";
+$title="$widgettitle";
+$wigWid="500";
+$ico="audio";
+require 'widgetBody.htm';
+
+$RETURN=qq~audioTbl='$BODY_TOP
+<DIV align=center>
+
+<table style="margin:5px 0px 10px 0px" align=center border=0 cellpadding=0 cellspacing=0><tr><td align=left colspan=5 style="padding-left:4px">
+<table align=left border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:7px"><img id=up_arrow16 onclick=upDIR16() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text1
+</td></tr></table></td></tr>
+<tr><td colspan=5 align=center style="padding:0px">
+<iframe name=pad16 style="margin:5px 0px 10px 0px;width:480px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=audio"></iframe>
+</td></tr>
+<tr><td colspan=5 align=center style="padding:0px">
+<input class=input style="width:460px" value="" id=audioURL readonly>
+</td></tr>
+<tr><td align=center>
+<table align=center style="margin:12px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceStartAuto() class=button_centerD id=ceAutoButton $uns>$AutoStartButton</td><td>$RBUT</td></tr></table>
+
+</td><td align=center>
+<table align=center style="margin:12px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceRemoveAuto() class=button_centerD id=ceAutoRemove $uns>$AutoStartRemove</td><td>$RBUT</td></tr></table>
+</td><td align=center style="width:60px">&nbsp;</td><td align=center>
+<table align=center style="margin:12px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceStartLInk() class=button_centerD id=ceStartButton $uns>$StartButton</td><td>$RBUT</td></tr></table>
+</td><td align=center>
+
+<table align=center style="margin:12px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=ceStopLInk() class=button_centerD id=ceStopButton $uns>$StopButton</td><td>$RBUT</td></tr></table>
+</td></tr>
+</table></DIV>
+
+
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function selection16(dir,path,url){
+	if(dir == "dir"){
+		pad16.location="$uttf?pathTree=x=audio="+path
+	}else{
+		byId('audioURL').value=url
+		byId('ceAutoButton').className="button_center"
+		byId('ceStopButton').className="button_center"
+		byId('ceStartButton').className="button_center"
+		byId('ceAutoRemove').className="button_center"
+	}
+}
+function upDIR16(){
+	pad16.location="$uttf?pathTree=up=audio="+pad16.updir
+}
+function ceStartLInk(){
+	if(byId('ceStartButton').className=="button_centerD"){return false}
+	go_on=audio_check_selection()
+	if(go_on==false){return false}
+	strng = '<a href="$uttf?playAudio='+byId('audioURL').value+'" class=audiolinkclass target="audiohole">'+cetxt+'</a>'
+	insert_audio_link(strng)
+}
+function ceStopLInk(){
+	if(byId('ceStopButton').className=="button_centerD"){return false}
+	go_on=audio_check_selection()
+	if(go_on==false){return false}
+	strng = '<a href="about:blank" class=audiolinkclass target="audiohole">'+cetxt+'</a>'
+	insert_audio_link(strng)
+}
+function audio_check_selection(){
+	cecheck_selected()
+	ceget_selected()
+	if(cetxt==''){
+		basicAlert("$htmlalert1")
+		return false
+	}
+	if(ceinside==0){
+		basicAlert("$htmlalert2")
+		return false
+	}
+}
+function insert_audio_link(htm){
+	if(isIE){
+		cesel.pasteHTML(htm);
+	}else{
+		doc().execCommand("InsertHTML", false, htm); 
+	}
+	insertAudioHole()
+}
+function insertAudioHole(){
+	if(!doc().body.innerHTML.match(/audioholeclass/)){
+	htmHole='<iframe class=audioholeclass name=audiohole style="width:1px;height:1px" src="about:blank"></iframe>'
+	doc().body.innerHTML=doc().body.innerHTML+htmHole
+	}
+}
+function ceStartAuto(){
+	htmHole='<span class=audiolinkclass><iframe id=audioholeclass name=audiohole style="width:1px;height:1px" src="$uttf?playAudio='+byId('audioURL').value+'"></iframe></span>'
+	if(doc().body.innerHTML.match(/editblock-/)){
+		for(i=0;i<padAll.length;++i){
+			if(padAll[i].className.match(/editblock-/)){
+				lastEB=padAll[i]
+			}
+		}	
+		lastEB.innerHTML=lastEB.innerHTML+htmHole	
+	}else{
+		doc().body.innerHTML=doc().body.innerHTML+htmHole
+	}
+}
+function ceRemoveAuto(){
+	doc().getElementById("audioholeclass").src="about:blank"
+	for(i=0;i<doc().getElementsByTagName("SPAN").length;++i){
+		if(doc().getElementsByTagName("SPAN")[i].className=="audiolinkclass"){
+			doc().getElementsByTagName("SPAN")[i].className="audioREMOVEclass"
+		}
+	}
+}
+byId('audioplace').innerHTML=audioTbl
+csAudio()
+~;
+1;

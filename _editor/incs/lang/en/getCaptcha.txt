@@ -1,0 +1,5 @@
+text1=Enter the 6
+text2=letters displayed above
+text3=Get New Letters
+lowercase=lower case
+UPPERCASE=Upper Case

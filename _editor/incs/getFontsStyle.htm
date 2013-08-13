@@ -1,0 +1,345 @@
+lang("getFontsStyle");
+$main='fontsStyleMain';
+$place='fontstyleplace';
+$title="$widgettitle";
+$wigWid="360";
+$ico="fonts_style";
+require 'widgetBody.htm';
+&get_cookie;
+open(U,"$users_txt");
+while(<U>){
+	if(/^$cookie{'ceuser'}=/){s`\s+$``;$ufnd=$_;last}
+}
+($user,$pass,$urls,$basic,$imgfolder,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$ufnd);
+@font_faces=split(/:/,$font_faces);
+@font_faces=sort(@font_faces);
+	$FONT_FACES.=qq~<div id=cxff0 onclick=cxfamily="";saply("cxff0") class=fontsoff $uns><font face="$vv" $uns>$NotSetoption</font></div>
+	~;
+for(@font_faces){
+		($n,$v)=split(/&/);chomp($v);$vv=$v;$v=~tr/ /_/;
+	$cxff++;
+	$FONT_FACES.=qq~<div id=cxff$cxff onclick=cxfamily="$v";saply("cxff$cxff") class=fontsoff $uns><font face="$vv" $uns>$n</font></div>
+	~;
+}
+$fa=qq~$size1,$size2,$size3,$size4,$size5,$size6,$size7~;
+@fa=split(/,/,$fa);
+$FONT_SIZES.=qq~<div id=cxfs0 onclick=cxsize="";saply("cxfs0") class=fontsoff $uns>$NotSetoption</div>
+	~;
+foreach $fa (@fa){
+$faa=$fa;$faa=~tr/_/ /;
+$cxfs++;
+$FONT_SIZES.=qq~<div id=cxfs$cxfs onclick=cxsize="$fa";saply("cxfs$cxfs") class=fontsoff $uns>$faa</div>
+	~;
+}
+@fp = qw(9 10 11 12 13 14 15 16 18 20 24 28 32 36 48);
+$FONT_PIX.=qq~<div id=cxfp0 onclick=cxsize="";saply("cxfp0") class=fontsoff $uns>$NotSetoption</div>
+	~;
+foreach $fp (@fp){
+$fpp=$fp;$fp." px";$fp=$fp."px";
+$fpp=~tr/_/ /;
+$cxfp++;
+$FONT_PIX.=qq~<div id=cxfp$cxfp onclick=cxsize="$fp";saply("cxfp$cxfp") class=fontsoff $uns>$fpp</div>
+	~;
+}
+
+
+@site_colors_=split(/,/,$site_colors);
+for(@site_colors_){if($_!~/FFFFFF/i){push(@site_colors,$_)}}
+if($#site_colors>-1){unshift(@site_colors,"#FFFFFF")}
+
+if($#site_colors>-1){
+	$COLORMENU1=qq~
+	<select onchange=cx_txt_color=this.options[this.selectedIndex].value;saply("cx_xtxt") style="margin-top:10px;width:200px;font-size:13px;font-family:arial;border:1px solid #999999;">~;
+	$COLORMENU2=qq~
+	<select onchange=cx_bg_color=this.options[this.selectedIndex].value;saply("cx_xbg") style="margin-top:10px;width:200px;font-size:13px;font-family:arial;border:1px solid #999999;">~;
+}
+$COLORS.=qq~<option style="background-color:#FFFFFF" value="">$SelectColoroption~;
+foreach $col (@site_colors){
+	$col_=$col;$col_=~s`#``;
+	$COLORS.=qq~<option style="background-color:$col" value="$col_">&nbsp;~;
+}
+if($#site_colors>-1){
+	$COLORMENU1=$COLORMENU1.$COLORS."</select>";
+	$COLORMENU2=$COLORMENU2.$COLORS."</select>";
+}
+if($site_colors_only!=1){
+@box=("FF0000","FFFF00","00FF00","00FFFF","0000FF","FF00FF","FFFFFF","F5F5F5","DCDCDC","D3D3D3","C0C0C0","A9A9A9","808080","696969","000000","2F4F4F","708090","778899","4682B4","4169E1","6495ED","B0C4DE","7B68EE","6A5ACD","483D8B","191970","000080","00008B","0000CD","1E90FF","00BFFF","87CEFA","87CEEB","ADD8E6","B0E0E6","F0FFFF","E0FFFF","AFEEEE","00CED1","5F9EA0","48D1CC","00FFFF","40E0D0","20B2AA","008B8B","008080","7FFFD4","66CDAA","8FBC8F","3CB371","2E8B57","006400","008000","228B22","32CD32","00FF00","7FFF00","7CFC00","ADFF2F","98FB98","90EE90","00FF7F","00FA9A","556B2F","6B8E23","808000","BDB76B","B8860B","DAA520","FFD700","F0E68C","EEE8AA","FFEBCD","FFE4B5","F5DEB3","FFDEAD","DEB887","D2B48C","BC8F8F","A0522D","8B4513","D2691E","CD853F","F4A460","8B0000","800000","A52A2A","B22222","CD5C5C","F08080","FA8072","E9967A","FFA07A","FF7F50","FF6347","FF8C00","FFA500","FF4500","DC143C","FF0000","FF1493","FF00FF","FF69B4","FFB6C1","FFC0CB","DB7093","C71585","800080","8B008B","9370DB","8A2BE2","4B0082","9400D3","9932CC","BA55D3","DA70D6","EE82EE","DDA0DD","D8BFD8","E6E6FA","F8F8FF","F0F8FF","F5FFFA","F0FFF0","FAFAD2","FFFACD","FFF8DC","FFFFE0","FFFFF0","FFFAF0","FAF0E6","FDF5E6","FAEBD7","FFE4C4","FFDAB9","FFEFD5","FFF5EE","FFF0F5","FFE4E1","FFFAFA");
+
+$SWATCH1=qq~<table style="border:1px solid #000000;background-color:#FaFaFa" align=center cellpadding=0 cellspacing=2 border=0>~;
+$k=0;
+if($k==1){$SWATCH1.="<tr>"}
+foreach $i (@box){
+	$SWATCH1.=qq~<td id=cx_color_txt$i style="border:1px solid #000000;background-color:#$i;font-size:1px;width:17px;height:14px" onclick=cx_txt_color="$i";saply(this.id) $uns>&nbsp;</td>~;
+++$k;
+if($k==14){$SWATCH1.="</tr>";$k=0}
+
+}
+$SWATCH1.="</table>";
+
+$k=0;
+$SWATCH2=qq~<table style="border:1px solid #000000;background-color:#FaFaFa" align=center cellpadding=0 cellspacing=2 border=0>~;
+$k=0;
+if($k==1){$SWATCH2.="<tr>"}
+foreach $i (@box){
+	$SWATCH2.=qq~<td id=cx_color_bg$i style="border:1px solid #000000;background-color:#$i;font-size:1px;width:17px;height:14px" onclick=cx_bg_color="$i";saply(this.id) $uns>&nbsp;</td>~;
+++$k;
+if($k==14){$SWATCH2.="</tr>";$k=0}
+
+}
+$SWATCH2.="</table>";
+}# $site_colors_only!=1
+
+if($isIE){$BNT=qq~<table align=center border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN style="visibility:hidden;margin-right:10px" class=icon $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReApplyTextContentChangestitle" $unz onclick=;ceCopies("Redo")></td><td align=center>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=sapply()>$Applybutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$UnApplyTextContentChangestitle" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>
+~;
+}else{
+$BNT=qq~
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=sapply()>Apply</td><td>$RBUT</td></tr></table>~;
+}
+	
+$RETURN=qq~fontstyleTbl='$BODY_TOP	
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td width=1% id=SM1 onclick=smSwap(1) class=tab_ $uns>$TextPropertiestab</td>
+<td width=1% id=SM2 onclick=smSwap(2) class=tab $uns>$TextColortab</td>
+<td width=1% id=SM3 onclick=smSwap(3) class=tab $uns>$HighlighterColor</td>
+<td width=97% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td></tr></table>
+
+<div style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px">
+<table id=smdv1 align=center style="table-layout:fixed;margin:0px" border=0 cellpadding=0 cellspacing=0>
+<tr valign=top>
+<td width=100 align=left class=widgetText11 $uns style="padding:0px 5px">$Class:
+<DIV class=stylebox id=clasestyle style="width:100px;height:81px;" $uns>&nbsp;</DIV>
+</td>
+<td width=80 align=left class=widgetText11 $uns style="padding:0px 5px">$Fixed:
+<DIV class=stylebox style="width:74px;height:81px;" $uns>$FONT_PIX</DIV>
+</td>
+<td width=120 rowspan=2 align=left class=widgetText11 $uns style="padding:0px 5px">$Attributes:
+<table border=0 cellpadding=0 cellspacing=0>
+<tr>
+<td align=left style="padding-top:5px" $uns><input name=cxbold id=cx_bold type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns>$Bold</td><td align=left style="padding-top:5px" $uns>&nbsp;<input name=cxbold id=cx_unbold type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns>$REMBold</td></tr>
+<tr><td align=left $uns><input name=cxitalic id=cx_italic type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns>$Italic</td><td align=left $uns>&nbsp;<input name=cxitalic id=cx_unitalic type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns>$REMItalic</td></tr>
+<tr><td colspan=4 $uns>&nbsp;</td></tr>
+<tr><td align=left $uns><input name=cxtxtdec id=cx_underline type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns colspan=3>$Underline</td></tr>
+<tr><td align=left $uns><input name=cxtxtdec id=cx_strike type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns colspan=3>$LineThrough</td></tr>
+<tr><td align=left $uns><input name=cxtxtdec id=cx_none type=radio $uns onclick=saply(this.id)></td><td align=left class=widgetText11 $uns colspan=3>$NoLine</td></tr>
+<tr><td colspan=4 $uns>&nbsp;</td></tr>
+<td align=left colspan=4 style="padding-top:5px" $uns class=widgetText11>
+<select id=cx_spacing class=widgetText11 style="width:40px" $uns onchange=saply(this.id)>
+<option value=0>0
+<option value="1.1">1.1
+<option value="1.2">1.2
+<option value="1.3">1.3
+<option value="1.4">1.4
+<option value="1.5">1.5
+<option value="1.6">1.6
+<option value="1.7">1.7
+<option value="1.8">1.8
+<option value="1.9">1.9
+<option value="2">2
+<option value="2.1">2.1
+<option value="2.2">2.2
+<option value="2.3">2.3
+<option value="2.4">2.4
+<option value="2.5">2.5
+<option value="2.6">2.6
+<option value="2.7">2.7
+<option value="2.8">2.8
+<option value="2.9">2.9
+</select>&nbsp;$Spacing</td></tr>
+<td align=left colspan=4 class=widgetText11 style="padding-top:5px;padding-right:5px" $uns>
+<select id=cx_height class=widgetText11 style="width:40px" $uns onchange=saply(this.id)>
+<option value=0>0
+<option value="1.1">1.1
+<option value="1.2">1.2
+<option value="1.3">1.3
+<option value="1.4">1.4
+<option value="1.5">1.5
+<option value="1.6">1.6
+<option value="1.7">1.7
+<option value="1.8">1.8
+<option value="1.9">1.9
+<option value="2.0">2.0
+<option value="2.1">2.1
+<option value="2.2">2.2
+<option value="2.3">2.3
+<option value="2.4">2.4
+<option value="2.5">2.5
+<option value="2.6">2.6
+<option value="2.7">2.7
+<option value="2.8">2.8
+<option value="2.9">2.9
+<option value="3.0">3.0
+</select>&nbsp;$LineHeight</td></tr>
+</td></tr>
+
+</table>
+</td></tr>
+<tr valign=top>
+<td align=left class=widgetText11 style="padding:6px 5px" $uns>$FontFamily:
+<DIV class=stylebox style="width:100px;height:81px;" $uns>$FONT_FACES</DIV>
+</td>
+<td align=left class=widgetText11 style="padding:6px 5px" $uns>$Adjustable:
+<DIV class=stylebox style="width:74px;height:81px;" $uns>$FONT_SIZES</DIV>
+</td></tr></table>
+
+<table style="display:none;visibility:hidden" align=center id=smdv2 border=0 cellpadding=0 cellspacing=0><tr><td align=center $uns>
+$SWATCH1
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+$COLORMENU1</td><td align=right>
+<table style="margin:10px 0px 0px 10px;" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class id=cx_b1 $uns onclick=cx_txt_color="";saply(this.id)>$UnselectColorbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr></table>
+
+<table style="display:none;visibility:hidden" align=center id=smdv3 border=0 cellpadding=0 cellspacing=0><tr><td align=center $uns>
+$SWATCH2
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr><td align=left>
+$COLORMENU2</td><td align=right>
+<table style="margin:10px 0px 0px 10px;" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class id=cx_b2 $uns onclick=cx_bg_color="";saply(this.id)>$UnselectColorbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table></td></tr></table>
+
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td colspan=3 align=center $uns>
+<DIV style="margin-top:10px;text-align:center;font-size:10px;font-variant:small-caps" class=widgetText11>$SampleChanges</DIV>
+<DIV style="text-align:left;border:1px solid #999999;width:344px;height:104px" $uns>
+<DIV id=stylePad style="text-align:left;background-color:#FFFFFF;border:1px solid #777777;width:340px;height:100px;margin:1px;overflow:auto" $uns></DIV></DIV>
+
+<tr><td colspan=3 align=center $uns>
+$BNT
+</td></tr></table>
+</div>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+cxClass='';cxfamily='';cxsize='';
+function sapply(){
+	ceget_selected()
+	cecheck_selected()
+	if(ceinside==0 || !cetxt){
+		basicAlert("$htmlalert")
+	}else{
+		style_set=''	
+		if(cxClass!=''){style_set+=' class="'+cxClass+'"'}		
+		style_set+=' style="'
+		if(cxfamily!=''){cxfamily=cxfamily.replace(/_/g," ");style_set+=' font-family:'+cxfamily+';'}
+		if(cxsize!=''){style_set+=' font-size:'+cxsize+';'}
+		if(byId('cx_bold').checked==true){style_set+=' font-weight:bold;'}
+		if(byId('cx_italic').checked==true){style_set+=' font-style: italic;'}
+		if(byId('cx_underline').checked==true){style_set+=' text-decoration:underline;'}
+		if(byId('cx_strike').checked==true){style_set+=' text-decoration:line-through;'}
+		if(byId('cx_spacing').selectedIndex>0){style_set+=' letter-spacing:'+byId('cx_spacing').options[byId('cx_spacing').selectedIndex].value+';'}
+		if(byId('cx_height').selectedIndex>0){style_set+=' line-height:'+byId('cx_height').options[byId('cx_height').selectedIndex].value+';'}
+		if(cx_txt_color!=''){style_set+=' color:#'+cx_txt_color+';'}
+		if(cx_bg_color!=''){style_set+=' background-color:#'+cx_bg_color+';'}
+		if(style_set.match(/style=/)){
+			style_set='<span'+style_set+'">'+cetxt+'</span>'
+		}else{
+			style_set='<span'+style_set+'>'+cetxt+'</span>'
+		}
+		if(isIE){
+			capture()
+			cesel.pasteHTML(style_set)			
+			byId('undoBTN').style.visibility="visible"
+			byId('redoBTN').style.visibility="hidden"
+		}else{
+			doc().execCommand("InsertHTML", false,style_set); 
+		}
+	}
+}
+pad_txt='';cx_txt_color='';cx_bg_color=''
+function saply(id){
+	if(id.match(/cxcl/)){
+		for(i=0;i<pageClassesArray.length;++i){
+			ii='cxcl'+i
+			byId(ii).style.color="#000000";byId(ii).style.backgroundColor="#FFFFFF"
+		}
+	}
+	if(id.match(/cxff/)){
+		for(i=0;i<$cxff;++i){
+			ii='cxff'+i
+			byId(ii).style.color="#000000";byId(ii).style.backgroundColor="#FFFFFF"
+		}
+	}
+	if(id.match(/cxfs|cxfp/)){
+		for(i=0;i<$cxfs;++i){
+			ii='cxfs'+i
+			byId(ii).style.color="#000000";byId(ii).style.backgroundColor="#FFFFFF"
+		}
+		for(i=0;i<$cxfp;++i){
+			ii='cxfp'+i
+			byId(ii).style.color="#000000";byId(ii).style.backgroundColor="#FFFFFF"
+		}
+	}
+	if(id.match(/cxfs/)){
+		byId('cxfp0').style.color="#FFFFFF";byId('cxfp0').style.backgroundColor="#999999"
+	}
+	if(id.match(/cxfp/)){
+		byId('cxfs0').style.color="#FFFFFF";byId('cxfs0').style.backgroundColor="#999999"
+	}
+	if(!id.match(/cx_/)){
+		byId(id).style.color="#FFFFFF"
+		byId(id).style.backgroundColor="#999999"
+	}
+	pad_set=''
+	if(pad_txt==''){pad_txt=byId('stylePad').innerHTML}
+	if(cxClass!=''){
+		for(i=0;i<doc().styleSheets.length;++i){
+			if(doc().styleSheets[i].cssRules != undefined){
+				for(j=0;j<doc().styleSheets[i].cssRules.length;++j){
+					if(doc().styleSheets[i].cssRules[j].selectorText!=undefined && doc().styleSheets[i].cssRules[j].selectorText.indexOf(cxClass)==1){
+						pad_set+=doc().styleSheets[i].cssRules[j].style.cssText
+					}
+				}
+			}else{
+				for(j=0;j<doc().styleSheets[i].rules.length;++j){
+					if( doc().styleSheets[i].rules[j].selectorText.indexOf(cxClass)==1){
+						pad_set+=doc().styleSheets[i].rules[j].style.cssText+';'
+					}
+				}
+			}
+		}
+	}		
+	if(cxfamily!=''){cxfamily=cxfamily.replace(/_/g," ");pad_set+=' font-family:'+cxfamily+';'}
+	if(cxsize!=''){pad_set+=' font-size:'+cxsize+';'}
+	if(byId('cx_bold').checked==true){pad_set+=' font-weight:bold;'}
+	if(byId('cx_unbold').checked==true){pad_set+=' font-weight:normal;'}
+	if(byId('cx_italic').checked==true){pad_set+=' font-style: italic;'}
+	if(byId('cx_unitalic').checked==true){pad_set+=' font-style: normal;'}
+	if(byId('cx_none').checked==true){pad_set+=' text-decoration:none;'}
+	if(byId('cx_underline').checked==true){pad_set+=' text-decoration:underline;'}
+	if(byId('cx_strike').checked==true){pad_set+=' text-decoration:line-through;'}
+	if(byId('cx_spacing').selectedIndex>0){pad_set+=' letter-spacing:'+byId('cx_spacing').options[byId('cx_spacing').selectedIndex].value+';'}
+	if(byId('cx_height').selectedIndex>0){pad_set+=' line-height:'+byId('cx_height').options[byId('cx_height').selectedIndex].value+';'}
+	if(cx_txt_color!=''){pad_set+=' color:#'+cx_txt_color+';'}
+	if(cx_bg_color!=''){pad_set+=' background-color:#'+cx_bg_color+';'}
+	byId('stylePad').innerHTML='<span style="'+pad_set+'">'+pad_txt+'</span>'
+}
+function smSwap(n){
+	byId('SM1').className="tab"
+	byId('SM2').className="tab"
+	byId('SM3').className="tab"
+	byId('smdv1').style.display="none"
+	byId('smdv2').style.display="none"
+	byId('smdv3').style.display="none"
+	byId('smdv2').style.visibility="hidden"
+	byId('smdv3').style.visibility="hidden"
+	var SM="SM"+n
+	byId(SM).className="tab_"
+	smdv="smdv"+n
+	byId(smdv).style.display="block"
+	if(n==2){setTimeout("cxVizTxt()",1000)}
+	if(n==3){setTimeout("cxVizBG()",1000)}
+}
+function cxVizTxt(){byId(smdv).style.visibility="visible"}
+function cxVizBG(){byId(smdv).style.visibility="visible"}
+byId('fontstyleplace').innerHTML=fontstyleTbl
+if(pageClassesArray.length>0){
+sopts='<div id=cxcl0 onclick=cxClass="";saply("cxcl0") class=fontsoff $uns>$NoClassoption</div>'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<div id=cxcl'+i+' onclick=cxClass="'+pageClassesArray[i]+'";saply("cxcl'+i+'") class=fontsoff $uns>'+pageClassesArray[i]+'</div>'
+}
+byId('clasestyle').innerHTML=sopts
+}
+
+cefonts_style()
+~;
+1;

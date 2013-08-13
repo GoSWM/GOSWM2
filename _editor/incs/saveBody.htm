@@ -1,0 +1,102 @@
+lang("saveHead");
+($file,$bgcolor,$text,$link,$alink,$vlink,$hlink,$marHor,$marVer,$bgimg,$undeline)=split(/=/,$params);
+
+if($demo){&disab}
+
+$bgcolor=uc($bgcolor);
+$text=uc($text);
+$link=uc($link);
+$alink=uc($alink);
+$vlink=uc($vlink);
+$hlink=uc($hlink);
+
+$file=$root.$file;
+
+if($bgcolor ne ''){
+	$ATT.=qq~bgcolor="$bgcolor" ~;
+	$BST.=qq~background-color:$bgcolor;~;
+}
+if($text ne ''){
+	$ATT.=qq~text="$text" ~;
+	$BST.=qq~color:$text;~;
+}
+if($link ne ''){
+	$ATT.=qq~link="$link" ~;
+	$ST.=qq~a:link {color:$link}\n~;
+}
+if($vlink ne ''){
+	$ATT.=qq~vlink="$vlink" ~;
+	$ST.=qq~a:visited {color:$vlink}\n~;
+}
+if($hlink ne ''){
+	$ATT.=qq~hover="$hlink" ~;
+	$ST.=qq~a:hover {color:$hlink}\n~;
+}
+if($alink ne ''){
+	$ATT.=qq~alink="$alink" ~;
+	$ST.=qq~a:active {color:$alink}\n~;
+}
+if($undeline eq "true"){
+	$ST.=qq~a{text-decoration:underline}\n~;
+}else{
+	$ST.=qq~a{text-decoration:none}\n~;
+}
+
+if($marHor eq ''){$marHor=0}
+if($marVer eq ''){$marVer=0}
+$marHor_=$marHor."px";
+$marVer_=$marVer."px";
+	$BST.=qq~margin:$marHor_ $marVer_;~;
+if($marHor ne ''){
+	$ATT.=qq~leftmargin="$marHor" ~;
+}
+if($marVer ne ''){
+	$ATT.=qq~topmargin="$marVer" ~;
+}
+
+if($bgimg ne ''){
+	$ATT.=qq~background="$bgimg" ~;
+	$BST.=qq~background-image:url($bgimg);~;
+}
+
+$BOST=qq~<!-- begin editor styles -->
+<style type="text/css">
+$ST</style>
+<!-- end editor styles -->
+~;
+
+$STYLES=qq~style="$BST"~;
+
+open(F,"$file");
+while(<F>){
+	$SAVE.=$_;
+}
+$BEG="<!-- begin editor styles -->";
+$END="<!-- end editor styles -->\n";
+$SAVE =~ s`$BEG.+$END``si;
+$SAVE =~ s`</head>`$BOST</head>`i;
+$SAVE =~ s/<BODY[^>]*>/<BODY $ATT $STYLES>/i;
+
+open(F,">$file");
+print F "$SAVE";
+
+
+$RETURN=qq~
+		byId('yesBut').innerHTML="$YES"
+		active_alert="$htmlalert2"
+		doAlert("confirm")
+		active_function = new Function("editPad.location.reload(true);closeAlert()")
+		cancel_function = new Function("closeAlert()")
+~;
+
+sub disab{
+	$RETURN=qq~
+	byId('yesBut').innerHTML="$OK"
+	active_alert="$disabled"
+	active_function = new Function("closeAlert()")
+	doAlert("alert")~;
+	&respond;
+}
+
+
+1;

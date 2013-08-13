@@ -1,0 +1,64 @@
+Upload the contents of the zip to your server. 
+Upload all files to a folder named "editor" at yourdomain.com/editor. 
+Upload files in the same layout positions as in the zip.
+
+On Unix
+Upload the "incs" and "txts" folders in ASCII format
+Upload the "imgs" and "flash" folders in BINARY format
+Chmod yourdomain.com/editor/edit.cgi to 0755 permissions
+Attempt to access yourdomain.com/editor/edit.cgi in your browser
+If edit.cgi does not execute, change the name to edit.pl and try again
+If edit.cgi does not execute, rename htaccess.txt to ".htaccess" and try again
+If edit.cgi does not execute, remove .htaccess and move edit.cgi to the folder named "cgi-bin"
+If editwrx.cgi is run in cgi-bin, open edit.cgi and edit $incs_folder_PATH & $txts_folder_PATH to relative or absolute paths to those two folders
+
+On Windows IIS
+Upload the "incs" and "txts" folders in ASCII format
+Upload the "imgs" and "flash" folders in BINARY format
+Edit the $incs_folder_PATH & $txts_folder_PATH to absolute paths to those two folders
+Attempt to access yourdomain.com/editor/edit.cgi in your browser
+If edit.cgi does not execute, consult http://gphrs.com/IIS_setup.gif and http://gphrs.com/IIS_setup2.gif to verify the server is correctly set up
+If edit.cgi does not execute, change the name to edit.pl and try again
+If edit.cgi does not execute, move edit.cgi to the folder named "cgi-bin"	
+
+
+Login to edit.cgi as "admin" with password "start"
+Open User Setups. Select the "admin" user and click Edit Selected User. Change the "admin" password
+Open Site Setup and review/change the basic site setup as desired
+Open User Setups and create a user following the instructions
+Go back to login and login as the user you created
+Open yourdomain.com/editor/test.html and edit in the editblock and save the edit
+
+Pages that do not contain editing blocks can be edited from the open body tag to the close body tag by Type1, Type3, & Type5 users.
+
+Type2, Type4 & Type6 users can edit only inside of editing blocks
+
+Review the source code of test.html to see how to set up editblocks and the login prompt on your pages
+Below are examples of how to setup block editing on html pages.
+
+ Editblocks must be coded into pages to edit only parts of pages. Example:
+
+<DIV class="editblock-1">
+Content to edit
+</DIV><!--"editblock-1" -->
+
+If you have multiple users editing a page you can specify which users can edit particular blocks by using a userblock instead of an editblock. Example:
+
+<DIV class="userblock-mike,cindy">
+Content that users mike and cindy can edit
+</DIV><!--"userblock-mike,cindy" -->
+
+Alternately, sections of pages can be protected from editing by using excludeblocks. Example:
+
+<DIV class="excludeblock-1">
+Content to exclude from editing
+</DIV><!--"excludeblock-1" -->
+
+You can even write an edit on a page to an included file (SSI, PHP, ASP) using an includeblock. Example:
+
+<DIV class="includeblock-/nav.shtml">
+<!--#include virtual="/nav.shtml" -->
+</DIV>
+
+
+

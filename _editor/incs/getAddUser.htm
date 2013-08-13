@@ -1,0 +1,418 @@
+lang("getAddUser");
+$main="adduserMain";
+$place="adduserplace";
+$title="$widgettitle";
+$wigWid="650";
+$ico="adduser";
+require 'widgetBody.htm';
+open(USRS,"$users_txt");
+	while(<USRS>){
+	($u,$x)=split(/=/);
+		if($u eq "admin"){next}
+		$USERS.=qq~<option value="$u">$u~;
+	}
+
+$RETURN=qq~adduserTbl='$BODY_TOP
+
+<div id=intro style="display:">
+<form name=one>
+<table align=center width=610 border=0 cellpadding=10 cellspacing=0 style="margin:6px">
+<tr><td style="font-family:tahoma,arial;font-size:11px;border:1px solid black;background-color:white;height:300px;overflow:auto;" valign=top>
+$text1<br><br>
+<table border=0 cellpadding=4 cellspacing=0><tr valign=top>
+<td><b>1.</b></td><td><input type=radio name=which value=without></td><td style="font-family:tahoma,arial;font-size:11px">$text2</td></tr>
+<tr valign=top><td>&nbsp;</td><td>&nbsp;</td>
+<td style="font-family:tahoma,arial;font-size:11px">$text3</td></tr>
+
+<tr><td colspan=3>&nbsp;</td></tr>
+<tr valign=top><td><b>2.</b></td><td><input type=radio name=which value=with><br><br></td>
+<td style="font-family:tahoma,arial;font-size:11px">$text4</td></tr>
+<tr valign=top><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;1.</td>
+<td style="font-family:tahoma,arial;font-size:11px">$text5
+</td></tr>
+<tr valign=top><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;2.</td>
+<td style="font-family:tahoma,arial;font-size:11px">$text6
+</td></tr>
+<tr valign=top><td>&nbsp;</td><td>&nbsp;&nbsp;&nbsp;3.</td>
+<td style="font-family:tahoma,arial;font-size:11px">$text7</td></tr>
+<tr><td colspan=3 align=right  style="padding:1px 20px 1px 1px">
+<table align=right border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:5px">
+<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Continue To Next Step" onclick=gcont()>$Continuebutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</td></tr>
+</td></tr></table></td></tr></table>
+</form>
+</div><!-- intro -->
+
+<div id=with_div style="display:none">
+<table width=100% height=20 border=0 cellpadding=0 cellspacing=0 style="margin-top:0px"><tr>
+<td id=tab_a class="tab" onclick=swapAU("div_a",this.id)>$StepOnetab</td>
+<td id=tab_b class="tab" onclick=swapAU("div_b",this.id)>$StepTwotab</td>
+<td id=tab_c class="tab" onclick=swapAU("div_c",this.id)>$StepThreetab</td>
+<td width=97% style="border-bottom:1px solid #FFFFFF;width:98%">&nbsp;</td></tr></table>
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:16px">
+
+<table id=intro2 align=center width=610 border=0 cellpadding=10 cellspacing=0 style="margin:0px 6px 0px 6px"><tr><td valign=top style="border:1px solid black;background-color:white;height:400px;font-family:tahoma,arial;font-size:11px">
+$text8
+</td></tr></table>
+
+<div id=div_a style="display:none;padding:0px">
+<table align=center width=610 border=0 cellpadding=10 cellspacing=0 style="margin:6px 6px"><tr><td valign=top style="border:1px solid black;background-color:white;height:400px;font-family:tahoma,arial;font-size:11px">$text9<BR><BR>
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+
+<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="$locatepagebuttontitle" onclick=gset("three")>$locatepagebutton</td><td>$RBUT</td></tr></table>
+
+  </td><td>&nbsp;&nbsp;
+<input class=input style="width:450px" readonly=true id=url_three name="xstep_two_page" value=""></td></tr>
+<tr><td></td><td>
+ <DIV id=pad_three style="display:none"></DIV>
+</td></tr></table>
+
+<br><br>
+<table align=right style="margin-right:20px" border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:5px">
+
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center class="button_center"  id=create_step_two_button onclick=create_step_two_form() $uns>$InsertStepOneFormbutton</td><td>$RBUT</td></tr></table>
+</td><td style="padding-left:5px">
+&nbsp;
+</td></tr></table></td></tr></table>
+</div>
+
+<div id=div_b style="display:none">
+<table align=center width=610 border=0 cellpadding=10 cellspacing=0 style="margin:6px 6px 0px 6px"><tr><td valign=top style="border:1px solid black;background-color:white;height:300px;overflow:auto;font-family:tahoma,arial;font-size:11px">
+$text10 <span style="cursor:hand;color:blue" onclick=tutorial()>$HERE</span> $text11
+<br>
+<table align=center border=0 cellpadding=5 cellspacing=0><tr><td align=center style="font-family:tahoma,arial;font-size:11px"><br><br>
+$text12</td></tr><tr><td align=center>
+<textarea style="width:500px;height:150px;background-color:#eeeeee;border:1px solid #999999" name=paypal_syntax></textarea></td></tr>
+<tr><td align=center style=";font-family:tahoma,arial;font-size:11px">
+$text13<br><br></td></tr>
+<tr><td>
+<table align=right style="margin-right:20px" border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:5px">
+
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class onclick=create_step_three_form()>$InsertStepTwoFormbutton</td><td>$RBUT</td></tr></table>
+
+</td><td style="padding-left:5px">
+&nbsp;</td></tr></table>
+
+</td></tr></table>
+</td></tr></table>
+
+</div>
+
+<div id=div_c style="display:none">
+<table align=center width=610 border=0 cellpadding=0 cellspacing=0 style="margin:6px 6px"><tr><td valign=top style="border:1px solid black;background-color:white;"><div style="padding:10px;height:390px;overflow:auto;font-family:tahoma,arial;font-size:11px">
+$text14
+<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="font-family:tahoma,arial;font-size:11px;">$text15</td><td style="padding-left:10px"><select class=input style="width:100px" id=xdefault_user2>$USERS</select>
+</td><td></td></tr>
+<tr><td style="font-family:tahoma,arial;font-size:11px;">$text16</td><td style="padding-left:10px"><input class=input style="width:200px" id=xnotice_email2></td><td style="font-family:tahoma,arial;font-size:11px;">&nbsp;&nbsp;$optional
+</td></tr></table>
+</div>
+<br>
+<LI> $text17<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Click to toggle display On/Off" onclick=gset("four")>$locatefolderbutton</td><td>$RBUT</td></tr></table>
+</td><td>&nbsp;&nbsp;
+ <input class=input style="width:400px" id=url_four name="xcreate_username_folder_in_folder2" value="" readonly></td></tr></table>
+  <DIV id=pad_four style="display:none"></DIV>
+  </div>
+<BR>
+<LI>$text18<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Click to toggle display On/Off" onclick=gset("five")>$locatefolderbutton</td><td>$RBUT</td></tr></table>
+
+  </td><td style=";font-family:tahoma,arial;font-size:11px">&nbsp;&nbsp;
+<input class=input style="width:400px" id=url_five name="xfolder_to_populate_from2" value="" readonly></td></tr></table>
+ <DIV id=pad_five style="display:none"></DIV>
+ </div></ol>
+$text19 <span style="border:4px double $editable_color">$outlined=xoutlined</span> $text20 <img align=absmiddle src="$utif/form.png" width="16" height="16" border="0" alt=""> $text21
+<div style="margin-top:10px">
+<table align=right style="margin-right:20px" border=0 cellpadding=0 cellspacing=0><td style="padding-right:5px">
+
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=insert_nu2()>$InsertFormbutton</td><td>$RBUT</td></tr></table>
+
+</td><td style="padding-left:5px">
+&nbsp;
+</td></tr></table></div>
+<div></div></td></tr></table>
+</div><br>
+</DIV><!--end of with-->
+
+</div><!-- with -->
+
+<div id=without_div style="display:none">
+<table align=center width=610 border=0 cellpadding=0 cellspacing=0 style="margin:6px">
+<tr><td style="border:1px solid black;background-color:white"><div style="padding:10px;height:390px;overflow:auto;font-family:tahoma,arial;font-size:11px;">
+$text22
+<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="font-family:tahoma,arial;font-size:11px;">$text23</td><td style="padding-left:10px"><select class=input style="width:100px" id=xdefault_user>$USERS</select>
+</td><td></td></tr>
+<tr><td style="font-family:tahoma,arial;font-size:11px;">$text24</td><td style="padding-left:10px"><input class=input style="width:200px" id=xnotice_email></td><td style="font-family:tahoma,arial;font-size:11px;">&nbsp;&nbsp;$optional
+</td></tr></table>
+</div>
+<BR><LI> $text25<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="$locatefolderbuttontitle" onclick=gset("one")>$locatefolderbutton</td><td>$RBUT</td></tr></table>
+ </td><td>&nbsp;&nbsp;
+ <input class=input style="width:400px" readonly=true id=url_one name="xcreate_username_folder_in_folder" value="" readonly></td></tr></table>
+ <DIV id=pad_one style="display:none"></DIV>
+ </div>
+<BR><LI>$text26<div  style="margin-top:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td>
+
+<table style="" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="$locatefolderbuttontitle" onclick=gset("two")>$locatefolderbutton</td><td>$RBUT</td></tr></table>
+</td><td>&nbsp;&nbsp;
+<input class=input style="width:400px" readonly=true id=url_two name="xfolder_to_populate_from" value="" readonly></td></tr></table>
+ <DIV id=pad_two style="display:none"></DIV>
+</div></ol>
+$text27 <span style="border:4px double $editable_color">$outlined</span> $text28 <img align=absmiddle src="$utif/form.png" width="16" height="16" border="0" alt=""> $text29
+</td></tr></table>
+<div style="margin-top:10px">
+<table align=right style="margin-right:20px" border=0 cellpadding=0 cellspacing=0><td style="padding-right:5px">
+
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class $uns onclick=insert_nu()>$InsertFormbutton</td><td>$RBUT</td></tr></table>
+</td><td style="padding-left:5px">
+&nbsp;
+</td></tr></table></div>
+</div><!-- without -->
+<iframe name=hole style="display:none"></iframe>
+<div id=form_div_without style="display:none">
+<form name=add_form method=post action="$uttf?add_nu_user">
+<input name="user_name" value="" maxlength=15><br>
+$text30<br><br>
+<input name="password" value="" maxlength=10><br>
+	$text31<br><br>
+<input name="user_email" value="" maxlength=50><br>
+	Enter Your Email Address<br><br>
+<input type=submit value="$SUBMIT"><br>
+<input  type=hidden name="create_username_folder_in_folder" value="">
+<input type=hidden name="folder_to_populate_from" value="">
+<input type=hidden name="default_user" value="">
+</form>
+</div>
+
+<div id=form_div_two style="display:none">
+<form id="form_id" name=step_two_form method=post action="$uttf?check_username" contentEditable=false>
+<input id="u_id" name="user_name" value="" maxlength=15><br>
+$text30<br><br>
+<input id="s_id" type=submit value="$SUBMIT"><br>
+<input id="re_id"  type=hidden name="submission_redirect" value="">
+</form>
+</div>
+
+$BODY_BOT';~;
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+
+$RETURN.=qq~
+pad1_code='<DIV><table style="margin:5px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>'+
+'<img id=up_arrow13 onclick=upDIR13() src="$utif/up_arrow.png" hspace=5 width="16" height="16" border="0" title="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>'+
+'<td style="padding-left:10px" class=widgetText11><b>$LocateAndSelect <span id=gwhat></span></b></td>'+
+'</td></tr>'+
+'<tr><td align=center colspan=2>'+
+'<iframe id=pad13 name=pad13 style="margin-bottom:0px;border:1px solid #999999;width:490px;height:160px" src="$uttf?pathTree=x=find_folder" frameborder="0"></iframe></td></tr></table>'+
+'</DIV>'
+pad2_code='<DIV><table style="margin:5px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>'+
+'<img id=up_arrow7 onclick=upDIR7() src="$utif/up_arrow.png" hspace=5 width="16" height="16" border="0" title="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>'+
+'<td style="padding-left:10px" class=widgetText11><b>$LocateAndSelect <span id=gwhat2></span></b></td>'+
+'</td></tr>'+
+'<tr><td align=center colspan=2>'+
+'<iframe id=pad7 name=pad7 style="margin-bottom:0px;border:1px solid #999999;width:490px;height:160px" src="$uttf?pathTree=x=find_files" frameborder="0"></iframe></td></tr></table>'+
+'</DIV>'
+
+whch_url="url_one"
+function gcont(){
+	if(document.one.which[0].checked == false && document.one.which[1].checked == false){
+	basicAlert("Select a process")
+	}else{
+		byId("intro").style.display="none"
+		if(document.one.which[0].checked == true){
+			byId("without_div").style.display=""
+		}
+		if(document.one.which[1].checked == true){
+			byId("with_div").style.display=""
+		}
+	}
+}
+function tutorial(){
+url="http://gphrs.com/tutorials/paypal_add_user.html"
+w=662;h=560
+LeftPos = (screen.availWidth) ? (screen.availWidth-w)/2 : 0;
+TopPos = (screen.availHeight) ? (screen.availHeight-h)/2 : 0;
+tut=''
+tut=window.open(url,"WIN","scrollbars=0,resizable=1,top="+TopPos+",left="+LeftPos+",width="+w+",height="+h)
+if(!tut){alert("$alert1")}
+}
+function moveUrl(u){
+	if(byId(whch_url).readonly==false){
+		byId(whch_url).value=u
+	};
+		byId("up_arrow13").style.visibility="visible";
+}
+
+function moveUrl2(u){
+	if(byId(whch_url).readonly==false){
+		byId(whch_url).value=u
+	}
+	byId("up_arrow13").style.visibility="hidden";
+}
+
+function gset(obj){
+	whch_pad="pad_"+obj	
+	whch_url="url_"+obj
+	if(byId("pad_one").innerHTML!=''){byId("pad_one").innerHTML=''}
+	if(byId("pad_two").innerHTML!=''){byId("pad_two").innerHTML=''}
+	if(byId("pad_three").innerHTML!=''){byId("pad_three").innerHTML=''}
+	if(byId("pad_four").innerHTML!=''){byId("pad_four").innerHTML=''}
+	if(byId("pad_five").innerHTML!=''){byId("pad_five").innerHTML=''}
+	if(byId(whch_pad).style.display=='block'){
+		byId(whch_pad).style.display='none'
+		byId(whch_url).readonly=true
+	}else{
+		byId(whch_pad).style.display='block'
+		byId(whch_url).readonly=false
+		if(obj == "one" || obj == "two" || obj=="four" || obj=="five"){
+			if(byId(whch_pad).innerHTML==''){byId(whch_pad).innerHTML=pad1_code}
+		}
+		if(obj == "three" || obj == "four"){
+			if(byId(whch_pad).innerHTML==''){byId(whch_pad).innerHTML=pad2_code}
+		}
+	}
+	if(obj=="one"){
+	byId("gwhat").innerHTML="$TheFolderToCreateNewUserFoldersIn"
+	}
+	if(obj=="two"){
+	byId("gwhat").innerHTML="$TheFolderToPopulateNewUsersFrom"
+	}
+	if(obj=="four"){
+	byId("gwhat").innerHTML="$TheFolderToCreateNewUserFoldersIn"
+	}
+	if(obj=="five"){
+	byId("gwhat").innerHTML="$TheFolderToPopulateNewUsersFrom"
+	}
+}
+function upDIR13(){
+	url="$uttf?pathTree=up=find_folder="+pad13.updir
+	pad13.location=url
+}
+function selection13(dir,path,url){
+	if(dir == "dir"){
+		pad13.location="$uttf?pathTree=x=find_folder="+path
+	}
+}
+function selection7(dir,path,url){
+	if(dir == "dir"){
+		pad7.location="$uttf?pathTree=x=find_files7="+path
+	}else{
+		byId(whch_url).value=url
+	}
+}
+function upDIR7(){
+	pad7.location="$uttf?pathTree=up=find_files7"
+}
+function swapAU(dv,tab){
+cycle=dv;
+	byId('tab_a').className="tab"
+	byId('tab_b').className="tab"
+	byId('tab_c').className="tab"
+	byId(tab).className="tab_"
+	byId('intro2').style.display="none"
+	byId('div_a').style.display="none"
+	byId('div_b').style.display="none"
+	byId('div_c').style.display="none"
+	byId(dv).style.display="inline"
+}
+function insert_nu(){
+	kryptG(byId("xnotice_email").value)
+	var FORM='<form class=formblock style="MARGIN: 0px" method=post action="$uttf?do_add_nu_user" target=formhole>'+
+'<input name="user_name" value="" maxlength=15><br>'+
+'$text30<br><br>'+
+'<input name="password" value="" maxlength=10><br>'+
+'	$text31<br><br>'+
+'<input name="user_email" value="" maxlength=50><br>'+
+'	$text32<br><br>'+
+'<input type=submit value="$SUBMIT"><br>'+
+'<input  type=hidden name="create_username_folder_in_folder" value="'+byId('url_one').value+'">'+
+'<input type=hidden name="folder_to_populate_from" value="'+byId('url_two').value+'">'+
+'<input type=hidden name="default_user" value="'+byId("xdefault_user").value+'">'+
+'<input type=hidden name="notice_email" value="'+xkrypt+'.com">'+
+'</form><iframe name=formhole style="display:none;width:0px;height:0px"></iframe>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(FORM);
+		}else{
+			doc().execCommand("InsertHTML", false, FORM); 
+		}
+	}		
+}
+function insert_nu2(){
+	kryptG(byId("xnotice_email2").value)
+	var FORM='<form class=formblock style="MARGIN: 0px" method=post action="$uttf?do_add_nu_user" target=formhole>'+
+'<input name="user_name" value="" maxlength=15><br>'+
+'$text30<br><br>'+
+'<input name="password" value="" maxlength=10><br>'+
+'	$text31<br><br>'+
+'<input name="user_email" value="" maxlength=50><br>'+
+'	$text32<br><br>'+
+'<input type=submit value="$SUBMIT"><br>'+
+'<input  type=hidden name="create_username_folder_in_folder" value="'+byId('url_four').value+'">'+
+'<input type=hidden name="folder_to_populate_from" value="'+byId('url_five').value+'">'+
+'<input type=hidden name="default_user" value="'+byId("xdefault_user2").value+'">'+
+'<input type=hidden name="notice_email" value="'+xkrypt+'.com">'+
+'</form><iframe name=formhole style="display:none;width:0px;height:0px"></iframe>'+
+'<script type="text/javascript">return "ddd"</script>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(FORM);
+		}else{
+			doc().execCommand("InsertHTML", false, FORM); 
+		}
+	}		
+}
+
+function create_step_two_form(){
+	var FORM='<form class=formblock style="MARGIN: 0px" method=post action="$uttf?checkUsername" target=formhole>'+
+'<input id=user_name name="user_name" value="" maxlength=15><br>'+
+'$text30<br><br>'+
+'<input type=submit value="$SUBMIT"><br>'+
+'<input type=hidden name="submission_redirect" value="'+byId('url_three').value+'">'+
+'</form><iframe name=formhole style="display:none;width:0px;height:0px"></iframe>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(FORM);
+		}else{
+			doc().execCommand("InsertHTML", false, FORM); 
+		}
+	}		
+}
+
+function kryptG(val){
+	alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	mess_="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX"
+	mess=mess_.split("")
+	xkrypt=''
+	chars=val.split("")
+	for(i=0;i<chars.length;++i){
+		if(alf.indexOf(chars[i])!=-1){
+			xkrypt+=mess[alf.indexOf(chars[i])]
+		}else{
+			xkrypt+=chars[i]
+		}
+	}
+}
+
+byId('adduserplace').innerHTML=adduserTbl;
+ceaddUser()
+~;
+
+1;

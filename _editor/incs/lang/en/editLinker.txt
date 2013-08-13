@@ -1,0 +1,12 @@
+widgettitle=Change Link URL
+linkURL=New Link URL
+linkTitle=Link Mouseover
+widgetTitle=Change Link URL/Mouseover Title
+existingURL=Existing URL
+ApplyButton=Apply Changes
+linkButtonTitle=Apply Changes
+LinkTarget=Target
+SameWindow=This&nbsp;Window
+DifferentFrame=Named Frame/Window
+NewWindow=Un-Named&nbsp;Window
+FramesName=Window/Frame&#39;s&nbsp;Name

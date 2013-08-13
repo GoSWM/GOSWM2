@@ -1,0 +1,3 @@
+title2=Refresh This Folder&rsquo;s List
+TITLE=TITLE
+NOTITLE=No Title

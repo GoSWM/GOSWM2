@@ -1,0 +1,84 @@
+lang("getThumbJS");
+if($isIE){$opacity="filter='alpha(opacity:90)'"}
+if($isFF){$opacity="opacity='.9'"}
+
+$RETURN=qq~function enlargeTH(im,w,h,alt){
+	wx=0;hx=0
+	if(document.getElementById("IMJ")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("IMJ"))}
+	if(document.getElementById("IMSHD")){document.getElementsByTagName('body')[0].removeChild(document.getElementById("IMSHD"))}
+	gal_dcw=document.documentElement.clientWidth?document.documentElement.clientWidth:document.body.clientWidth
+	var dch=document.documentElement.clientHeight?document.documentElement.clientHeight:document.body.clientHeight
+	var dbst= document.documentElement.scrollTop?document.documentElement.scrollTop:document.body.scrollTop
+	var shad = document.createElement("DIV");
+	if(h>(dch-40)){
+		wx=w;w=w*((dch-40)/h);wz=parseInt(w);hx=parseInt(h);h=parseInt(dch)-40;hz=parseInt(h);noChn=0
+	}else{
+		wx=w;wz=w;hx=h;hz=h;noChn=1
+	}
+	var LeftPos=(gal_dcw-w)/2
+	var TopPos = dbst
+	shad.style.top="0px"
+	shad.style.left="0px"
+	shad.style.width= gal_dcw+"px"
+	shad.style.height= dch+"px"
+	shad.id= "IMSHD"
+	shad.style.position="fixed"
+	shad.style.backgroundColor="#dcdcdc"
+	shad.style.$opacity
+	document.getElementsByTagName('body')[0].appendChild(shad);
+	//var hh=eval(h)+10
+	var ww=eval(w)+4
+	var element = document.createElement("DIV");
+	element.id = 'IMJ';	
+	element.style.width=eval(w)+2+"px"
+	element.style.border="1px solid #aaaaaa"
+	element.style.padding="2px 2px 2px 2px"
+	element.style.backgroundColor="#f5f5dc"
+	element.style.position="absolute"
+	shad.style.zIndex="100000"
+	element.style.zIndex="100001"
+	element.style.top=TopPos+"px"
+	element.style.left=LeftPos+"px"
+	document.getElementsByTagName('body')[0].appendChild(element);
+	if(alt==''){alt="&nbsp;"}
+	elIMJ='<div style="border:1px solid #888888;background-color:#ffffff" '+
+	'onmouseover=document.getElementById("ThumbEnlarged").style.display="block">'+
+	'<table id=imgTBL width="'+ww+'" border=0 cellpadding=0 cellspacing=0>'+
+	'<tr><td align=left style="font-family:trebuchet ms,Tahoma,Helvetica;font-size:11px;padding:5px;'+
+	'font-weight:bold;">'+alt+'</td>'+	
+	'<td align=right style="padding-right:5px">'
+	if(wx!=0){
+	elIMJ+='<img id=shrinkSpan src="$utif/shrink.png" style="display:none;cursor:pointer" width="16" height="16" border="0" title="$ShrinkImage" '+
+	'onclick=this.style.display="none";document.getElementById("expandSpan").style.display="inline";'+
+	'shrinkIMG() align=absmiddle hspace=4>'+
+	'<img id=expandSpan src="$utif/expand.png" style="cursor:pointer" width="16" height="16" border="0" title="$ExpandImage" '+
+	'onclick=this.style.display="none";document.getElementById("shrinkSpan").style.display="inline";'+
+	'expandIMG() align=absmiddle hspace=4>'
+	}	
+	elIMJ+='<img src="$utif/close.png" style="cursor:pointer" width="16" height="16" border="0" title="$Close" '+
+	'onmousedown=document.getElementsByTagName("body")[0].removeChild(document.getElementById("IMSHD"));'+
+	'document.getElementsByTagName("body")[0].removeChild(document.getElementById("IMJ")) align=absmiddle hspace=4>'+	
+	'</td></tr><tr><td colspan=2 align=left style="padding:0px"><img id=ThumbEnlarged '+
+	'src="'+im+'" width="'+w+'" height="'+h+'" title="'+alt+'" style="border-top:1px solid #888888" onmousedown=this.style.display="none"></td>'+
+	'</tr></table></div>'
+	document.getElementById("IMJ").innerHTML=elIMJ
+	if(noChn==1){document.getElementById("expandSpan").style.visibility="hidden"}
+}
+function expandIMG(){
+	document.getElementById("ThumbEnlarged").width=parseInt(wx)
+	document.getElementById("IMJ").style.width=parseInt(wx)+2+"px"
+	document.getElementById("imgTBL").width=parseInt(wx)+2
+	document.getElementById("IMJ").style.left=parseInt((gal_dcw-parseInt(wx))/2)+"px"
+	document.getElementById("ThumbEnlarged").height=parseInt(hx)
+}
+function shrinkIMG(){
+	document.getElementById("ThumbEnlarged").width=parseInt(wz)
+	document.getElementById("IMJ").style.width=parseInt(wz)+2+"px"
+	document.getElementById("imgTBL").width=parseInt(wz)+2
+	document.getElementById("IMJ").style.left=parseInt((gal_dcw-parseInt(wz))/2)+"px"
+	document.getElementById("ThumbEnlarged").height=parseInt(hz)
+}
+~;
+1;
+
+	

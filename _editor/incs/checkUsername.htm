@@ -1,0 +1,47 @@
+&get_input;
+lang("checkUsername");
+$user_name=~s! !_!g;
+$user_name=~s!\W|!!g;
+
+
+open(USERS,"$users_txt");
+while(<USERS>){
+	if(/^$user_name=/){&bailout;exit}
+}
+close(USERS);
+
+$kryp=crypt($user_name,"ce");
+$kryp=substr($kryp,2);
+
+$date = time +10* 86400 ;
+$cookie_expire = gmtime($date);
+
+print "Set-Cookie: Sign_Up_Username=$user_name|$kryp;expires=$cookie_expire;path=/\n";
+
+
+	$RETURN=qq~parent.location="$submission_redirect"~;
+	&holeRespond;
+
+
+
+sub get_input{
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ tr/+/ /;
+		$value =~ s/pLuS/+/g;
+		$value =~ s/~!/ ~!/g;
+		$value =~ s/[\r]//g;
+		$$name=$value;
+		push(@names,$name);
+	}
+}#get_input
+
+sub bailout{
+	$RETURN=qq~alert("$alert")~;
+	&holeRespond;
+exit
+}
+1;

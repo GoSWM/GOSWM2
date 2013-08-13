@@ -1,0 +1,526 @@
+lang("editTable");
+$main="tableeditMain";
+$place="tableeditplace";
+$title="$widgettitle";
+$wigWid="360";
+$ico="table_edit";
+require 'widgetBody.htm';
+
+$RETURN=qq~tableEditor='$BODY_TOP
+<!-- TABLE -->
+<table width=100% border=0 cellpadding=0 cellspacing=0 style="margin-bottom:10px"><tr>
+<td id=Ttab style="width:1%" class=tab_ onclick=swap(this.id)>$tabletab</td>
+
+<td id=Rtab style="width:1%" class=tab onclick=swap(this.id)>$rowtab</td>
+
+<td id=Ctab style="width:1%" class=tab onclick=swap(this.id)>$celltab</td>
+
+<td style="border-bottom:1px solid #FFFFFF;width:98%;padding-right:5px;font-size:1px;" align=right>&nbsp;</td>
+</tr></table>
+
+<!-- TABLE_DIV -->
+<div id=table_div style="display:none"><form style="margin:0px" name="TablForm">
+<table style="margin-bottom:10px" align=center border=0 cellpadding=3 cellspacing=0>
+<tr>
+	<td align=right><select id=tableAlign name=tableAlign style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999"><option value="left">$leftoption<option value="center">$centeroption<option value="right">$rightoption</select></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("align",TablForm.tableAlign.value); $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$TableAlignment</td></tr>
+<tr>
+	<td align=right><select id=tableDisplay name=tableDisplay style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999"><option value="block">$Blockoption<option value="inline">$Inlineoption<option value="">$Noneoption</select></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.style.display=TablForm.tableDisplay.value; $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$TableDisplay</td></tr>
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:30px" id=tableWidth1 name=tableWidth1 value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("width",TablForm.tableWidth1.value+"%");TablForm.tableWidth2.value="" $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$TableWidthPercentage</td></tr>
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:30px" id=tableWidth2 name=tableWidth2 value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("width",TablForm.tableWidth2.value);TablForm.tableWidth1.value="" $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>Table Width Fixed</td></tr>
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:30px" id=tableHeight name=tableHeight value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("height",TablForm.tableHeight.value) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table>
+	</td>
+	<td class=widgetText11>$TableHeightFixed</td></tr>
+
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:20px" name=tableBorderi id=tableBorderi  value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=set_tableB() $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td><table width=100% border=0 cellpadding=0 cellspacing=0><tr><td class=widgetText11>
+	$TableBorder </td><td>&nbsp;<select style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999" id=tableStyle name=tableStyle><option value=none>$Noneoption
+<option value=solid selected>$Solidoption<option value=dotted>$Dotoption<option value=dashed>$Dashoption</select></td><td align=right class=widgetText11>
+	<input type=checkbox name=tableStyleAll id=tableStyleAll value=""> $All</td></tr></table></td></tr>
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:20px" id=tablePadding name=tablePadding value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("cellPadding",TablForm.tablePadding.value)  $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$TableCellPadding</td></tr>
+<tr>
+	<td align=right><input class=input onfocus=select() style="width:20px" id=tableSpacing name=tableSpacing value=""></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTable.setAttribute("cellSpacing",TablForm.tableSpacing.value)  $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$TableCellSpacing</td></tr>
+	
+<tr><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=select_color(selectedTable,"bgColor","tbl_bg")  $button_class $uns>$SelectColorButton</td><td>$RBUT</td></tr></table></td>
+<td id=xtbl_bg class=widgetText11>$TableBackgroundColor</td></tr>
+
+<tr><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=select_color(selectedTable,"borderColor","tbl_brd")  $button_class $uns>$SelectColorButton</td><td>$RBUT</td></tr></table></td>
+<td id=xtbl_bd class=widgetText11>$TableBorderColor</td></tr>
+
+<tr id=applyTBLclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=applyclassesTBLfun() $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td><td id=clasesTBLapply></td></tr>	
+<tr id=removeTBLclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=removeclassesTBLfun() $button_class style="width:32px" $uns>$removebutton</td><td>$RBUT</td></tr></table></td><td id=clasesTBLremove></td></tr>	
+
+<tr><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=DeleteTable(selectedTable)  $button_class $uns>$removebutton</td><td>$RBUT</td></tr></table></td>
+<td class=widgetText11>$DeleteTable</td></tr>
+
+</table></form>
+</div>
+<!-- ROW_DIV -->
+<div id=row_div style="display:none"><form  style="margin:0px" name="RowForm">
+<table style="margin-bottom:10px" align=center border=0 cellpadding=3 cellspacing=0>
+<tr>
+	<td align=right><select style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999" id=tr_valign name=tr_valign>
+<option value=top>$topoption<option value=middle>$middleoption<option value=bottom>$bottomoption</select></td>
+	<td><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTR.setAttribute("vAlign",RowForm.tr_valign.options[RowForm.tr_valign.selectedIndex].value) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td class=widgetText11>
+	<td class=widgetText11>$RowVerticalAlignment</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=row_above() $button_class style="width:32px" $uns>$insertbutton</td><td>$RBUT</td></tr></table>
+	</td>
+	<td class=widgetText11>$RowAboveSelectedRow</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=row_below() $button_class style="width:32px" $uns>$insertbutton</td><td>$RBUT</td></tr></table>
+	</td>
+	<td class=widgetText11>$RowBelowSelectedRow</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=copy_row_below() $button_class style="width:32px" $uns>$clonebutton</td>
+	<td>$RBUT</td></tr></table>
+	</td>
+	<td class=widgetText11>$SelectedRowToNewRowBelow</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=row_delete() $button_class style="width:32px" $uns>$deletebutton</td><td>$RBUT</td></tr></table>
+		</td>
+	<td class=widgetText11>$EntireSelectedRow</td></tr>
+
+<tr><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=select_color(selectedTR,"bgColor","rw_bg") $button_class $uns>$selectcolorbutton</td><td>$RBUT</td></tr></table></td>
+<td id=xrow_bg class=widgetText11>$RowBackgroundColor</td></tr>
+	
+	<tr id=applyROWclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=applyclassesROWfun() $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td><td id=clasesROWapply></td></tr>	
+<tr id=removROWclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center onclick=removeclassesROWfun() $button_class style="width:32px" $uns>$removebutton</td><td>$RBUT</td></tr></table></td><td id=clasesROWremove></td></tr>	
+
+</table></form>
+</div>
+<!-- CELL_DIV -->
+<div id=cell_div style="display:none">
+<form style="margin:0px" name="CellForm">
+<table style="margin-bottom:10px" align=center border=0 cellpadding=3 cellspacing=0>
+<tr>
+	<td align=right>
+	<select style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999" id=td_align name=td_align style="width:60px">
+<option value=left>$leftoption<option value=center>$centeroption<option value=right>$rightoption</select></td>
+		<td align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTD.setAttribute("align",CellForm.td_align.options[CellForm.td_align.selectedIndex].value) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellHorizontalAlignment</td></tr>
+<tr>
+	<td align=right>
+	<select style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999" id=td_valign name=td_valign style="width:60px">
+<option value=top>$topoption<option value=middle>$middleoption<option value=bottom>$bottomoption</select></td>
+		<td align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTD.setAttribute("vAlign",CellForm.td_valign.options[CellForm.td_valign.selectedIndex].value) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellVerticalAlignment</td></tr>
+	
+	
+	<tr>
+	<td align=right>
+	<input class=input onfocus=select() style="width:30px" id=cellBdThick name=cellBdThick value=""</td>
+		<td align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=set_cellB(CellForm.cellBdThick.value,CellForm) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellBorderThickness <select style="font-size:11px;color:#000000;font-family:tahoma;background-color:#F9F9F9;border:1px solid #999999" id=td_style name=td_style id=td_style><option value=none>$Noneoption
+<option value=solid selected>$Solidoption<option value=dotted>$Dotoption<option value=dashed>$Dashoption</select></td></tr>
+
+	
+	<tr>
+	<td align=right>
+	<input class=input onfocus=select() style="width:30px" name=cellWidth id=cellWidth value=""</td>
+		<td align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=set_cellW("width",CellForm.cellWidth.value,CellForm) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellWidth <input type=radio name=cw id=cw1 value=fixed>$fixed <input type=radio id=cw2 name=cw value=percent>$percent</td></tr>
+	<tr>
+	<td align=right >
+	<input class=input onfocus=select() style="width:30px" id=cellHeight name=cellHeight value=""</td>
+		<td align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=selectedTD.setAttribute("height",CellForm.cellHeight.value) $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellFixedHeight</td></tr>
+
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=cell_left() $button_class style="width:32px" $uns>$insertbutton</td><td>$RBUT</td></tr></table></td>
+	<td class=widgetText11>$CellLeftOfSelectedCell</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=cell_right() $button_class style="width:32px" $uns>$insertbutton</td><td>$RBUT</td></tr></table>
+		</td>
+	<td class=widgetText11>$CellRightOfSelectedCell</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=cell_delete() $button_class style="width:32px" $uns>$deletebutton</td><td>$RBUT</td></tr></table>
+		</td>
+	<td class=widgetText11>$RemoveSelectedCell</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<img $uns src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=selectedTD.setAttribute("colSpan",parseInt(selectedTD.getAttribute("colSpan"))+1) style="margin-right:2px">
+	<img $uns src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=selectedTD.setAttribute("colSpan",selectedTD.getAttribute("colSpan")-1) style="margin-left:2px">
+	</td>
+	<td class=widgetText11>$SelectedCellColSpan</td></tr>
+<tr>
+	<td align=right colspan=2>
+	<img $uns src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=selectedTD.setAttribute("rowSpan",parseInt(selectedTD.getAttribute("rowSpan"))+1) style="margin-right:2px">
+	<img $uns src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=selectedTD.setAttribute("rowSpan",selectedTD.getAttribute("rowSpan")-1) style="margin-left:2px">
+	</td>
+	<td class=widgetText11>$SelectedCellRowSpan</td></tr>
+
+<tr>
+	<td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=select_color(selectedTD,"bgColor","cl_bg")  $button_class $uns>$selectcolorbutton</td><td>$RBUT</td></tr></table>
+	</td>
+	<td><span id=xcell_bg class=widgetText11>$CellBackgroundColor</span></td></tr>
+<tr>
+	<td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=select_color(selectedTD,"brdColor","cl_brd")  $button_class $uns>$selectcolorbutton</td><td>$RBUT</td></tr></table>
+	</td>
+	<td><span id=xcell_bg class=widgetText11>$CellBorderColor</span></td></tr>
+<tr id=applyCELLclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=applyclassesCEllfun() $button_class style="width:32px" $uns>$applybutton</td><td>$RBUT</td></tr></table></td><td id=clasesCEllapply></td></tr>	
+<tr id=removeCELLclass><td colspan=2 align=right><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=removeclassesCEllfun() $button_class style="width:32px" $uns>$removebutton</td><td>$RBUT</td></tr></table></td><td id=clasesCEllremove></td></tr>	
+</table></form>
+</div>
+
+
+
+<!-- END TABLE -->
+
+$BODY_BOT
+'~;
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+noTableCellWord="$noTableCellWord"
+byId('tableeditplace').innerHTML=tableEditor
+function DeleteTable(obj){
+	activeDelTabl=obj
+	byId('yesBut').innerHTML="$YES"
+	active_alert="$htmlalert3?"
+	doAlert("confirm")
+	active_function = new Function("DeleteTable2()")
+	cancel_function = new Function("closeAlert()")
+}
+function DeleteTable2(){
+	mainNode=activeDelTabl.parentNode
+	mainNode.removeChild(activeDelTabl);
+	closeAlert()
+}
+
+function set_tbl_edit(){
+		selectedTR = selectedTD.parentNode
+		if(selectedTR.parentNode.tagName.toUpperCase()=="TBODY"){
+			selectedTBODY =  selectedTR.parentNode
+			selectedTable = selectedTBODY.parentNode
+		}else{
+			selectedTable = selectedTR.parentNode
+		}
+		swap("Ctab")
+		set_tbl()
+}
+function set_tbl(){
+	
+	if(selectedTable.getAttribute("width") && selectedTable.getAttribute("width").indexOf("%")!=-1){
+			if(selectedTable.getAttribute("width")!=null){Form.tableWidth1.value=selectedTable.getAttribute("width")}
+		}else{
+			if(selectedTable.getAttribute("width")!=null){Form.tableWidth2.value=selectedTable.getAttribute("width")}
+		}
+	if(selectedTable.getAttribute("height")!=null){Form.tableHeight.value=selectedTable.getAttribute("height")}
+	if(selectedTable.getAttribute("border")!=null){byId('tableBorderi').value=selectedTable.getAttribute("border")}
+	byId('tablePadding').value=selectedTable.getAttribute("cellPadding")
+	byId('tableSpacing').value=selectedTable.getAttribute("cellSpacing")
+	t_bg=selectedTable.getAttribute("bgColor")
+	t_bd=selectedTable.getAttribute("borderColor")
+		
+	
+	if(selectedTR.getAttribute("vAlign")){
+		tr_va=selectedTR.getAttribute("vAlign")
+		for(i=0;i<byId('tr_valign').options.length;++i){
+			if(byId('tr_valign').options[i].value.toUpperCase()==tr_va.toUpperCase()){
+				byId('tr_valign').options[i].selected=true
+			}
+		}
+	}
+		
+			
+	if(selectedTD.getAttribute("width")!=null){byId('cellWidth').value=selectedTD.getAttribute("width")}
+	if(selectedTD.getAttribute("height")!=null){byId('cellWidth').value=selectedTD.getAttribute("height")}
+	if(selectedTD.getAttribute("align")){
+		for(i=0;i<byId('td_align').options.length;++i){
+			if(tbyId('d_align').options[i].value.toUpperCase()==selectedTD.getAttribute("align").toUpperCase()){
+				byId('td_align').options[i].selected=true
+			}
+		}
+	}
+	if(selectedTD.getAttribute("vAlign")){
+		for(i=0;i<byId('td_valign').options.length;++i){
+			if(byId('td_valign').options[i].value.toUpperCase()==selectedTD.getAttribute("vAlign").toUpperCase()){
+				byId('td_valign').options[i].selected=true
+			}
+		}
+	}
+}
+function roll(obj){
+	 byId("table_div").style.display='none'
+	 byId("row_div").style.display='none'
+	 byId("cell_div").style.display='none'
+	 byId(obj).style.display=''
+}
+	function row_above(){
+	 if(selectedTR.rowIndex==0){active_alert="$htmlalert1";doAlert("alert","close");return false}else{
+	 trxx=selectedTR.rowIndex
+	 trx=selectedTable.insertRow(selectedTR.rowIndex)
+	 for(i=0;i<selectedTR.cells.length;++i){
+	 	trx.insertCell(i);
+		selectedTable.rows[trxx].cells[i].className="editablecellborder"
+		 if(noTableCellWord!=1){selectedTable.rows[trxx].cells[i].innerHTML="CELL"}
+		}
+	}
+	roll_ceonOff()
+	}
+	function row_below(){
+	trxx=selectedTR.rowIndex+1
+	 trx=selectedTable.insertRow(selectedTR.rowIndex+1)
+	 for(i=0;i<selectedTR.cells.length;++i){
+	 	trx.insertCell(i); 
+		selectedTable.rows[trxx].cells[i].className="editablecellborder"
+		 if(noTableCellWord!=1){selectedTable.rows[trxx].cells[i].innerHTML="CELL"}
+		}
+	roll_ceonOff()
+	}
+	function copy_row_below(){
+	trxx=selectedTR.rowIndex+1
+	 trx=selectedTable.insertRow(selectedTR.rowIndex+1)
+	 for(i=0;i<selectedTR.cells.length;++i){
+	 	trx.insertCell(i); 
+		selectedTable.rows[trxx].cells[i].className="editablecellborder"
+		if(selectedTR.getAttribute("vAlign")!=undefined){
+			selectedTable.rows[trxx].vAlign=selectedTR.vAlign
+		}
+		for(k=0;k<selectedTR.cells[i].attributes.length;++k ){
+			if(selectedTR.cells[i].attributes[k].specified){
+				if(selectedTR.cells[i].attributes[k].nodeName!="class" && selectedTR.cells[i].attributes[k].nodeName!="style"){
+					selectedTable.rows[trxx].cells[i].setAttribute(selectedTR.cells[i].attributes[k].nodeName,selectedTR.cells[i].attributes[k].nodeValue)
+				}
+			}
+			if(selectedTR.cells[i].attributes[k].nodeName=="style"){
+				for (varX in selectedTR.cells[i].currentStyle){
+					if(selectedTR.cells[i].style.getAttribute(varX)!='' && selectedTR.cells[i].style.getAttribute(varX)!=null 
+						&& selectedTR.cells[i].style.getAttribute(varX)!=0 && selectedTR.cells[i].style.getAttribute(varX)!="false"){
+						selectedTable.rows[trxx].cells[i].style.setAttribute(varX,selectedTR.cells[i].style.getAttribute(varX))
+					}
+				}
+			}
+		}
+		selectedTable.rows[trxx].cells[i].innerHTML=selectedTR.cells[i].innerHTML
+	}	
+	roll_ceonOff()
+	}
+
+	function row_delete(){
+	 selectedTable.deleteRow(selectedTR.rowIndex)
+	}
+	function cell_left(){
+	 if(selectedTD.cellIndex==0){active_alert="$htmlalert2";doAlert("alert","close");return false}else{
+	 tdxx=selectedTD.cellIndex
+	 tdx=selectedTR.insertCell(tdxx);
+	 selectedTR.cells[tdxx].setAttribute('class','editablecellborder')
+	 if(noTableCellWord!=1){selectedTR.cells[tdxx].innerHTML="CELL"}
+	roll_ceonOff()	 
+	}}
+	function cell_right(){
+	tdxx=parseInt(selectedTD.cellIndex)+1
+	 tdx=selectedTR.insertCell(tdxx);
+	 selectedTR.cells[tdxx].setAttribute('class','editablecellborder')
+	  if(noTableCellWord!=1){selectedTR.cells[tdxx].innerHTML="CELL"}
+	roll_ceonOff()
+	}
+	function cell_delete(){
+	 selectedTR.deleteCell(selectedTD.cellIndex)
+	}
+	
+function select_color(obj1,obj2,obj3){
+	color_what=obj3
+	cecolor()
+}
+	var undo_col
+	function un_set_color(){
+	byId("undo_but").disabled=true
+	structure.setAttribute(construct,undo_col)
+	}
+function swap(obj){
+if(obj=="Ttab"){
+byId("Ttab").className="tab_"
+byId("Rtab").className="tab"
+byId("Ctab").className="tab"
+roll("table_div")
+}else if(obj=="Rtab"){
+byId("Ttab").className="tab"
+byId("Rtab").className="tab_"
+byId("Ctab").className="tab"
+roll("row_div")
+}else{
+byId("Ttab").className="tab"
+byId("Rtab").className="tab"
+byId("Ctab").className="tab_"
+roll("cell_div")
+}
+}	
+	
+function set_cellW(v,w,Form){
+if(byId('cw2').checked==true){w+="%"}
+selectedTD.setAttribute(v,w)
+}
+function set_cellS(styl){
+selectedTD.style.border=styl
+}
+function set_cellB(thck,Form){
+if(thck!='' && thck!=0){
+styl=byId('td_style').options[byId('td_style').selectedIndex].value
+selectedTD.style.border=thck+"px "+styl
+}}
+
+function set_tableB(){
+	if(byId('tableBorderi').value!='' && byId('tableBorderi').value>0){
+		selectedTable.style.borderWidth=byId('tableBorderi').value+"px"
+		selectedTable.style.borderStyle=byId('tableStyle').options[byId('tableStyle').selectedIndex].value
+					if(!selected_col.match(/#/)){selected_col="#"+selected_col}
+		selectedTable.style.borderColor=selected_col
+		if(byId('tableStyleAll').checked==true){
+			for(i=0;i<selectedTable.rows.length;++i){
+				for(j=0;j<selectedTable.rows[i].cells.length;++j){
+					selectedTable.rows[i].cells[j].style.borderWidth=byId('tableBorderi').value+"px"
+					selectedTable.rows[i].cells[j].style.borderStyle=byId('tableStyle').options[byId('tableStyle').selectedIndex].value
+					selectedTable.rows[i].cells[j].style.borderColor=selected_col
+				}
+			}
+		}else{
+			for(i=0;i<selectedTable.rows.length;++i){
+				for(j=0;j<selectedTable.rows[i].cells.length;++j){
+					selectedTable.rows[i].cells[j].style.borderWidth=''
+					selectedTable.rows[i].cells[j].style.borderStyle=''
+					selectedTable.rows[i].cells[j].style.borderColor=''
+				}
+			}
+		}
+	}else{
+		selectedTable.style.borderWidth=''
+		selectedTable.style.borderStyle=''
+		selectedTable.style.borderColor=''
+		for(i=0;i<selectedTable.rows.length;++i){
+			for(j=0;j<selectedTable.rows[i].cells.length;++j){
+				selectedTable.rows[i].cells[j].style.borderWidth=''
+				selectedTable.rows[i].cells[j].style.borderStyle=''
+				selectedTable.rows[i].cells[j].style.borderColor=''
+			}
+		}
+	}
+}
+function roll_ceonOff(){
+	ceonOff()
+	setTimeout("ceonOff(1)",1000)
+}
+function applyclassesTBLfun(){
+	if(byId('classesTBLapply').options[byId('classesTBLapply').selectedIndex].value==''){return false}
+	if(selectedTable.className!=''){
+		selectedTable.className+=" "+byId('classesTBLapply').options[byId('classesTBLapply').selectedIndex].value
+	}else{
+		selectedTable.className=byId('classesTBLapply').options[byId('classesTBLapply').selectedIndex].value
+	}
+}
+function removeclassesTBLfun(){
+	if(byId('classesTBLremove').options[byId('classesTBLremove').selectedIndex].value==''){return false}	
+	classesTBLArray_=new Array()
+	classesTBLArray=selectedTable.className.split(/ /);
+	for(i=0;i<classesTBLArray.length;++i){
+		if(classesTBLArray[i] != byId('classesTBLremove').options[byId('classesTBLremove').selectedIndex].value){
+			classesTBLArray_.push(classesTBLArray[i])
+		}
+	}
+	selectedTable.className=classesTBLArray_.join(" ")
+}
+function applyclassesROWfun(){
+	if(byId('classesROWapply').options[byId('classesROWapply').selectedIndex].value==''){return false}
+	if(selectedTR.className!=''){
+		selectedTR.className+=" "+byId('classesROWapply').options[byId('classesROWapply').selectedIndex].value
+	}else{
+		selectedTR.className=byId('classesROWapply').options[byId('classesROWapply').selectedIndex].value	
+	}
+}
+function removeclassesROWfun(){
+	if(byId('classesROWremove').options[byId('classesROWremove').selectedIndex].value==''){return false}	
+	classesROWArray_=new Array()
+	classesROWArray=selectedTR.className.split(/ /);
+	for(i=0;i<classesROWArray.length;++i){
+		if(classesROWArray[i] != byId('classesROWremove').options[byId('classesROWremove').selectedIndex].value){
+			classesROWArray_.push(classesROWArray[i])
+		}
+	}
+	selectedTR.className=classesROWArray_.join(" ")
+}
+function applyclassesCEllfun(){
+	if(byId('classesCEllapply').options[byId('classesCEllapply').selectedIndex].value==''){return false}
+	if(selectedTD.className!=''){
+		selectedTD.className+=" "+byId('classesCEllapply').options[byId('classesCEllapply').selectedIndex].value
+	}else{
+		selectedTD.className=byId('classesCEllapply').options[byId('classesCEllapply').selectedIndex].value
+	}
+}
+function removeclassesCEllfun(){
+	if(byId('classesCEllremove').options[byId('classesCEllremove').selectedIndex].value==''){return false}	
+	classesCEllArray_=new Array()
+	classesCEllArray=selectedTD.className.split(/ /);
+	for(i=0;i<classesCEllArray.length;++i){
+		if(classesCEllArray[i] != byId('classesCEllremove').options[byId('classesCEllremove').selectedIndex].value){
+			classesCEllArray_.push(classesCEllArray[i])
+		}
+	}
+	selectedTD.className=classesCEllArray_.join(" ")
+}
+
+if(pageClassesArray.length>0){
+	sopts='<option value="">$StyleClassOption'
+	for(i=0;i<pageClassesArray.length;++i){
+		sopts+='<option value="'+pageClassesArray[i]+'" style="max-width:100px">'+pageClassesArray[i]
+	}
+	byId('clasesCEllapply').innerHTML='<select id=classesCEllapply class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesCEllremove').innerHTML='<select id=classesCEllremove class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesROWapply').innerHTML='<select id=classesROWapply class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesROWremove').innerHTML='<select id=classesROWremove class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesROWapply').innerHTML='<select id=classesROWapply class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesROWremove').innerHTML='<select id=classesROWremove class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesTBLapply').innerHTML='<select id=classesTBLapply class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesTBLremove').innerHTML='<select id=classesTBLremove class=input style="max-width:100px">'+sopts+'</select>'
+}else{
+	byId('applyCELLclass').style.display="none"
+	byId('removeCELLclass').style.display="none"
+	byId('applyROWclass').style.display="none"
+	byId('removROWclass').style.display="none"
+	byId('removeTBLclass').style.display="none"
+	byId('applyTBLclass').style.display="none"
+}
+
+ceeditTable()
+set_tbl_edit()
+~;
+
+
+1;

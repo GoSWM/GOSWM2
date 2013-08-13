@@ -1,0 +1,52 @@
+
+
+($file,$wid,$hei)=split(/=/,$params);
+$wh=$wid."x".$hei;
+
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+if($isIM==1){	
+	require 'useImageMagick.htm';
+	$img = new Image::Magick;
+  	$img->Read("$file");
+	$img -> Resize($wh);
+	if($quality<100){$img ->Set(quality=>$quality)}
+	$img -> Write($file);
+	$ok=1;
+}elsif($isGD){
+	require 'useGDLibrary.htm';
+	if($wid>$hei){$WH=$wid}else{$WH=$hei}
+	$file =~ m`\.(\w+)$`;$ext=$1;
+    open IN, "$file"  or die "Could not open.";
+	if($ext =~/png/i){
+        $srcImage = GD::Image->newFromPng(*IN);
+	}
+	if($ext =~/jpg/i){
+        $srcImage = GD::Image->newFromJpeg(*IN);
+	}
+    close IN;
+    ($thumb,$x,$y) = createGD($srcImage,$WH);
+    open OUT, ">$file" or die "Could not save ";
+    binmode OUT;
+	if($ext =~/jpg/i){
+		print OUT $thumb->jpeg;
+	}
+ 	if($ext =~/png/i){
+       	print OUT $thumb->png;
+	}
+    close OUT;
+	
+}else{
+	$uttf=~s`https*://``;
+	$RETURN=qq~JITc("http://gphrs.com/cgi/imagemagick_resizeThumb.cgi?resize=$url_=$wid=$hei=$domain_license=$uttf")~;
+}
+
+
+
+print "Content-type: text/html\n\n";
+print qq~
+byId('saveThumbSizeButton').style.display="none"
+byId('thumbButt2').style.visibility="hidden"
+byId('InsertThumbnailToVideobutton').style.display="table"
+~;
+1;

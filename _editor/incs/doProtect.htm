@@ -1,0 +1,96 @@
+lang("getLock");
+
+@pairs = split(/&/,$params);
+foreach $pair (@pairs){
+	($name, $value) = split(/=/,$pair,2);
+	$value =~ tr/+/ /;
+	$value =~ s/~!/ ~!/g;
+	$value =~ s/[\r]//g;
+ 	if ($value =~ /\<\!--\#(.*)\s+(.*)\s?=\s?(.*)--\>/) { &kill_input; }
+  	if($value =~ /[;><\*`\|]/){ &kill_input; }
+	$$name=$value;
+}
+$Foldertoprotect=~s`^/``;
+$Foldertoprotect=~s`/$``;
+
+if($Type eq "Create"){
+$pttf=$uttf;$pttf=~s`$host``;$pttf=~s`$host``;
+open(HTA,">$root/$Foldertoprotect/.htaccess");
+print HTA qq~Authtype Basic
+Authname "$Realmname"
+AuthUserFile $root/$Foldertoprotect/.htpasswd
+<files .ht*>
+Order allow,deny
+Deny from all
+</files>
+ErrorDocument 401  $pttf?resetBasicPassword=/$Foldertoprotect
+require valid-user
+~;
+
+$salt=substr($Defaultmembersname,0,2);
+if($^O ne 'MSWin32'){$pw=crypt($Defaultmemberspw,"$salt")}else{$pw=$Defaultmemberspw}
+open(HTP,">$root/$Foldertoprotect/.htpasswd");
+print HTP qq~$Defaultmembersname:$pw:$Defaultmembersem\n~;
+
+$RETURN=qq~	active_alert="$htmlalert1"
+	byId('yesBut').innerHTML="$OK"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")
+	pad17.location.reload(true)~;
+}#create
+
+if($Type eq "Add"){
+	$salt=substr($NewMemberName,0,2);
+	if($^O ne 'MSWin32'){$pw=crypt($NewPassword,"$salt")}else{$pw=$NewPassword}
+	open(HTP,">>$root/$Foldertoprotect/.htpasswd");
+	print HTP qq~$NewMemberName:$pw:$NewMemberEmail\n~;
+	$RETURN=qq~active_alert="$htmlalert2"
+	byId('yesBut').innerHTML="$OK"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")
+	pad17.location.reload(true)~;
+}#add
+
+if($Type eq "Remove"){
+	open(HTP,"$root/$Foldertoprotect/.htpasswd");
+	while(<HTP>){
+		if(/^$RemoveMemberName:/){$_=''}
+		$SAVE.=$_;
+	}
+	open(HTP,">$root/$Foldertoprotect/.htpasswd");
+	print HTP "$SAVE";
+	$RETURN=qq~active_alert="$htmlalert3"
+	byId('yesBut').innerHTML="$OK"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")
+	pad17.location.reload(true)~;
+}#remove
+
+if($Type eq "DeleteAll"){
+	unlink("$root/$Foldertoprotect/.htaccess");
+	unlink("$root/$Foldertoprotect/.htpasswd");
+	$RETURN=qq~active_alert="$htmlalert5"
+	byId('yesBut').innerHTML="$OK"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")
+	pad17.location.reload(true)~;
+
+}#DeleteAll#
+
+sub kill_input {
+$value=~s`\W``g;
+print "Content-type: text/html\n\n";
+print qq~
+<HTML><HEAD>
+</HEAD><BODY>
+<CENTER><H1><FONT COLOR="#FF0000">CGI Alert</FONT></H1></CENTER>
+<CENTER><H3>THE SERVER REJECTED<br>
+THE CHARACTER<P><B>$&</B><P>IN YOUR SUBMISSION<br>
+Field input = $value<P>
+Please Click <form><input type=button 
+value=&nbsp;&nbsp;Here&nbsp;&nbsp; onClick="history.go(-1)"></form>
+to try again<p>
+Thank You!</H3></CENTER></BODY></HTML>~;
+exit;
+}#kill_input
+1;

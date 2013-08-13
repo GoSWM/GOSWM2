@@ -1,0 +1,37 @@
+lang("getLock");
+
+&get_this_input;
+
+$htp=$folder."/.htpasswd";
+open(HTP,"$htp");
+while(<HTP>){
+	($u,$p,$e)=split(/:/);
+	if($u eq $uname){$fnd=1}
+}
+
+if($fnd){
+	$RETURN=qq~alert("$TheNameIsInUse")~;
+}else{
+	$salt=substr($uname,0,2);
+	if($^O ne 'MSWin32'){$pw=crypt($upass,"$salt")}else{$pw=$upass}
+	open(HTP,">>$htp");
+	print HTP qq~$uname:$pw:$uemail\n~;
+	$RETURN=qq~alert("$UserWasAdded")~;
+}
+
+
+sub get_this_input{
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ tr/+/ /;
+		$value =~ s/~!/ ~!/g;
+		$value =~ s/[\r]//g;
+ 		if ($value =~ /\<\!--\#(.*)\s+(.*)\s?=\s?(.*)--\>/) { &kill_input; }
+  		if($value =~ /[;><\*`\|]/){ &kill_input; }
+		$$name=$value;
+	}
+}#get_input
+

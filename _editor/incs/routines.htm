@@ -1,0 +1,340 @@
+if($^O eq 'MSWin32'){if($ENV{'PerlXS'} =~ /PerlIS/i){print "HTTP/1.0 200 OK\n"}}
+
+sub adminLogin{require 'adminLogin.htm';}
+sub basicSignup{require 'basicSignup.htm';&holeRespond}
+sub checkUser{require 'checkUser.htm';&respond}
+sub checkThumb{require 'checkThumb.htm';&respond}
+sub checkUsername{require 'checkUsername.htm'}
+sub confirmCaptcha{require 'confirmCaptcha.htm';&respond}
+sub createGallery{require 'createGallery.htm';&respond}
+sub createThumbnail{require 'createThumbnail.htm';&respond}
+sub createThumb{require 'createThumb.htm';&respond}
+sub deleteFolder{require 'deleteFolder.htm';&respond}
+sub deleteImage{require 'deleteImage.htm';&respond}
+sub deletePage{require 'deletePage.htm';&respond}
+sub do_add_nu_user{require 'do_add_nu_user.htm';}
+sub doCreateFolder{require 'doCreateFolder.htm'}
+sub getAddUser{require 'getAddUser.htm';&respond}
+sub getToolbar{require 'getToolbar.htm';&respondhtml}
+sub Descriptions{require 'Descriptions.htm'}
+sub doPassword{require 'doPassword.htm';&respond}
+sub doProtect{require 'doProtect.htm';&respond}
+sub doRename{require 'doRename.htm';}
+sub doSaveAs{require 'doSaveAs.htm'}
+sub doUpload{require 'doUpload.htm';&holeRespond}
+sub editTable{require 'editTable.htm';&respond}
+sub editImg{require 'editImg.htm';&respond}
+sub editLinker{require 'editLinker.htm';&respond}
+sub embedSearch{require 'embedSearch.htm';&respond}
+sub doSearch{require 'doSearch.htm';&respond}
+sub doSubmission{require 'doSubmission.htm'}
+sub flashRegex{require 'flashRegex.htm'}
+sub forceDownload{require 'forceDownload.htm'}
+sub getAudio{require 'getAudio.htm';&respond}
+sub getBackups{require 'getBackups.htm';&respond}
+sub getCaptcha{require 'getCaptcha.htm';&respond}
+sub getChars{require 'getChars.htm';&respond}
+sub getChangeLog{require 'getChangeLog.htm'}
+sub getColor{require 'getColor.htm';&respond}
+sub getColorPad{require 'getColorPad.htm';&respondhtml}
+sub getComments{require 'getComments.htm';&respondhtml}
+sub getCopy{require 'getCopy.htm';&respond}
+sub getCSS{require 'getCSS.htm'}
+sub getFilm{require 'getFilm.htm';&respond}
+sub getFlash{require 'getFlash.htm';&respond}
+sub getFonts{require 'getFonts.htm';&respond}
+sub getFontsStyle{require 'getFontsStyle.htm';&respond}
+sub getForm{require 'getForm.htm';&respond}
+sub getGallery{require 'getGallery.htm';&respond}
+sub getInput{require 'getInput.htm';&respond}
+sub getImgUrl{require 'getImgUrl.htm';&respond}
+sub getImageSize{require 'getImageSize.htm';&respond}
+sub getLock{require 'getLock.htm';&respond}
+sub getLogin{require 'getLogin.htm';&respond}
+sub getLinker{require 'getLinker.htm';&respond}
+sub getNuCaptcha{require 'getNuCaptcha.htm';&respond}
+sub getOpenfolder{require 'getOpenfolder.htm';&respond}
+sub getPassword{require 'getPassword.htm';&respond}
+sub getPhotos{require 'getPhotos.htm';&respond}
+sub getPreview{require 'getPreview.htm';&respond}
+sub getProperties{require 'getProperties.htm';&respond}
+sub getSave{require 'getSave.htm';&respond}
+sub getSaveAs{require 'getSaveAs.htm';&respond}
+sub getSearch{require 'getSearch.htm';&respond}
+sub getSrc{require 'getSrc.htm';&respond}
+sub getTablePad{require 'getTablePad.htm';&respond}
+sub getThumbJS{require 'getThumbJS.htm';&respond}
+sub getUnformat{require 'getUnformat.htm';&respond}
+sub getUpdate{require 'getUpdate.htm';&respond}
+sub getUpload{require 'getUpload.htm';&respond}
+sub headContent{require 'headContent.htm';&respond}
+sub htmlEdit{require 'htmlEdit.htm';&respond}
+sub insertHtml{require 'insertHtml.htm';&respond}
+sub insertWord{require 'insertWord.htm';&respond}
+sub isProtected{require 'isProtected.htm';&respond}
+sub listGallery{require 'listGallery.htm';&respond}
+sub openPlayerJS{require 'openPlayerJS.htm';&respond}
+sub listImages{require 'listImages.htm';&respond}
+sub mailto{require 'mailTo.htm';&holeRespond}
+sub openGalleryJS{require 'openGalleryJS.htm';&respond}
+sub pathTree{require 'pathTree.htm'}
+sub playAudio{require 'playAudio.htm'}
+sub prompt{require 'prompt.htm';&respond}
+sub resetBasicPassword{require 'resetBasicPassword.htm'}
+sub resizeThumb{require 'resizeThumb.htm'}
+sub rewriteImgSize{require 'rewriteImgSize.htm';&respond}
+sub rewritefile{require 'rewritefile.htm';&respond}
+sub runPlayerJS{require 'runPlayerJS.htm';&respond}
+sub saveBody{require 'saveBody.htm';&respond}
+sub saveHead{require 'saveHead.htm';&respond}
+sub saveCSS{require 'saveCSS.htm';&respond}
+sub saveWrite{require 'saveWrite.htm';&holeRespond}
+sub secImage{require 'secImage.htm'}
+sub sendmail{require 'sendMail.htm';}
+sub vidUploaded{require 'vidUploaded.htm';&holeRespond}
+sub userhelp{require 'userHelp.htm';&respond}
+sub userList{require 'userList.htm'}
+sub updateFile{require 'updateFile.htm'}
+sub update_file_get{require 'updateFile_get.htm'}
+sub upload_resize{require 'upload_resize.htm'}
+sub uploadVideo{require 'uploadVideo.htm'}
+sub uploadThumb{require 'uploadThumb.htm'}
+sub bodyBgUpload{require 'bodyBgUpload.htm'}
+sub flashNote{require 'flashNote.htm'}
+sub scriptNote{require 'scriptNote.htm'}
+
+
+
+
+sub lang{
+	if(!$defaultLang){$defaultLang="en";}
+	$userLang=$defaultLang;
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie);
+		$name =~ s/^\s*//;
+		if($name =~ /lang/){$userLang=$value}
+	}
+	$commfile=$incs_folder_PATH."/lang/".$userLang."/common.txt";
+	open(COMM,"$commfile");while(<COMM>){($n,$v)=split(/=/,$_,2);$v=~s`\s+$``;$$n=$v;}
+	$langfile=$incs_folder_PATH."/lang/".$userLang."/".$_[0].".txt";
+	if(-e $langfile){
+		open(LANG,"$langfile");while(<LANG>){($n,$v)=split(/=/,$_,2);$v=~s`\s+$``;$v=~s/\$(\w+)/${$1}/eg;$$n=$v;}
+	}else{
+		$langfile=$incs_folder_PATH."/lang/en/".$_[0].".txt";
+		open(LANG,"$langfile");while(<LANG>){($n,$v)=split(/=/,$_,2);$v=~s`\s+$``;$v=~s/\$(\w+)/${$1}/eg;$$n=$v;}
+	}
+}#lang
+
+sub set{
+	print "Content-type: text/html\n\n";
+	open(SET,"$incs_folder_PATH/set.htm");
+	while(<SET>){print}
+}#set 
+
+sub respond{
+	print "Cache-control: no-cache\n"; 
+	print "Pragma: no-cache\n"; 
+	if($ENV{'HTTP_USER_AGENT'} =~ /MSIE/){
+		print "Content-type: text/html\n\n";
+	}else{
+		print "Content-type: text/javascript\n\n";
+	}
+	print "$RETURN";
+		
+	exit;
+}#respond
+
+sub respondhtml{
+	print "Cache-control: no-cache\n"; 
+	print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print "$RETURN";
+	exit;
+}#respond
+
+sub holeRespond{
+	print "Cache-control: no-cache\n"; 
+	print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<script type="text/javascript">$RETURN~;
+	print qq~</script>~;
+	exit;
+}#holeRespond
+
+sub holealert{
+print "Cache-control: no-cache\n"; 
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~<script type="text/javascript">
+	parent.byId('yesBut').innerHTML="OK"
+	parent.active_alert="$_[0]"
+	parent.doAlert("alert")
+	parent.active_function = new Function("parent.closeAlert()")
+	</script>~;
+	exit;
+}#alert
+
+sub alert{
+print "Cache-control: no-cache\n"; 
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~byId('yesBut').innerHTML="OK"
+	active_alert="$_[0]"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")~;
+	exit;
+}#alert
+
+sub browser{
+	if($ENV{'HTTP_USER_AGENT'} =~ /MSIE/){
+		$isIE="1";
+	}else{
+		$isFF="1";
+	}
+	$abs="absmiddle";
+}#browser
+
+sub get_cookie{
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie);
+		$name =~ s/^\s*//;
+		if($name =~ /^\D/){$$name=$value}
+		$cookie{$name}=$value;
+	}
+}#get_cookie
+
+sub config{
+	$txts_folder_PATH=~s`/$``;
+	$config_txt=$txts_folder_PATH."/config.txt";
+	$license_txt=$txts_folder_PATH."/license.txt";
+	$users_txt=$txts_folder_PATH."/users.txt";
+	$custom_txt=$txts_folder_PATH."/custom.txt";
+	open(CONF,$config_txt);
+	while(<CONF>){
+		s`\s+$``;
+		($n,$v)=split(/=/);
+		$$n=$v;
+	}
+	close(CONF);
+	if($action eq "getToolbar" || $qs eq ''){
+		open(LICS,$license_txt);	
+		$domain_license=<LICS>;
+		$domain_license=~s`\s+$``;
+		close(LICS);
+		if($domain_license =~ m`^https*://`){
+			$client=$domain_license."?".$ENV{'HTTP_HOST'};
+			$clientx=$domain_license;
+			$domain_license='';
+		}
+		if($domain_license =~ m`server=`){
+			if($domain_license =~ /&/){
+				($domain_license,$limited)=split(/&/,$domain_license);
+			}
+			$xserver_license=$domain_license;
+			($x,$server_license)=split(/=/,$domain_license);
+			require "$parent_folder_PATH/controller.cgi";
+			$client="$server_license";				
+		}
+	}#"getToolbar"
+	$close_img="modal_close";
+	open(CUST,$custom_txt);
+	while(<CUST>){
+		s`\s+$``;
+		($n,$v)=split(/=/);
+		$$n=$v;
+	}
+	close(CUST);	
+$uns='unselectable="on"';
+$uns_="unselectable='on'";
+$unz=qq~unselectable="on" style="cursor:pointer"~;
+$button_class=qq~onmouseup=this.className="button_center" onmousedown=this.className="button_center_" class=button_center~;
+$LBUT=qq~<img class=buttonLeft src=$utif/spacer.png>~;
+$RBUT=qq~<img class=buttonRight src=$utif/spacer.png>~;
+}#config
+
+sub not_loggedin{
+print "Cache-control: no-cache\n"; 
+print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print qq~parent.location="$host"~;
+exit;
+}#not_loggedin
+
+sub parseUser{
+&check_cookie;
+if($nu_folders==0){$nuFo=";visibility:hidden"}
+if($del_folders==0){$delFo=";visibility:hidden"}
+if($del_files==0){$delFi=";visibility:hidden"}
+if($ren_files==0){$reFi=";visibility:hidden"}
+if($ren_folders==0){$renFo=";visibility:hidden"}
+}#parseUser
+
+sub check_cookie{
+	&get_cookie;
+	open(USRS,"$users_txt");
+	while(<USRS>){
+		if(/$ceuser=/){s`\s+$``;$usr=$_;last}
+	}
+	close(USRS);
+	($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+}#check_cookie
+
+sub noRoot{
+	print "Content-type: text/html\n\n";
+	print q~Your server does not have a usable environment variable for root<BR><BR>Manually enter the server's path to the domain's root folder in the $root=''; variable on line 11 of this file~;
+	exit;
+}#noRoot
+
+sub environment{
+	open(US,"$txts_folder_PATH/users.txt");
+		$APW=<US>;
+		($ad,$apw)=split(/=/,$APW);
+		chomp($apw);
+if($params ne "mnousw" && $params ne $apw){exit}
+print "Content-type: text/html\n\n";
+	print "<tt>$path_to_domain<BR><BR>";
+for (sort keys %ENV) {
+  print "<br>$_=$ENV{$_}\n";
+ }
+ print "<br>OS=$^O ";
+  print "<br>PV=$] ";
+ print "<br>=============== ";
+ open(WWD,"$txts_folder_PATH/config.txt");
+ while(<WWD>){
+   print "<br><tt>$_</tt> "; 
+ }
+  open(LLC,"$txts_folder_PATH/license.txt");
+ while(<LLC>){
+   print "<br><tt>$_</tt> "; 
+ }
+&modules;
+ exit;
+}#environment
+
+sub modules{
+  print "<br>===============<br>";
+  $isIS=eval { require Image::Size; } ? 1 : 0;
+  $isIM=eval { require Image::Magick; } ? 1 : 0;
+  $isGD=eval { require GD; } ? 1 : 0;
+  $isLWP=eval { require LWP::Simple; } ? 1 : 0;
+  $isLWU=eval { require LWP::UserAgent; } ? 1 : 0;
+  $isLWC=eval { require LWP::ConnCache; } ? 1 : 0;
+  $isSM=eval { require Mail::Sendmail; } ? 1 : 0;
+  print "ImageSize=$isIS<BR>Image Magick=$isIM<br>GD Library=$isGD<BR>LWP Simple=$isLWP<br>Send Mail=$isSM<br>User Agent=$isLWU<br>Cache Conn=$isLWC";
+  print "<br>====== $pi = $pt = $root =======<br>";
+exit;
+}#modules
+
+sub logout{
+	$date = time - 365 * 86400;
+	$cookie_expire = gmtime($date);
+	print "Set-Cookie: loginParams=;expires=$cookie_expire;path=/\n";
+	print "Content-type: text/html\n\n";
+	print qq~<script type="text/javascript">location="$uttf"</script>~;
+	exit;
+}
+1;

@@ -1,0 +1,10 @@
+print "Content-type: text/html\n\n";
+print qq~<html><head><title></title></head><BODY bgcolor=#000000 text=000000>
+<div id="flashcontent"></div>
+<script type="text/javascript" src="$flash_folder_URL/swfobject.js"></script>
+	<SCRIPT type="text/javascript">var s2 = new SWFObject("$flash_folder_URL/audioplayer.swf", "aplayer", "0", "0", "0");
+s2.addVariable("file","$params");
+s2.addVariable("autostart","true");
+s2.write("flashcontent");
+</SCRIPT>
+</body></html>~;

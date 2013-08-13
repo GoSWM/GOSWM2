@@ -1,0 +1,21 @@
+
+
+$RETURN=qq~
+function JITs(url){
+	if(document.getElementById('JQS')){document.getElementsByTagName('head')[0].removeChild(document.getElementById('JQS'))};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JQS';	
+	script.src=url 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}	
+function doSearch(){
+	sTerms=escape(document.getElementById("searchTerms").value)
+	url="$uttf?doSearch=$params="+sTerms
+	JITs(url)
+}
+~;
+
+
+1;

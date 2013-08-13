@@ -1,0 +1,131 @@
+lang("getFonts");
+$main="fontsMain";
+$place="fontsplace";
+$title="$widgettitle";
+$wigWid="240";
+$ico="fonts_html";
+require 'widgetBody.htm';
+&get_cookie;
+open(U,"$users_txt");
+while(<U>){
+	if(/^$cookie{'ceuser'}=/){s`\s+$``;$ufnd=$_;last}
+}
+($user,$pass,$urls,$basic,$imgfolder,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$ufnd);
+
+@font_faces=split(/:/,$font_faces);
+@font_faces=sort(@font_faces);
+for(@font_faces){
+		($n,$v)=split(/&/);chomp($v);$vv=$v;$v=~tr/ /_/;
+	
+	$FONT_FACES.=qq~<div onclick=cechng_family("$v") onmouseover=this.className="fontson" onmouseout=this.className="fontsoff" class=fontsoff $uns><font face="$vv" $uns>$n</font></div>
+	~;
+}
+$FONTZ=qq~<div id=fonts_div style="width:110px;border:1px solid #999999;margin-right:3px;">
+<div style="height:62px;overflow:auto;padding:2px" $uns>
+<font face=tahoma $uns>$FONT_FACES</font>
+</div></div>
+~;
+
+@site_colors_=split(/,/,$site_colors);
+for(@site_colors_){if($_!~/FFFFFF/i){push(@site_colors,$_)}}
+if($#site_colors>-1){unshift(@site_colors,"#FFFFFF")}
+
+if($#site_colors>-1){$COLOR=qq~<tr>
+<td colspan=2 align=left $uns style="padding:1px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="padding:0px 11px 0px 6px">
+<img src="$utif/paint.png" width="17" height="17" border="0" title="$ColorTexttitle" onclick=colSwatch("ForeColor") $uns></td><td style="padding:0px 11px 0px 0px">
+<img src="$utif/hilite.png" width="17" height="17" border="0" title="$HighlightTexttitle" onclick=colSwatch("BackColor") $uns></td>
+<td style="padding:0px 11px 0px 0px">
+<img style="background-color:#FFFFFF" id=swatch_ src="$utif/swatch_.png" width="17" height="17" $uns>
+</td><td>
+<select id=color_swatch onchange=byId("swatch_").style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor style="width:111px;font-size:9px;font-family:arial;border:1px solid #999999;">~;
+}
+foreach $col (@site_colors){
+	$col_=$col;$col_=~s`#``;
+	$COLOR.=qq~<option style="background-color:$col" value="$col_">&nbsp;~;
+}
+if($#site_colors>-1){$COLOR.=qq~</select></td></tr></table></td></tr>~;}
+	
+$RETURN=qq~fontsTbl='$BODY_TOP	
+<table style="margin-bottom:0px;" align=center border=0 cellpadding=3 cellspacing=0><tr>
+<td $uns>
+<table border=0 cellpadding=4 cellspacing=0>
+<tr><td $uns><img src="$utif/fontup.png" width="17" height="17" border="0" title="$IncreaseFontSizetitle" onclick=cechng_size("up") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/fontdn.png" width="17" height="17" border="0" title="$DecreaseFontSizetitle" onclick=cechng_size("dn") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/fontrm.png" width="17" height="17" border="0" title="$RemoveFontFormattingtitle" onclick=cetoggle("RemoveFormat")  $uns></td></tr>
+
+<tr><td $uns><img src="$utif/bold.png" width="17" height="17" border="0" title="$Boldtitle" onclick=cetoggle("Bold") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/italic.png" width="17" height="17" border="0" title="$Italictitle=" onclick=cetoggle("Italic") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/underline.png" width="17" height="17" border="0" title="$Underlinetitle" onclick=cetoggle("Underline") $uns></td></tr>
+
+<tr><td $uns><img src="$utif/strikethrough.png" width="17" height="17" border="0" title="$StrikeThroughtitle" onclick=cetoggle("StrikeThrough") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/supscript.png" width="17" height="17" border="0" title="$SuperScripttitle" onclick=cetoggle("SuperScript") $uns></td>
+<td style="padding-left:7px" $uns><img src="$utif/subscript.png" width="17" height="17" border="0" title="$SubScripttitle" onclick=cetoggle("SubScript") $uns></td></tr>
+</table></td>
+<td align=center $uns>
+$FONTZ
+</td></tr>
+$xCOLOR
+<tr>
+<td colspan=2 align=center $uns style="padding-top:6px" id=clases>
+</td></tr>
+</table>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function roll_menus(id_){
+	id=id_.replace(/x/,"");
+	if(byId(id).style.display=="block"){
+		byId(id).style.display="none"
+		byId(id_).style.backgroundImage="URL($utif/menu_button.png)"
+	}else{
+		byId(id).style.display="block"
+		byId(id_).style.backgroundImage="URL($utif/menu_button2.png)"
+	} 
+}
+function colSwatch(obj){
+	selected_col=byId("color_swatch").options[byId("color_swatch").selectedIndex].value;
+	set_what_color(obj)
+}
+function setClass2(val){
+	classesFNTArray_=new Array()
+	if(val==""){return false}
+	ceget_selected()
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(byId('fntCLS1').checked==true){
+		cehtm="<span class="+val+">"+cetxt+"</span>"
+			if(isIE){
+				cesel.pasteHTML(cehtm);
+			}else{
+				doc().execCommand("InsertHTML", false, cehtm); 
+			}
+		}
+		if(byId('fntCLS2').checked==true){
+			classesFNTArray=ceel.className.split(/ /);
+			for(i=0;i<classesFNTArray.length;++i){
+				if(classesFNTArray[i] != byId('classesFNTapply').options[byId('classesFNTapply').selectedIndex].value){
+					classesFNTArray_.push(classesFNTArray[i])
+				}
+			}
+			ceel.className=classesFNTArray_.join(" ")
+		}
+	}
+}
+byId('fontsplace').innerHTML=fontsTbl
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassoption'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+byId('clases').innerHTML='<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>'+
+'<select onchange=setClass2(this.options[this.selectedIndex].value) id=classesFNTapply class=input style="max-width:100px">'+sopts+'</select></td>'+
+'<td align=left><input name=fntCLS id=fntCLS1 type=radio checked></td><td align=left class=widgetText11 style="font-size:9px">$Applybutton</td>'+
+'<td align=left><input name=fntCLS id=fntCLS2 type=radio></td><td align=left class=widgetText11 style="font-size:9px">$Removebutton</td></tr></table>'
+}
+
+cefonts_html()
+~;
+1;

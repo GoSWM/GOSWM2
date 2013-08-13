@@ -1,0 +1,21 @@
+widgettitle=Backups For Page In Editor
+
+option1=Select Backup File
+option2=There Are No Backups For This Page
+
+button1=Overwrite Active Page With Selected Backup
+button2=Open The Selected Backup In Editor
+button3=Reload Active Page Into The Editor
+button4=Delete The Selected Backup File
+htmlalert1=Open
+htmlalert2=in the editor
+htmlalert3=Replace
+htmlalert4=with
+htmlalert5=Delete the backup
+htmlalert6=Reload the active page
+htmlalert7=into the editor
+htmlalert8=Original
+htmlalert9=replaced by
+htmlalert10=Load restored original into editor
+htmlalert11=The backup
+htmlalert12=was deleted

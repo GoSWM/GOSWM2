@@ -1,0 +1,53 @@
+lang("insertHtml");
+$main="inserthtmlMain";
+$place="inserthtmlplace";
+$title="$widgettitle";
+$wigWid="440";
+$ico="insert_html";
+$close_img="modal_close";
+require 'widgetBody.htm';
+
+if($isIE){
+$BTN=qq~<table align=center style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReApplyTextContentChangestitle" $unz onclick=;ceCopies("Redo")></td><td align=center><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns id=actualsize onclick=ceinsert_code()>$InsertHTML</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN  style="visibility:hidden;margin-left:10px" class=icon $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$UnApplyTextContentChangestitle" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>~;
+}else{
+$BTN=qq~<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns id=actualsize onclick=ceinsert_code()>$InsertHTML</td><td>$RBUT</td></tr></table>~;
+}
+$RETURN=qq~inserthtmlTbl='$BODY_TOP
+	
+<table align=center border=0 cellpadding=3 cellspacing=0><tr><td align=center>
+<tr><td align=center style="padding-bottom:7px" class=widgetText11>
+$text1
+<tr><td align=center>
+<textarea id=cethecode style="width:400px;height:200px;border:1px solid #777" wrap=virtual></textarea>
+</td></tr>
+<tr><td align=center>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+
+$BTN
+
+</td></tr></table>
+</td></tr></table>
+
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~function ceinsert_code(){
+	if(byId('cethecode').value==""){return false}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			capture()
+			byId('undoBTN').style.visibility="visible"
+			byId('redoBTN').style.visibility="hidden"					
+			cesel.pasteHTML(byId('cethecode').value);
+		}else{
+			doc().execCommand("InsertHTML", false, byId('cethecode').value); 
+		}
+	}
+}
+
+byId('inserthtmlplace').innerHTML=inserthtmlTbl
+csInsertHtml()
+~;
+1;

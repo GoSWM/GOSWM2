@@ -1,0 +1,9 @@
+subject=Submission From Form
+required1=The Form Field
+required2=Was Required
+nofile=No File Was Uploaded
+emptyfile=The Uploaded File Was Empty
+notopen1=Could Not Open
+notopen2=To Write To It
+illegal=You Submitted An Illegal Character
+nocookie=Your Browser Is Not Cookie Enabled

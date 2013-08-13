@@ -1,0 +1,5 @@
+widgettitle=Insert HTML
+ReApplyTextContentChangestitle=ReApply Text Content Changes
+UnApplyTextContentChangestitle=UnApply Text Content Changes
+InsertHTML=Insert HTML
+text1=Enter or Paste Content

@@ -1,0 +1,81 @@
+use CGI qw/:standard :html3/;
+
+	if ($^O =~ /MSWin32/i){	
+		$temp = $ENV{'TEMP'} || $ENV{'TMP'} || $ENV{'WINDIR'};
+		if($temp =~ /Temp/i){
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp";
+			}
+		}else{
+			$temp=$temp."/Temp";
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp"; 
+			}else{
+				$tmp="$path_to_domain/Temp";
+				mkdir($tmp,0755);
+				$TempFile::TMPDIRECTORY="$tmp"; 
+				$CGITempFile::TMPDIRECTORY="$tmp"; 
+			}
+		}
+	}
+
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+    if($params eq "one"){$file = param('upload1');}
+	if($params eq "two"){$file = param('upload3');}
+	$file =~ m!([^/:\\]*)$!;$short_name = $1;
+	$short_name=~m`(.+)\.(\w+)$`;$short_name = $1;$ext=$2;
+	
+	if($params eq "one"){$folder = param('vid_folder');}
+	if($params eq "two"){$folder = param('uploadVidURL');}
+	$short_name=~s` `_`g;$short_name=~s`$space";`_`g;$short_name=~s`\.`_`g;
+ 	$file_=$folder."/".$short_name.".".$ext;
+	
+   open (SAVE,">$file_") || die $!;
+	binmode SAVE if $^O eq 'MSWin32';
+    while ($size = read($file,$data,1024)) {
+        print SAVE $data;
+        $total_size += $size;
+    }
+    close SAVE;
+    if ($total_size < 1) {unlink($file_);$ret="NOT";}
+
+$thumb_name=$short_name;
+$vid_name=$short_name.".".$ext;
+
+
+print "Content-type: text/html\n\n";
+
+if($params eq "one"){
+$uploadedURL=$file_;
+$root=~s`\w:``;
+$uploadedURL=~s`$root``;
+print qq~
+<script type="text/javascript">
+parent.byId('thumb_name').value="$thumb_name"
+parent.byId('vid_name').value="$vid_name"
+parent.byId('uploadedVidURL').value="$uploadedURL"
+parent.byId('uploadThumbForm').submit()
+parent.pad11.location.reload(true)
+location="about:blank"
+</script>
+~;
+}
+
+if($params eq "two"){
+$uploadedURL=$file_;
+$root=~s`\w:``;
+$uploadedURL=~s`$root`$host`;
+print qq~
+<script type="text/javascript">
+parent.byId('uploadVidDiv').style.display="none"
+parent.byId('uploadedVidDiv').style.display="block"
+parent.byId('uploadedVidURL').value="$uploadedURL"
+parent.pad15.location.reload(true)
+location="about:blank"
+</script>
+~;
+}
+
+1;

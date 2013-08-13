@@ -1,0 +1,4 @@
+htmlalert1=The thumbnail<br>
+htmlalert2=<br>was created
+htmlalert3=The thumbnail<br>
+htmlalert4=<br>was NOT created<BR><BR>Your server does not support thumbnail creation

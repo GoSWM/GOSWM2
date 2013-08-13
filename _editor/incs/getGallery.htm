@@ -1,0 +1,412 @@
+lang("getGallery");
+$main="galleryMain";
+$place="galleryplace";
+$title="$widgettitle";
+$wigWid="480";
+$ico="gallery";
+$close_img="modal_close";
+require 'widgetBody.htm';
+if($isFF){$moron="<DIV align=center>";$more_moron=";padding-left:10px"}
+&get_cookie;
+open(USRS,"$users_txt");
+while(<USRS>){
+	if(/$cookie{'ceuser'}=/){s`\s+$``;$usr=$_;last}
+}
+($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$usr);
+if($isFF){$ffWid="size=60"}
+if($isIE){$ieWid="align=right";$ieBrd="border:1px solid #999999;background-color:#EBEBE4"}
+
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isLWP=eval { require LWP::Simple } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+if($isIM==0 && $isLWP==0 && $isGD==0){&notAvaliable}
+
+if($demo == 1){
+	$FUNC1=qq~demoing()~;
+}else{
+	$FUNC1=qq~ceUploadFiles2()~;
+}
+
+$RETURN=qq~galleryTbl='$BODY_TOP
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td id=GL1 onclick=glSwap(1) class=tab_ $uns>$GalleryImagesFoldertab</td>
+<td id=GL2 onclick=glSwap(2) class=tab $uns>$MultiThumbnailGallerytab</td>
+<td id=GL3 onclick=glSwap(3) class=tab $uns>$SingleThumbnailGallerytab</td>
+<td width=97% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td></tr></table>
+
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px">
+
+
+<DIV id=gldv1>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 style="padding-left:4px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:3px"><img id=up_arrow10 onclick=upDIR10() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLevel" style="cursor:pointer;visibility:hidden"></td>
+<td style="width:20px;padding-left:7px"><img id=nu_folders onclick=cenewFolder10() src="$utif/foldernew.png" width="16" height="16" border="0" alt="$CreateNewFoldertitle" style="cursor:pointer"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$OpenGalleryFolder
+</td></tr></table></td></tr>
+<tr><td colspan=3 align=center style="padding:0px">
+<iframe name=pad10 onload=setgalPath() style="margin:5px 0px 10px 0px;width:460px;height:150px;border:1px solid #999999" frameborder=0 src="$uttf?pathTree=x=gallery" $uns></iframe>
+</td></tr></table>
+
+<table style="table-layout:fixed" align=center border=0 cellpadding=0 cellspacing=0>
+
+
+<tr><td width=35 align=right>
+<input onfocus=this.select() id=numberOfUploads2 onkeyup=moreUploads2(this.value) maxlength=2 style="background-color:#ffffff;font-size:11px;width:15px;border:1px solid #999999" value="1"></td>
+<td align=left width=425 style="font-family:tahoma,arial;font-size:11px$more_moron" id=howmanytoupload2>&nbsp;&nbsp;$Numberofimagestoupload</td></tr>
+</td></tr>
+<tr><td align=center  id=uploadtr2 colspan=2>
+<table align=center  id=uploadTbl21 border=0 cellpadding=0 cellspacing=0>
+<tr><td width=35 align=right><img id=throbber1 style="visibility:hidden;margin-right:4px" src="$utif/throbber.gif" width="16" height="16" border="0"></td>
+<td align=center><form id=uploadForm21 style="margin:0px" enctype="multipart/form-data" method=post action=$uttf?doUpload=gallery target=hole>
+<table border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 align=left>
+<input  $ffWid style="$ieBrd;font-size:11px;width:400px" type=file name=upload value=""></td></tr>
+<tr><td class=widgetText11 align=right style="width:112px">$ImageCaption&nbsp;</td><td align=left style="width:180px">
+<input STYLE="width:180px" name=imgCAP id=imgCAP21 value="" class=input></td></tr></table>
+<input type=hidden name=imgDIR id=imgDIR21 value=""></form>
+</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center>
+<table id=ceUploadButtonTbl2 style="margin:12px 0px 12px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center onclick=$FUNC1 $button_class title="Upload" id=ceUploadButton2>$UploadFilebutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV>
+
+<DIV id=gldv2 style="display:none;padding-top:10px">
+<center><table align=center style="margin:0px 0px 5px 10px" border=0 cellpadding=2 cellspacing=0>
+<tr><td class=widgetText11 align=center colspan=2 style="padding-bottom:10px">$GallerysImageFolder<DIV id=galPath style="font-weight:bold"></DIV></td></tr>
+<tr><td align=left class=widgetText11>$Numberofimagesperrow</td><td align=left><input class=input style="width:30px" id=cols value=""></td></tr>
+<tr><td align=left class=widgetText11>$Cellpaddingforlayout</td><td align=left><input class=input style="width:30px" id=padg value=""></td></tr>
+<tr><td align=left class=widgetText11>$Maxwidthofthumbnails</td>
+<td align=left><input class=input style="width:30px" id=wid value=""></td></tr>
+<tr><td align=left class=widgetText11>$Maxheightofthumbnails</td>
+<td align=left><input class=input style="width:30px" id=hei value=""></td></tr>
+<tr><td align=left class=widgetText11>$Widthofthumbnailborder</td><td align=left><input class=input style="width:30px" id=bwid value="1"></td></tr>
+<tr><td align=left class=widgetText11>$Colorofthumbnailborder</td><td align=left><input class=input style="width:60px" id=bcol value="$borderdefaultcolor"></td></tr>
+<tr><td colspan=2 align=center>
+
+<DIV align=center><table align=center style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=setMultiGallery()>$InsertMuiltThumbnailGallerybutton</td><td>$RBUT</td></tr></table>
+</td></tr>
+</table></DIV></center>
+
+
+<DIV id=gldv3 style="display:none;padding-top:10px;">
+<table align=center style="margin:10px 0px 5px 10px" border=0 cellpadding=2 cellspacing=0>
+<tr><td class=widgetText11 align=center colspan=2 style="padding-bottom:10px">$GallerysImageFolder<DIV id=galPath2 style="font-weight:bold"></DIV></td></tr>
+<tr><td width=235 align=center>
+<table border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 style="padding-bottom:10px" align=center class=widgetText11>
+<DIV id=cxselectNote>$text1</DIV>
+<DIV id=cximg_list></DIV>
+</td></tr>
+
+<tr><td align=left class=widgetText11><SPAN id=gmaxw>$Maxwidthofthumbnail</SPAN>
+<SPAN id=gthew style="display:none">$Widthofthumbnail</SPAN></td>
+<td align=left><input class=input style="width:30px" id=widS value=""></td></tr>
+<tr><td align=left class=widgetText11><SPAN id=gmaxh>$Maxheightofthumbnail</SPAN>
+<SPAN id=gtheh style="display:none">$Heightofthumbnail</SPAN></td>
+<td align=left><input class=input style="width:30px" id=heiS value=""></td></tr>
+<tr><td align=left class=widgetText11>$Widthofthumbnailborder</td><td align=left><input class=input style="width:30px" id=bwidS value="1"></td></tr>
+<tr><td align=left class=widgetText11>$Colorofthumbnailborder</td><td align=left><input class=input style="width:60px" id=bcolS value="$borderdefaultcolor"></td></tr>
+</table>
+</td><td width=235 align=center>
+<div id=displayofimageTH style="text-align:left;border:4px double #999999;background-color:#ffffff;overflow:hidden;width:180px;height:120px;margin:0px 0px" $uns></div>
+<table id=captTBL style="display:none" border=0 cellpadding=2 cellspacing=0><tr><td align=left class=widgetText11>$Caption</td><td align=left>
+<input STYLE="width:140px" id=cxthumbCaption value="" class=input></td></tr></table>
+<table id=sizTBL style="visibility:hidden" border=0 cellpadding=2 cellspacing=0><tr><td align=left class=widgetText11>$ImageSize</td>
+<td id=sizTD align=left class=widgetText11></td></tr></table>
+</td></tr>
+
+<tr><td colspan=2 align=center>
+
+<table id=createSingleGalleryButton align=center style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=createSingleGallery()>$CreateThumbnailForGallerybutton</td><td>$RBUT</td></tr></table>
+
+<table id=setSingleGalleryButton align=center style="display:none;margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=setSingleGallery(1)>$InsertThumbnailForGalleryIntoPage</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+
+</DIV></DIV></DIV>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+demo="$demo"
+GalleryImageFolder=''
+GalleryImageVirtual=''
+function ceinsert_code(){
+	if(byId('cethecode').value==""){return false}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(byId('cethecode').value);
+		}else{
+			doc().execCommand("InsertHTML", false, byId('cethecode').value); 
+		}
+	}
+}
+function selection10(dir,path,url){
+	if(dir == "dir"){
+		pad10.location="$uttf?pathTree=x=gallery="+path
+	}
+}
+function upDIR10(){
+	pad10.location="$uttf?pathTree=up=gallery="+pad10.updir
+}
+function glSwap(n){
+	byId('GL1').className="tab"
+	byId('GL2').className="tab"
+	byId('GL3').className="tab"
+	byId('gldv1').style.display="none"
+	byId('gldv2').style.display="none"
+	byId('gldv3').style.display="none"
+	var GL="GL"+n
+	byId(GL).className="tab_"
+	gldv="gldv"+n
+	byId(gldv).style.display="block"
+	if(n==3){
+		url="$uttf?listImages="+pad10.dir
+		JITc(url)
+	}
+}
+function cenewFolder10(){
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=folder10="+pad10.urldir
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+function setgalPath(){
+	byId('galPath').innerHTML=pad10.urldir	
+	byId('galPath2').innerHTML=pad10.urldir
+	GalleryImageFolder=pad10.urldir
+	GalleryImageVirtual=pad10.dirvirtual
+}
+totalFilesUploaded2=0;totalToUpload2=0;
+
+function moreUploads2(val){
+	totalToUpload2=byId('numberOfUploads2').value
+	totalFilesUploaded2=0
+	numberOfUps2=''
+	for(i=1;i<=byId('numberOfUploads2').value;++i){
+	numberOfUps2+='<table id=uploadTbl2'+i+' border=0 cellpadding=0 cellspacing=0><tr valign=top><td width=35 align=right>'+
+	'<img id=throbber'+i+' style="visibility:hidden;margin-right:4px" src="$utif/throbber.gif" width="16" height="16" border="0"></td>'+
+	'<td align=center><form id=uploadForm2'+i+' style="margin:0px" enctype="multipart/form-data" method=post '+
+	'action=$uttf?doUpload=gallery target=hole><table border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 align=left>'+
+	'<input $ffWid style="$ieBrd;font-size:11px;width:400px" type=file name=upload value=""></td></tr>'+
+	'<tr><td class=widgetText11 align=right style="width:112px">$ImageCaption&nbsp;</td><td align=left style="width:180px">'+
+	'<input STYLE="width:180px" name=imgCAP id=imgCAP2'+i+' value="" class=input></td></tr></table>'+
+	'<input type=hidden name=imgDIR id=imgDIR2'+i+' value=""></form></td></tr></table>'
+	}
+	if(byId('numberOfUploads2').value>1){byId('ceUploadButton2').innerHTML="$UploadFilesbutton"}else{byId('ceUploadButton2').innerHTML="$UploadFilebutton"}
+	if(byId('numberOfUploads2').value!=0){byId('ceUploadButtonTbl2').style.visibility="visible"}
+	byId('uploadtr2').innerHTML=numberOfUps2
+}
+function ceUploadFiles2(){
+	if(byId('numberOfUploads2').value>0){
+		for(i=1;i<=byId('numberOfUploads2').value;++i){
+			var imgDIR2_="imgDIR2"+i
+			byId(imgDIR2_).value=pad10.dir
+		}
+		currentUploadNum2=byId('numberOfUploads2').value
+		currentUploadForm2="uploadForm2"+currentUploadNum2
+		currentThrobber2="throbber"+currentUploadNum2
+		byId(currentThrobber2).style.visibility="visible"
+		oldUploadNumber2=eval(currentUploadNum2)+1
+		if(oldUploadNumber2<=totalToUpload2){
+			oldUploadTbl2="uploadTbl2"+oldUploadNumber2
+			byId(oldUploadTbl2).style.display="none"
+		}
+		++totalFilesUploaded2
+		if(byId('numberOfUploads2').value>1){byId('ceUploadButton2').innerHTML="$UploadFilesbutton"}else{byId('ceUploadButton2').innerHTML="$UploadFilebutton"}	
+		byId(currentUploadForm2).submit()
+		byId('numberOfUploads2').value-=1	
+		byId('howmanytoupload2').innerHTML="$Numberofimageslefttoupload"
+	}else{
+		byId('uploadTbl21').style.display="none"
+		if(byId('numberOfUploads2').value==0){byId('ceUploadButtonTbl2').style.visibility="hidden"}
+		if(totalFilesUploaded2>1){
+			basicAlert(totalFilesUploaded2+" $ImagesWereUploaded")
+			totalFilesUploaded2=0
+			pad10.reloader()
+		}else{
+			basicAlert(totalFilesUploaded2+" $ImageWasUploaded")
+			totalFilesUploaded2=0
+			pad10.reloader()
+		}
+		byId('howmanytoupload2').innerHTML="$Numberofimagestoupload"
+	}
+	
+}
+function resetup2(){
+byId('numberOfUploads2').value=1
+moreUploads2(1)
+}
+function setMultiGallery(){
+	no_go=0;
+	if(demo==1){alert("$DemoNoteThumbnailswillnotberesized")}
+	if(byId("cols").value==""){no_go=1}
+	if(byId("padg").value==""){no_go=1}
+	if(byId("wid").value==""){no_go=1}
+	if(byId("hei").value==""){no_go=1}
+	if(byId("bcol").value==""){no_go=1}
+	if(byId("bwid").value==""){no_go=1}
+	if(no_go==1){basicAlert("$Youhavenotcompletedallfields");return false}
+	var strng=byId("cols").value+'='+
+	byId("wid").value+'='+
+	byId("hei").value+'='+
+	byId("bwid").value+'='+
+	byId("bcol").value+'='+
+	byId("padg").value
+	scrtGalUrl='$uttf?createGallery='+GalleryImageVirtual+'='+strng
+	strng='<div id=gallerySpot align=center>'+
+	'<DIV style="font-size:11px;font-family:trebuchet ms,arial">$LoadingGallery<br><br>'+
+	'<img src="$imgs_folder_URL/throbber_bar.gif" width="128" height="15" border="0"></DIV></div>'+
+	'<SCRIPT id="galleryJS" type="text/javascript" src="'+scrtGalUrl+'"></SCRIPT>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(!doc().getElementById("galleryJS")){
+			script =editPad.document.createElement('script');	
+			script.type = 'text/javascript';	
+			script.defer = true;	
+			script.id = 'galleryJS';	
+			script.src=scrtGalUrl
+			editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+		}	
+		if(isIE){
+			cesel.pasteHTML(strng)
+		}else{
+			doc().execCommand("InsertHTML", false, strng); 
+		}
+		strng=""
+		ceonOff(1)
+	}	
+}
+
+function checkForThumb(tx,val){
+	if(tx.match(/_th\./)){
+		byId('createSingleGalleryButton').style.display='none';
+		byId('setSingleGalleryButton').style.display='block';
+	}else{
+		byId('createSingleGalleryButton').style.display='block';
+		byId('setSingleGalleryButton').style.display='none';
+	}
+	vals=val.split("|")
+	byId('displayofimageTH').innerHTML='<img id=theThumb onload=fixTHSize() src="'+vals[1]+'">'
+}
+function fixTHSize(){
+	sFullWid=byId('theThumb').width;sFullHei=byId('theThumb').height
+	byId('sizTD').innerHTML=byId('theThumb').width+' x '+byId('theThumb').height
+	byId('sizTBL').style.visibility="visible"
+	theThumbwid=byId('theThumb').width
+	theThumbhei=byId('theThumb').height
+		if(theThumbwid >= 178){
+			byId("theThumb").width=178
+			ratio=178/theThumbwid
+			byId("theThumb").height=parseInt(theThumbhei*ratio)
+		}
+		if(byId("theThumb").height >= 118){
+			nu_h=byId("theThumb").height
+			nu_w=byId("theThumb").width
+			byId("theThumb").height=118
+			ratio=118/nu_h
+			byId("theThumb").width=parseInt(nu_w*ratio)
+		}
+	if(byId('theThumb').src.match(/_th\./)){
+		byId("widS").value=theThumbwid
+		byId("heiS").value=theThumbhei
+		byId('gmaxw').style.display="none"
+		byId('gmaxh').style.display="none"
+		byId('gthew').style.display="inline"
+		byId('gtheh').style.display="inline"
+	}else{
+		byId("widS").value=''
+		byId("heiS").value=''
+		byId('gmaxw').style.display="inline"
+		byId('gmaxh').style.display="inline"
+		byId('gthew').style.display="none"
+		byId('gtheh').style.display="none"	
+	}
+}
+function createSingleGallery(){
+	no_go=0;
+	if(byId("widS").value==""){no_go=1}
+	if(byId("heiS").value==""){no_go=1}
+	if(byId("bcolS").value==""){no_go=1}
+	if(byId("bwidS").value==""){no_go=1}
+	if(no_go==1){basicAlert("$Youhavenotcompletedallfields");return false}
+	if(byId('listImagesMenu').selectedIndex==0){basicAlert("$Youhavenotselectedanimage");return false}
+	url="$uttf?createThumb="+byId('listImagesMenu').options[byId('listImagesMenu').selectedIndex].value+"="+byId("widS").value+"="+byId("heiS").value
+	JITc(url)
+}
+function setSingleGallery(nz){
+	no_go=0;
+	if(byId("widS").value==""){no_go=1}
+	if(byId("heiS").value==""){no_go=1}
+	if(byId("bcolS").value==""){no_go=1}
+	if(byId("bwidS").value==""){no_go=1}
+	if(no_go==1){basicAlert("You have not completed all fields");return false}
+	if(byId('listImagesMenu').selectedIndex==0){basicAlert("$Youhavenotselectedanimage");return false}
+	if(byId("bwidS").value!='' && byId("bwidS").value!=0){
+		gimgBRD='style="border:#000000 solid '+byId("bwidS").value+'px"'
+	}else{gimgBRD=""}
+	cxthum=byId("listImagesMenu").options[byId("listImagesMenu").selectedIndex].value.split("|")
+	cxtfull=cxthum[1].replace(/_th\./,".");
+	if(nz==1){
+		widZ=byId("widS").value
+		heiZ=byId("heiS").value
+	}
+	if(nz==2){
+		calcSize()
+	}
+	gceimg='<img src="'+cxthum[1]+'" title="$ClickToOpenGallery" '+
+	gimgBRD+' width="'+widZ+'" height="'+heiZ+'" '+
+	' onclick="openGallery(&#39;'+cxtfull+'&#39;)" style="cursor:pointer" />'		
+	if(!doc().getElementById("galleryJS")){
+		gceimg+='\\n<script id=galleryJS type="text/javascript" src="'+uttf+'?openGalleryJS"></script></SPAN>'
+		script =editPad.document.createElement('script');	
+		script.type = 'text/javascript';	
+		script.defer = true;	
+		script.id = 'galleryJS';	
+		script.src="$uttf?openGalleryJS" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+	}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(gceimg)
+		}else{
+			doc().execCommand("InsertHTML", false, gceimg); 
+		}
+		
+		gceimg=""
+	}	
+}
+function calcSize(){
+	byId("widS").value
+	widZ=44
+	heiZ=55
+	if(sFullWid >= byId("widS").value){
+		widZ=byId("widS").value
+		ratio=byId("widS").value/sFullWid
+		heiZ=parseInt(sFullHei*ratio)
+	}
+	if(sFullHei >= byId("heiS").value){
+		heiZ=byId("heiS").value
+		ratio=byId("heiS").value/sFullHei
+		widZ=parseInt(sFullWid*ratio)
+	}
+}
+byId('galleryplace').innerHTML=galleryTbl
+ceCreateGal()
+~;
+
+sub notAvaliable{
+	print "Content-type: text/javascript\n\n";
+	print qq~alert("$alert")~;
+	exit
+}#notAvaliable
+1;

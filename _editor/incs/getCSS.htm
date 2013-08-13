@@ -1,0 +1,11 @@
+if(!$CSSfile){$CSSfile="default"}
+$CSSfile=$incs_folder_PATH."/css/".$CSSfile.".css";
+
+print "Content-type: text/css\n\n";
+open(CSS,"$CSSfile");
+while(<CSS>){
+	s/\$(\w+)/${$1}/eg;
+	print;
+}
+exit;
+1;

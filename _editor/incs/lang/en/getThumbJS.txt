@@ -1,0 +1,2 @@
+ExpandImage=Expand Image
+ShrinkImage=Shrink Image

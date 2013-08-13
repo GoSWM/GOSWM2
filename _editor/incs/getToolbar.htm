@@ -1,0 +1,2071 @@
+open(VER,"$incs_folder_PATH/version.htm");
+$version=<VER>;
+close(VER);	
+$remake="$incs_folder_PATH/remake.htm";
+$remade="$incs_folder_PATH/remade.htm";
+if(!-e $remade){require $remake}
+&get_login;
+lang("getToolbar");
+$isLWP=eval { require LWP::Simple; } ? 1 : 0;
+if(!$editorusername){&adminit;}
+$SaLT=substr($editorpassword,0,2);
+
+open(U,"$users_txt");
+while(<U>){
+	if(/^$editorusername=/){s`\s+$``;$ufnd=$_;last}
+}
+if(!$editablecellborder){$editablecellborder="#333333"}
+if($ENV{'HTTP_USER_AGENT'} =~ m`Firefox/2`i){$isFF2=1}
+($user,$pass,$urls,$basic,$imgfolder,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/,$ufnd);
+$PW=crypt($pass,$SaLT);
+if($editorpassword=~/&/){
+	($sess,$sess_)=split(/&/,$editorpassword);
+	$session=$sess;$sess=reverse($sess);
+	$sexx=crypt($sess,substr($sess,0,2));
+	$sexxx=$sexx;
+	$sexx=~s`\d\d``;
+	if($sess_ ne $sexx && $sess_ ne $sexxx){$RETURN="<br><br><center>Session Error=$sess_ ne $sexx</center>";&respondhtml}
+	$then=$session+7200;$time=time;
+	if($time>$then){
+		if($urlToEdit =~/none$/){
+			print "Set-Cookie: loginParams=;path=/\n";
+			$urlToEdit=$uttf;
+		}
+		$RETURN="<br><br><center><FONT face=verdana>Session Has Timed Out - Login Again<BR><BR><a href='$urlToEdit'>Page You Were Editing</a></FONT></center>";&respondhtml;
+	}
+	$session=time;$sess=reverse($session);$sess_=crypt($sess,substr($sess,0,2));$sess_=substr($sess_,2);
+}else{
+	#$PW=crypt($editorpassword,"ce");
+	if($PW eq $editorpassword){$session=time;$sess=reverse($session);$sess_=crypt($sess,substr($sess,0,2));$sess_=substr($sess_,2)}
+	if($PW ne $editorpassword){
+		print "Set-Cookie: loginParams=;path=/\n";
+		$RETURN=qq~<br><br><center>Wrong Login<BR><BR><A HREF="$uttf">Login Again</A></center>~;
+		&respondhtml;
+	}
+}
+if($parent_url){
+	@incs=<$incs_folder_PATH/*>;
+	foreach $inc (@incs){
+		unlink($inc);
+	}
+}
+
+$URL=join("\",\"",@urls);
+&get_cookie;
+if($ceuser eq "demo"){
+	$date = time - 365 * 86400;$cookie_expire = gmtime($date);
+	print "Set-Cookie: ceuser=demo;domain=.$host_;expires=$cookie_expire;path=/\n";
+}
+$host_=$ENV{'HTTP_HOST'};$host_=~s/www\.//;
+$date = time + 365 * 86400;$cookie_expire = gmtime($date);
+print "Set-Cookie: ceuser=$user;domain=.$host_;expires=$cookie_expire;path=/\n";
+if($editorremember eq "true" && $editorpassword!~/&/){
+	#print "Set-Cookie: cepword=$editorpassword;domain=.$host_;expires=$cookie_expire;path=/\n";
+	print "Set-Cookie: ceremem=1;domain=.$host_;expires=$cookie_expire;path=/\n";
+}else{
+	if($cookie{'cepword'} && $editorpassword!~/&/){
+		$date_ = time - 365 * 86400;$cookie_expire = gmtime($date_);
+		#print "Set-Cookie: cepword=;domain=.$host_;expires=$cookie_expire;path=/\n";
+	}
+}
+print "Set-Cookie: loginParams=$editorusername|$session&$sess_|$editorremember|$urlToEdit;path=/\n";
+
+if($urlToEdit eq "none"){
+	$location="about:blank"
+}else{
+	$location=$host.$urlToEdit;
+}
+if($isIE){$paratitle="$paratitleIE";$opacity="filter:alpha(opacity:60)";}
+if($isFF){$paratitle="$paratitleFF";$opacity="opacity:.3";}
+&seed;
+if($basic =~ s`openfolder``){$of=qq~<td width=22 align=center>$openfolder_</td>~}
+$BASIC=qq~<td width=22 align=center>$onoff_</td>$of<td><table cellspacing=0 id=tbBar style="visibility:visible"><tr>~;
+$basic_=$basic;
+$jst=qq~style="padding:0px 4px"~;
+if($basic=~s/left/justify/){$JUST.=qq~<td $uns $jst>$left_</td>~}
+if($basic=~s/center/justify/){$JUST.=qq~<td $uns $jst>$center_</td>~}
+if($basic=~s/full/justify/){$JUST.=qq~<td $uns $jst>$full_</td>~}
+if($basic=~s/right/justify/){$JUST.=qq~<td $uns $jst>$right_</td>~}
+if($basic=~s/outdent/justify/){$JUST.=qq~<td $uns $jst>$outdent_</td>~}
+if($basic=~s/indent/justify/){$JUST.=qq~<td $uns $jst>$indent_</td>~}
+$JUST=qq~<table border=0 cellpadding=0 cellspacing=0><tr>$JUST</tr></table>~;
+
+@basic=split(/,/,$basic);
+$ju=0;
+for(@basic){
+	if($_ eq "justify" && $ju==1){next}
+	$icon = $_."_";$$_=$$icon;
+	if($_ eq "pub"){
+		$BASIC.=qq~<td width=22 align=center>$publisher_</td><td width=22 align=center>$publog_</td>~;
+		$iscomments="publisher";
+		next;
+	}
+	if($_ eq "auth"){
+		$BASIC.=qq~<td width=22 align=center>$author_</td>~;
+		$iscomments="author";
+		next;
+	}
+	if($$icon eq ''){next}
+	if($noIEundoredo && $isIE && ($_ eq "undo" || $_ eq "redo")){next}
+	if(/updates/){
+		$BASIC.=qq~<td id=updateICO style="display:none" width=22 align=center>$$icon</td>~;
+	}else{
+		$BASIC.=qq~<td width=22 align=center>$$icon</td>~;
+	}
+	if($_ eq "justify"){$ju=1}
+}
+
+
+$BASIC=qq~<table style="margin:1px 0px 0px 0px" border=0 cellpadding=0 cellspacing=0><tr>$BASIC</tr></table><td width=22 align=center>$exit_</td></td>
+<td style="padding:0px 5px"><div id=nameSpot style="border:1px solid #999999;background-color:#FFFFFF;font-family:tahoma,arial;font-size:10px;padding:1px 2px"></div></td>
+<td><input id=spot style="width:0px;display:none"></td></tr></table>~;
+
+
+@heads=split(/,/,$headers);
+foreach $h (@heads){
+	$HEADZ.=qq~<div onclick=ceset_head("$h") onmouseover=this.className="block_slide_on"
+	onmouseout=this.className="block_slide_off" class=block_slide_off $uns><font face="tahoma" $uns>Tag &lt;$h&gt;</font></div>
+	~;	
+}
+$HEADZ=qq~<div style="width:100px;">
+<div style="padding:2px;" $uns>
+<font face=tahoma $uns>$HEADZ</font>
+</div></div>
+	~;
+
+$host_=$host;$host_=~s`https*://``;
+if($utype==1 || $utype == 2){$Ptype=1}
+if($utype==3 || $utype == 4){$Ptype=2}
+if($utype==5 || $utype == 6){$Ptype=3}
+
+if($utype==1 || $utype == 3 || $utype == 5){$Utype=1}
+if($utype==2 || $utype == 4 || $utype == 6){$Utype=2}
+
+@langs_=<$incs_folder_PATH/lang/*>;
+foreach $lang_ (@langs_){
+	$lang_=~s`$incs_folder_PATH/lang/``;
+	push(@LANGS_,$lang_);
+}
+$LANGS_=join(",",@LANGS_);
+if($toolbar_on_bottom){
+	$IFRAMETOP=qq~<iframe name=editPad id=editPad style="width:100%;margin:0px;visibility:hidden;" frameborder=0 onload=loaded() src="$location"></iframe>~;
+	$tlbBrd=qq~border-top:1px solid #999999;~;
+	$just_slide_down="just_slide_down2";
+	$jsd=qq~dbdyHeight-61+"px"~;
+	$block_slide_down="block_slide_down2";
+	if($isIE){$bsd=qq~dbdyHeight-140+"px"~;}else{$bsd=qq~dbdyHeight-144+"px"~}
+}else{
+	$IFRAMEBOTTOM=qq~<iframe name=editPad id=editPad style="width:100%;margin:0px;visibility:hidden;border-top:1px solid #999999;" frameborder=0 onload=loaded() src="$location"></iframe>~;
+	$tlbBrd=qq~border-bottom:1px solid #999999;~;
+	$just_slide_down="just_slide_down1";
+	$jsd=qq~"28px"~;
+	$block_slide_down="block_slide_down1";
+	$bsd=qq~"28px"~;
+}
+
+if(!$demo){$demo=0}
+$RETURN=qq~<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html><head><META http-equiv="Cache-Control" content="no-cache"><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"><title>Page Editor</title>
+<script type="text/javascript">
+
+$alert9
+isLWP="$isLWP"
+expires="$cookie_expire"
+demo="$demo"
+uttf="$uttf"
+utif="$utif"
+edtype="$Utype"
+pgtype="$Ptype"
+version="$version";
+plus="$plus"
+iscomments='$iscomments'
+uti="$utif"
+username="$editorusername"
+widgetLeft="$widgetLeft"
+widgetTop=$widgetTop+31
+editorOn=0
+domain_license='$domain_license'
+client='$client'
+isIE="$isIE"
+isFF="$isFF"
+isFF2="$isFF2"
+if(!navigator.appName.match(/explorer/i)){isFF=1;isIE=0}else{isIE=1;isFF=0}
+not_escape='$not_escape'
+widgetIndex=1000;
+licenseerror1="$licenseerror1"
+licenseerror2="$licenseerror2"
+licenseerror3="$licenseerror3"
+licenseerror4="$licenseerror4"
+licenseerror5="$licenseerror5"
+licenseerror6="$licenseerror6"
+licenseerror7="$licenseerror7"
+licenseerror8="$licenseerror8"
+licenseerror9="$licenseerror9"
+licenseerror10="$licenseerror10"
+ceinside=0
+disableHref='$disableHref'
+prohibit_base64_images='$prohibit_base64_images'
+prohibit_base64_images_TEXT="$prohibit_base64_images_TEXT"
+copy_backup='$copy_backup'
+borderAllTables="$borderAllTables"
+external_css="$external_css"
+skip_css="$skip_css"
+savingCss=0
+docAll=document.getElementsByTagName("*");
+function byId(_id){return document.getElementById(_id)}
+ceSpotsArray=new Array("open","saving","savas","help","links","backup","photos","uploads","fonts","fontstyle","htmledit","table","tableedit","color","form","password","char","update","unformat","input","srcedit","editsrc","property","inputimg","preview","flash","imgedit","inserthtml","insertword","gallery","headcontent","film","copy","adduser","search","comments","audio","lock","linksedit")			
+window.onerror=un 
+function un(msg,url,ln){
+	if(msg == "Object doesn't support this property or method" && (ln >380 && ln < 400)){
+		basicAlert("$highlight1")
+		return true
+	}else if(msg == "Object doesn't support this property or method" && (ln >10 && ln < 11)){
+		basicAlert("$highlight2")
+		return true
+	}else{
+		if(uttf.match(/dev7/)){return false}else{return true}
+	}
+}
+function demoing(){
+	alert("$disabled")
+}
+function uncopy(){
+		byId('undoBTN').style.visibility="hidden"
+		byId('redoBTN').style.visibility="hidden"
+}
+function capture(){
+	copies=new Array()
+	if(copies.length==3){
+		undoc=copies.shift()
+	}
+	copies[copies.length]=doc().body.innerHTML
+	recopies=new Array()
+}
+function ceCopies(typ){
+	if(typ=="Undo"){
+		bkcop=copies.pop()
+		recopies[recopies.length]=doc().body.innerHTML
+		doc().body.innerHTML=bkcop
+	}
+	if(typ=="Redo"){
+		if(recopies.length==0){return false}
+		recop=recopies.pop()
+		copies[copies.length]=doc().body.innerHTML
+		doc().body.innerHTML=recop
+	}
+}
+function JITc(URL){
+	if(document.getElementById('JAX')){
+		document.getElementsByTagName('head')[0].removeChild(document.getElementById('JAX'))
+	};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JAX';	
+	script.src=URL 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}
+function zindx(obj){
+	++widgetIndex;
+	byId(obj).style.zIndex=widgetIndex;
+}
+function scrolledTop(){
+		scroll_top=0
+		if (document.documentElement && document.documentElement.scrollTop){scroll_top= document.documentElement.scrollTop}
+		else if (document.body && document.body.scrollTop){scroll_top= document.body.scrollTop}
+}
+function startModal(e,obj,are,bod){
+ 	if(!e){var e=window.event};
+    offsetX=e.clientX;
+    offsetY=e.clientY;
+    coordX=parseInt(byId(obj).style.left);
+    coordY=parseInt(byId(obj).style.top);
+    MaxDrag=true;
+	activeArea=are;
+	activeDrag=obj;
+	activeBod=bod
+	byId('shadow').style.display="block"
+	zindx('shadow')
+    document.onmousemove=dragModal;
+	document.onmouseup=stopModal;
+}
+function dragModal(e){
+	if(!MaxDrag){return};
+	if(activeArea!="hol_alertMain"){
+		byId(activeArea).style.display="none";
+	}	
+	if(!e){var e=window.event};
+   	drgLeft=coordX+e.clientX-offsetX;
+   	drgTop=coordY+e.clientY-offsetY;
+   	byId(activeDrag).style.left=drgLeft+'px';
+  	byId(activeDrag).style.top=drgTop+'px';
+   	return false;
+}
+function stopModal(){
+	if(MaxDrag==true){
+		MaxDrag=false;
+		imObj="img_"+activeDrag
+		if(byId(imObj)){
+			if(byId(imObj).className.match(/_dn/)){
+				byId(activeArea).style.display="block";
+			}
+		}else{
+			byId(activeArea).style.display="block";
+		}		
+		byId('shadow').style.display="none"
+	}
+}
+ceSAve="on"
+color_what="ForeColor"
+selected_col="#000000"
+function cecolor(){
+	if(byId('colorplace').innerHTML==""){
+		var URL="$uttf?getColorPad"		
+		hole.location=URL
+	}else{
+		byId('colorplace').style.display="none"
+		if(color_what=="ForeColor" || color_what=="BackColor"){
+			if (doc().selection && doc().selection.createRange){
+				sel=doc().selection.createRange();
+				zel=sel.parentElement()
+				if(zel.currentStyle.color){selected_col=zel.currentStyle.color.replace(/#/,'')}else{selected_col='C0C0C0'}
+			}
+			if(editPad.getSelection){
+       			sel= byId('editPad').contentWindow.getSelection(); 
+	   			if(sel.anchorNode){zel=sel.anchorNode.parentNode
+				if(zel.color){selected_col=zel.color.replace(/#/,'')}}else{selected_col='C0C0C0'}
+			}
+			scrolledTop()
+			setUp("colorPadMain",'colorplace',304)
+			byId('Color_Title').innerHTML="$colorwidget"
+			byId('colorButton1').style.display=""
+			byId('colorButton1_').innerHTML="$textbg"
+			byId('colorButton2_').innerHTML="$textcolor"
+			byId('img_colorPadMain').style.visibility="visible"
+			byId('cp_close').className="modal_close"
+			ceset()
+		}else{
+			byId('img_colorPadMain').style.visibility="hidden"
+			setUpPad("colorPadMain",'colorplace',304)
+			if(color_what=="tbl_brd"){
+				byId('Color_Title').innerHTML="$table1"
+				byId('colorButton1').style.display="none"
+				byId('colorButton2_').innerHTML="$table10"
+			}
+			if(color_what=="tbl_bg"){
+				byId('Color_Title').innerHTML="$table2"
+				byId('colorButton1').style.display="none"
+				byId('colorButton2_').innerHTML="$table3"
+			}
+			if(color_what=="rw_bg"){
+				byId('Color_Title').innerHTML="$table4"
+				byId('colorButton1').style.display="none"
+				byId('colorButton2_').innerHTML="$table5"
+			}
+			if(color_what=="cl_bg"){
+				byId('Color_Title').innerHTML="$table6"
+				byId('colorButton1').style.display="none"
+				byId('colorButton2_').innerHTML="$table7"
+			}
+			if(color_what=="cl_brd"){
+				byId('Color_Title').innerHTML="$table8"
+				byId('colorButton1').style.display="none"
+				byId('colorButton2_').innerHTML="$table9"
+			}
+			byId('cp_close').className="modal_close_"
+		}
+	}
+}
+function ceupload(){
+	if(byId('uploadsplace').innerHTML==""){
+		var URL="$uttf?getUpload"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('uploadMain','uploadsplace',404)
+	}
+}
+function celink(){
+	if(byId('linksplace').innerHTML==""){
+		var URL="$uttf?getLinker"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp("linkMain",'linksplace',404)
+		setceanchorSelect()
+	}
+}
+function cetable(){
+	if(byId('tableplace').innerHTML==""){
+		var URL="$uttf?getTablePad"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('tablePadMain','tableplace',360)
+	}
+}
+function ceeditTable(){
+	scrolledTop()
+	setUp('tableeditMain','tableeditplace',360)
+}
+function cesrc(){
+	if(byId('srceditplace').innerHTML==""){
+		var URL="$uttf?getSrc=find"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('srceditMain','srceditplace',360)
+	}
+}
+function ceeditsrc(obj,stage){
+	if(byId('editsrcplace').innerHTML=="" || stage == "re"){
+		var URL="$uttf?getSrc=editor="+obj
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('editsrcMain','editsrcplace',980)
+	}
+}
+function ceCreateGal(){
+	if(byId('galleryplace').innerHTML==""){
+		var URL="$uttf?getGallery"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('galleryMain','galleryplace',480)
+	}
+}
+function cehtml(){
+	if(byId('htmleditplace').innerHTML==""){
+		var URL="$uttf?htmlEdit"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('htmleditMain','htmleditplace',360)
+		gethtmlAreas()
+	}
+}
+function gethtmlAreas(){
+	eas=new Array()
+	EASTB=''
+	EASTB='<table align=center border=0 cellpadding=3 cellspacing=0>'
+	if(edtype==1 && bkfnd==0){
+		EASTB+='<tr><td>'+
+		'<table style="margin:0px 5px 2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td><img class=buttonLeft src=$utif/spacer.png width=5 height=18></td><td align=center onclick=setHtmlEdits("bodycontent") $button_class>$edit &raquo;</td><td><img class=buttonRight src=$utif/spacer.png width=5 height=18></td></tr></table></td><td align=left style="white-space:nowrap;font-family:tahoma,arial;font-size:11px">$entirebody</td>'+
+		'</td></tr>'
+	}
+	for(i=0;i<padAll.length;++i){
+	if(padAll[i].id.match(/wagmp_map/)){continue}
+	if(padAll[i].name){continue}
+		if(padAll[i].className.match(/editblock|includeblock|userblock/) || padAll[i].id.match(/editblock|includeblock|userblock/)){
+			if(padAll[i].className.match(/userblock/) || padAll[i].id.match(/userblock/)){
+				if(padAll[i].className.match(/$editorusername/) || padAll[i].className.match(/allusers/) ){
+					easClas=padAll[i].className
+					eas[eas.length]=easClas
+				}else if(padAll[i].id.match(/$editorusername/) || padAll[i].id.match(/allusers/) ){
+					easClas=padAll[i].id
+					eas[eas.length]=easClas				
+				}
+			}else{
+				if(padAll[i].className.match(/editblock|includeblock/)){easClas=padAll[i].className}
+				if(padAll[i].id.match(/editblock|includeblock/)){easClas=padAll[i].id}
+				eas[eas.length]=easClas
+			}
+		}
+	}
+	for(i=0;i<eas.length;++i){
+		eas_=eas[i].replace(/ editxblock| includexblock/g,"")
+		eas_=eas_.replace(/ /g,"_")
+		EASTB+='<tr><td>'+
+		'<table style="margin:0px 5px 2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td><img class=buttonLeft src=$utif/spacer.png width=5 height=18></td><td align=center onclick=setHtmlEdits("'+eas_+'") $button_class>$edit &raquo;</td><td><img class=buttonRight src=$utif/spacer.png width=5 height=18></td></tr></table></td><td align=left style="white-space:nowrap;font-family:tahoma,arial;font-size:11px">'+eas_+'</td>'+
+		'</td></tr>'
+	}
+	EASTB+='</table>'
+	byId('selectspace').innerHTML=EASTB
+}
+function cefonts_html(){
+	if(byId('fontsplace').innerHTML==""){
+		var URL="$uttf?getFonts"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('fontsMain','fontsplace',240)
+	}
+}
+function cefonts_style(){
+	if(byId('fontstyleplace').innerHTML==""){
+		ceget_selected()
+		cecheck_selected()
+		if(ceinside==0){
+			byId('fontstyleplace').innerHTML='';
+			byId('yesBut').innerHTML="$OK"
+			basicAlert("$selectarea1")
+		}else{
+			var URL="$uttf?getFontsStyle"
+			JITc(URL)
+		}
+	}else{
+		ceget_selected();
+			if(cetxt){
+				scrolledTop()
+				setUp('fontsStyleMain','fontstyleplace',360)
+				byId('stylePad').innerHTML=cetxt
+			}else{
+				byId('fontstyleplace').innerHTML='';
+				byId('yesBut').innerHTML="$OK"
+				active_alert="$selectarea2"
+				doAlert("alert")
+				active_function = new Function("closeAlert()")
+			}
+
+	}
+}
+
+function cereload(){
+	byId('yesBut').innerHTML="$yes"
+	active_alert='$reloadhtml'
+	doAlert("confirm")
+	active_function = new Function("editPad.location.reload(true);closeAlert()")
+	cancel_function = new Function("closeAlert()")
+}
+function cephoto(){
+	if(byId('photosplace').innerHTML==""){
+		var URL="$uttf?getPhotos"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		byId('propertyplace').style.display="none"
+		byId('propImg2').style.visibility="hidden"
+		byId('displayofimage').innerHTML=''
+		setUp('photoMain','photosplace',530)
+				if(pad4.dir){pad4.reloader()}
+	}
+}
+function csEmbedFlash(){
+	if(byId('flashplace').innerHTML==""){
+		var URL="$uttf?getFlash"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		byId('propertyplace').style.display="none"
+		byId('propImg3').style.visibility="hidden"
+		setUp('flashMain','flashplace',480)
+				if(pad9.dir){pad9.reloader()}
+	}
+}
+function selectSomething(){
+		active_alert="Select A File!"
+		doAlert("alert")
+		active_function = new Function("closeAlert()")
+}
+function ceget_head(e){
+	if(byId('block_slide_down').style.display=="none"){
+		if(isIE){evt=event}
+		if(isFF){evt=e}
+		byId('block_slide_down').style.left=evt.clientX-10+"px"
+		byId('block_slide_down').style.top=$bsd
+		byId('block_slide_down').style.display="block"
+	}else{
+		byId('block_slide_down').style.display="none"	
+	}
+}
+
+function ceset_head(obj){
+	ceget_selected()
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(obj.match(/Quote/i)){obj="BlockQuote"}
+		cehtm="<"+obj+">"+cetxt+"</"+obj+">"
+		if(isIE){
+			cesel.pasteHTML(cehtm);
+		}else{
+			doc().execCommand("InsertHTML", false, cehtm); 
+		}
+	}
+}
+function csStyleManager(){
+	if(byId('stylemanagerplace').innerHTML==""){
+		var URL="$uttf?styleManager"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('stylemanagerMain','stylemanagerplace',630)
+	}
+}
+function ceget_selected(){
+cesel=0
+	if (doc().selection && doc().selection.createRange){
+       cesel=doc().selection.createRange();   
+	   ceel=cesel.parentElement()
+	   cetxt=cesel.htmlText
+	}else 	if(editPad.getSelection){
+       cesel= byId('editPad').contentWindow.getSelection(); 
+	   ceel=cesel.anchorNode.parentNode
+		if (cesel.rangeCount > 0 && window.XMLSerializer){
+			cesel=cesel.getRangeAt(0);
+			cetxt=new XMLSerializer().serializeToString(cesel.cloneContents());
+		}
+	}
+}
+function cecheck_selected(){
+	if(doc().body.innerHTML.match(/editblock|includeblock|userblock/)){			
+		if (doc().selection && doc().selection.createRange){
+    	   cesel=doc().selection.createRange();
+		   ceinside=0;
+	 	  upEL=cesel.parentElement()
+			while(upEL.tagName != "BODY"){
+				if((upEL.className || upEL.id) && (upEL.className.match(/editblock|includeblock|userblock/) || upEL.id.match(/editblock|includeblock|userblock/))){
+					ceinside=1
+					break
+				}else{
+					upEL=upEL.parentElement
+				}
+			}
+		}else if(byId('editPad').contentWindow.getSelection){
+      	 cesel= byId('editPad').contentWindow.getSelection(); 
+	 	  ceinside=0;
+	 	  if(!cesel.anchorNode){return false}
+		   upEL=cesel.anchorNode;
+	 	  while(upEL.tagName != "BODY"){
+				if((upEL.className || upEL.id) && (upEL.className.match(/editblock|includeblock|userblock/) || upEL.id.match(/editblock|includeblock|userblock/))){
+					ceinside=1
+					break
+				}else{
+					upEL=upEL.parentNode
+				}
+		   }
+		}
+	}
+	if(!doc().body.innerHTML.match(/editblock|includeblock|userblock/)){
+ 		if (doc().selection && doc().selection.createRange){
+    	   cesel=doc().selection.createRange();
+		   ceinside=0;
+	 	  upEL=cesel.parentElement();
+			while(upEL.tagName != "HTML"){
+				if(upEL.className && upEL.className.match(/editorToolbar/)){
+					upEL=upEL.parentElement
+				}else{
+					ceinside=1
+					break
+				}				
+			}
+		}else if(byId('editPad').contentWindow.getSelection){
+      	 cesel= byId('editPad').contentWindow.getSelection(); 
+	 	  ceinside=0
+	 	  if(!cesel.anchorNode){return false}
+		   upEL=cesel.anchorNode
+	 	  while(upEL.tagName != "HTML"){
+				if(upEL.className && upEL.className.match(/editorToolbar/)){
+					upEL=upEL.parentNode
+				}else{
+					ceinside=1
+					break
+				}
+		   }
+		}
+	}	
+}
+function ifInside(elem){
+	upEL=elem;
+	isinside=0;
+	while(upEL.tagName != "BODY"){
+		if(upEL.className.match(/editblock|includeblock|userblock/) || upEL.id.match(/editblock|includeblock|userblock/)){
+			isinside=1
+			break
+		}else{
+			upEL=upEL.parentNode			
+		}
+	}
+	return isinside
+}
+function set_what_color(obj) {
+	if(color_what=="tbl_brd"){
+		set_tableB()
+	}else if(color_what=="tbl_bg"){
+		selectedTable.style.backgroundColor="#"+selected_col
+	}else if(color_what=="rw_bg"){
+		selectedTR.style.backgroundColor="#"+selected_col
+	}else if(color_what=="cl_bg"){
+		selectedTD.style.backgroundColor="#"+selected_col
+	}else if(color_what=="cl_brd"){
+		selectedTD.style.borderColor="#"+selected_col
+	}else{
+		if(isFF && obj=="BackColor"){obj="hilitecolor";}
+		if(isFF){doc().execCommand("styleWithCSS", false, true)}
+		if(!selected_col.match(/rgb|#/)){selected_col="#"+selected_col}
+		doc().execCommand(obj, false, selected_col);
+		if(isFF){doc().execCommand("styleWithCSS", false, false)}
+	}
+}
+function userList(){
+	URL="$uttf?userList"
+	editPad.location=URL
+}
+function ceonOff(n){
+	if(editPad.location.href.match("about:blank")){return false}
+	if(editPad.location.href.match("$ENV{'SCRIPT_NAME'}")){return false}
+	if(editorOn==0 && noteditable==0){
+		byId('yesBut').innerHTML="$OK"
+		active_alert="$notautorized"
+		doAlert("alert")
+		active_function = new Function("userList();closeAlert()")
+		return false
+	}
+	if(noteditable==1 && edtype==2){
+		basicAlert("$noareas")
+		return false
+	}
+	bkfnd=0;notEditing=1
+	
+	
+	
+	if(byId('onOffSwitch').src.match(/icon_off/) || n==1){
+		for(i=0;i<padAll.length;++i){
+		if(padAll[i].id.match(/wagmp_map/)){continue}
+		if(padAll[i].id.match(/huh/)){alert("huh = "+padAll[i].id)}
+		if(padAll[i].name){continue}
+		
+		if(padAll[i].getAttribute('editblock')){padAll[i].className="editblock-"+padAll[i].getAttribute('editblock')}
+		if(padAll[i].getAttribute('userblock')){padAll[i].className+="userblock-"+padAll[i].getAttribute('userblock')}
+		if(padAll[i].getAttribute('includeblock')){padAll[i].className="includeblock-"+padAll[i].getAttribute('includeblock')}
+		if(padAll[i].getAttribute('excludeblock')){padAll[i].className="excludeblock-"+padAll[i].getAttribute('excludeblock')}
+		
+		if(padAll[i].className || padAll[i].id){
+			if(padAll[i].className.match(/editblock|userblock/) || padAll[i].id.match(/editblock|userblock/)){bkfnd=1;
+				if(padAll[i].className.match(/userblock/)){
+					if(padAll[i].className.match(/$editorusername/) || padAll[i].className.match(/allusers/) ){
+						padAll[i].contentEditable=true
+						padAll[i].className+=" editxblock"
+					}
+				}else{
+					padAll[i].contentEditable=true
+					padAll[i].className+=" editxblock"
+				}
+			}
+			if(padAll[i].className.match(/includeblock/) || padAll[i].id.match(/includeblock/)){bkfnd=1
+				padAll[i].contentEditable=true
+				padAll[i].className+=" includexblock"
+			}
+			if(padAll[i].className.match(/excludeblock/) || padAll[i].id.match(/excludeblock/)){
+				padAll[i].contentEditable=false
+				notEditing=0
+				padAll[i].className+=" excludexblock"
+			}		
+			if(padAll[i].tagName=="A"){
+				
+				padAll[i].ondblclick=editElement
+			}	
+  			if(padAll[i].className.match("editable")){
+				if(padAll[i].tagName=="IMG"){padAll[i].ondblclick=editElement}
+				if(padAll[i].tagName=="TD"){
+					padAll[i].ondblclick=editElement;
+					padAll[i].className=padAll[i].className.replace(/editablexcellborder/,"editablecellborder")
+				}
+				if(padAll[i].tagName=="TABLE"){padAll[i].className="editablecellborder";padAll[i].contentEditable=true}
+				if(isFF){byId('editPad').contentDocument.addEventListener('dblclick', editElement, false)}
+				if(padAll[i].tagName=="TABLE"){padAll[i].contentEditable="true"}
+  			}
+			if(padAll[i].className=="xformblock"){
+				padAll[i].className="formblock"
+			}	
+		}
+		}
+		if(disableHref==1 && editPad.document.body.innerHTML.match(/editblock|userblock/)){
+			padHREF=editPad.document.getElementsByTagName("A");
+			for(i=0;i<padHREF.length;++i){
+				ifInside(padHREF[i])
+				if(isinside==0){
+					padHREF[i].href="javascript:void(0)"
+				}
+			}
+		}
+		if(borderAllTables==1){
+			for(i=0;i<padAll.length;++i){
+			if(padAll[i].id.match(/wagmp_map/)){continue}
+				if(padAll[i].tagName=="TD" && ifInside(padAll[i])){
+					padAll[i].ondblclick=editElement;
+					padAll[i].className=padAll[i].className="editablecellborder"
+				}
+				if(padAll[i].tagName=="TABLE" && ifInside(padAll[i])){padAll[i].className="editablecellborder";padAll[i].contentEditable=true}
+			}
+			if(isFF){byId('editPad').contentDocument.addEventListener('dblclick', editElement, false)}
+		}
+		byId('onOffSwitch').src=utif+"/icon_on.png"
+		byId('tbBar').style.visibility="visible" 
+		if(isFF2){
+			byId('editPad').contentDocument.designMode="on";}
+		else{
+			if(edtype==1 && bkfnd==0){
+				editPad.document.body.contentEditable=true
+				if(notEditing==0 && isIE && document.documentMode==8){
+					if(!document.cookie.match(/compatNote=1/)){
+						basicAlert("$COMPATIBILITY")}
+					}
+			}
+		}
+		if(!isIE){doc().execCommand("styleWithCSS", false,false);}
+	}
+	else if(byId('onOffSwitch').src.match(/icon_on/) || n==0){
+		for(i=0;i<padAll.length;++i){
+		if(padAll[i].id.match(/wagmp_map/)){continue}
+		if(padAll[i].name){continue}
+		if(padAll[i].className){
+			if(padAll[i].className.match(/ editxblock/)){
+				padAll[i].contentEditable=false
+				padAll[i].className=padAll[i].className.replace(/ editxblock/g,'')
+			}
+			if(padAll[i].className.match(/ includexblock/)){
+				padAll[i].contentEditable=false
+				padAll[i].className=padAll[i].className.replace(/ includexblock/g,'')
+			}
+			if(padAll[i].className.match(/ excludexblock/)){
+				padAll[i].contentEditable=false
+				padAll[i].className=padAll[i].className.replace(/ excludexblock/g,'')
+			}
+			if(padAll[i].className.match("editable")){
+				if(padAll[i].tagName=="IMG"){padAll[i].ondblclick=''}
+				if(padAll[i].tagName=="TD"){
+					padAll[i].ondblclick='';
+					padAll[i].className=padAll[i].className.replace(/editablecellborder/,"editablexcellborder")
+				}
+				if(padAll[i].tagName=="TABLE"){padAll[i].className="xeditablecellborder";padAll[i].contentEditable=false}
+			}
+			if(padAll[i].className=="formblock"){
+				padAll[i].className="xformblock"
+			}
+			if(padAll[i].tagName=="TABLE"){padAll[i].contentEditable="false"} 
+		}}
+		byId('onOffSwitch').src=utif+"/icon_off.png"
+		byId('tbBar').style.visibility="hidden"
+		if(isFF2){byId('editPad').contentDocument.designMode="off"}
+		editPad.document.body.contentEditable=false;
+	}	
+}
+function uncompat(chkd){
+	if(chkd==true){
+		document.cookie = "compatNote=1;expires="+expires+";path=/"
+	}
+}
+function show_cells(){
+	for(i=0;i<padAll.length;i++){
+	if(padAll[i].name){continue}
+  		if(padAll[i].className.match("editable")){
+			if(padAll[i].tagName=="IMG"){padAll[i].ondblclick=editElement}
+			if(padAll[i].tagName=="TD"){padAll[i].ondblclick=editElement}
+			if(isFF){byId('editPad').contentDocument.addEventListener('dblclick', editElement, false)}
+			if(padAll[i].tagName=="TABLE"){padAll[i].contentEditable="true"}
+  		}
+	}
+}
+function unshow_cells(){
+	for(i=0;i<padAll.length;i++){
+	if(padAll[i].name){continue}
+		if(padAll[i].className.match("editable")){
+			if(padAll[i].tagName=="IMG"){padAll[i].ondblclick=''}
+			if(padAll[i].tagName=="TD"){padAll[i].ondblclick=''}
+		}
+		if(padAll[i].tagName=="TABLE"){padAll[i].contentEditable="false"} 
+	}
+}
+function cetoggle(obj){
+	if(obj=="RemoveFormat"){doc().execCommand("Unlink",false,null)}
+	doc().execCommand(obj,false,null)
+}
+activeFontSize=1
+function cechng_size(obj){
+	if(obj=="up" && activeFontSize<7){activeFontSize+=1}
+	if(obj=="dn" && activeFontSize>1){activeFontSize-=1}
+	doc().execCommand("FontSize", false, activeFontSize);
+}
+function cechng_family(obj){
+	obj=obj.replace(/_/g," ")
+	doc().execCommand("FontName", false, obj);
+}
+function cesave(){
+	if(byId('savingplace').innerHTML==""){
+		var URL="$uttf?getSave"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('savingMain','savingplace',240)
+	}
+}
+function cesaveas(){
+	if(byId('savasplace').innerHTML==""){
+		var URL="$uttf?getSaveAs="+location.pathname
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('saveAsMain','savasplace',400)
+		if(isIE){pad2.location.reload(true)}
+	}
+}
+function cebackups(){
+	if(byId('backupplace').innerHTML==""){
+		var URL="$uttf?getBackups="+editPad.location.pathname
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('backupMain','backupplace',310)
+	}
+}
+function editElement(e){
+	if(editPad.event){evt=editPad.event.srcElement}else{evt=e.target}
+	if(evt.tagName=="A"  || evt.tagName=="a"){
+		if(evt.href && !evt.href.match(/javascript:/) && evt.className.match(/editable/)){
+			active_editLinkProperties=evt
+			byId('linkseditplace').innerHTML="";
+			if(active_editLinkProperties.href.match(/^https/)){active_editLinkProp=active_editLinkProperties.href.replace(/https\\:\\/\\//,"XXXXXXXX")}
+			else{ active_editLinkProp=active_editLinkProperties.href.replace(/http\\:\\/\\//,"XXXXXXX")}
+			var URL="$uttf?editLinker="+active_editLinkProp
+			JITc(URL)
+		}
+	}else if(evt.tagName=="IMG" && evt.className.match(/editable/)){
+		active_editImgProperties=evt
+		byId('imgeditplace').innerHTML=""
+		var URL="$uttf?editImg="+evt.src
+		JITc(URL)	
+	}else if(evt.tagName=="TD" && evt.className.match(/editable/)){
+		selectedTD=evt
+		byId('tableeditplace').innerHTML=""
+		var URL="$uttf?editTable"
+		JITc(URL)
+	}else if(evt.parentNode.tagName=="TD" && evt.parentNode.className.match(/editable/)){
+		selectedTD=evt.parentNode
+		byId('tableeditplace').innerHTML=""
+		var URL="$uttf?editTable"
+		JITc(URL)	
+	}
+}
+function ceforms(){
+	if(byId('formplace').innerHTML==""){
+		var URL="$uttf?getForm";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('formMain','formplace',476)
+	}
+}
+function csInsertHtml(){
+	if(byId('inserthtmlplace').innerHTML==""){
+		var URL="$uttf?insertHtml";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inserthtmlMain','inserthtmlplace',440)
+	}
+}
+function csInsertWord(){
+	if(byId('insertwordplace').innerHTML==""){
+		var URL="$uttf?insertWord";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('insertwordMain','insertwordplace',440)
+	}
+}
+function cepassword(){
+	if(byId('passwordplace').innerHTML==""){
+		var URL="$uttf?getPassword"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('passwordMain','passwordplace',170)
+	}
+}
+basic_icons="$basic_"
+function ceuserhelp(){
+	if(byId('helpplace').innerHTML==""){
+		var URL="$uttf?userhelp=$basic_"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('helpMain','helpplace',575)
+	}
+}
+function backitup(){
+	if(copy_backup==1){
+		byId("backupdiv").style.display=''
+		byId("backups").value=editPad.document.body.innerHTML
+		byId("backups").focus()
+		byId("backups").select()
+		document.execCommand("Cut")
+		byId("backupdiv").style.display='none'
+	}
+}
+function prohibit_base64_imagesF(){
+	for(i=0;i<doc().images.length;++i){
+		if(doc().images[i].src.match(/data:image/i)){
+			alert(prohibit_base64_images_TEXT)
+			rettype="false"
+		}
+	}
+}
+rettype="true"
+function dosave(){
+	rettype="true"
+	if(prohibit_base64_images==1){prohibit_base64_imagesF()}
+	if(rettype=="false"){return false}
+	 backitup()
+	
+	byId('pageURL').value=editPad.location.href
+	 
+	if(byId('saveitas').value==""){
+		byId('backitup').value=byId('savebackup').checked
+	}
+	if(byId('deletepending')){
+		byId('convertpending').value=byId('deletepending').checked
+	}
+	if(edtype==1 && bkfnd==0){
+		DAIH=editPad.document.body.innerHTML;		
+		var retx = /<\\/textarea>/gi;
+		var	tx = "<=textarea>";
+		DAIH=DAIH.replace(retx,tx)
+		var repls = /[+]/g;
+		var pls = "&pLuS"
+		DAIH=DAIH.replace(repls,pls)	
+		var repls = /&nbsp;/g;
+		var pls = "xnbzp_"
+		DAIH=DAIH.replace(repls,pls)	
+		var httpx = "hTtXp";
+		DAIH=DAIH.replace(/http/g,httpx)	
+		if(not_escape==1){DAIH=unescape(DAIH)}else{DAIH=escape(DAIH)}
+		byId("cearea").innerHTML +="<textarea name=page_body>"+DAIH+"</textarea>"
+		for(i=0;i<padAll.length;++i){
+		if(padAll[i].id.match(/wagmp_map/)){continue}
+		if(padAll[i].name){continue}
+			pdcn=1
+			if(padAll[i].className.match(/includeblock/)) {
+				pdcn=padAll[i].className
+				pdcn=pdcn.replace(/ includeblock/g,'');
+			}
+			else if(padAll[i].getAttribute("includeblock")){
+				pdcn="includeblock_"+padAll[i].getAttribute("includeblock")
+			}
+			if(pdcn!=1){
+				DAIH=padAll[i].innerHTML;		
+				var retx = /<\\/textarea>/gi;
+				var	tx = "<=textarea>";
+				DAIH=DAIH.replace(retx,tx)
+				var repls = /[+]/g;
+				var pls = "&pLuS"
+				var repls = /&nbsp;/g;
+				var pls = "xnbzp_"
+				DAIH=DAIH.replace(repls,pls)					
+				DAIH=DAIH.replace(repls,pls)
+				var httpx = "hTtXp";
+				DAIH=DAIH.replace(/http/g,httpx)
+				if(not_escape==1){DAIH=unescape(DAIH)}else{DAIH=escape(DAIH)}
+    			byId("cearea").innerHTML +="<textarea name="+pdcn+">"+DAIH+"</textarea>"
+			}
+		}
+	}else{
+		for(i=0;i<padAll.length;++i){
+		if(padAll[i].id.match(/wagmp_map/)){continue}
+		if(padAll[i].name){continue}
+			if(padAll[i].className.match(/userblock/) && !padAll[i].className.match(/$editorusername|allusers/)){continue}
+			if(padAll[i].className.match(/editblock|userblock/) || padAll[i].className.match(/includeblock/) && !padAll[i].getAttribute("editblock")){
+				pdcn=padAll[i].className
+				pdcn=pdcn.replace(/ editblock/g,'');pdcn=pdcn.replace(/ editxblock/g,'');
+				pdcn=pdcn.replace(/ includeblock/g,'');pdcn=pdcn.replace(/ includexblock/g,'');
+				if(padAll[i].getAttribute("editblock")){
+					pdcn="editblock_"+padAll[i].getAttribute("editblock")
+				}
+				if(padAll[i].getAttribute("userblock")){
+					pdcn="userblock_"+padAll[i].getAttribute("userblock")
+				}				
+				if(padAll[i].getAttribute("includeblock")){
+					pdcn="includeblock_"+padAll[i].getAttribute("includeblock")
+				}
+				DAIH=padAll[i].innerHTML;		
+				var retx = /<\\/textarea>/gi;
+				var	tx = "<=textarea>";
+				DAIH=DAIH.replace(retx,tx)
+				var repls = /[+]/g;
+				var pls = "&pLuS"
+				DAIH=DAIH.replace(repls,pls)
+				var repls = /&nbsp;/g;
+				var pls = "xnbzp_"
+				DAIH=DAIH.replace(repls,pls)	
+				var httpx = "hTtXp";
+				DAIH=DAIH.replace(/http/g,httpx)
+				if(not_escape==1){DAIH=unescape(DAIH)}else{DAIH=escape(DAIH)}
+    			byId("cearea").innerHTML +="<textarea name="+pdcn+">"+DAIH+"</textarea>"
+			}	
+			if(padAll[i].id.match(/editblock|userblock/) || padAll[i].id.match(/includeblock/) && !padAll[i].getAttribute("editblock")){
+				pdcn=padAll[i].id
+				pdcn=pdcn.replace(/ editblock/g,'');pdcn=pdcn.replace(/ editxblock/g,'');
+				pdcn=pdcn.replace(/ includeblock/g,'');pdcn=pdcn.replace(/ includexblock/g,'');
+				DAIH=padAll[i].innerHTML;		
+				var retx = /<\\/textarea>/gi;
+				var	tx = "<=textarea>";
+				DAIH=DAIH.replace(retx,tx)
+				var repls = /[+]/g;
+				var pls = "&pLuS"
+				DAIH=DAIH.replace(repls,pls)
+				var httpx = "hTtXp";
+				DAIH=DAIH.replace(/http/g,httpx)
+				var repls = /&nbsp;/g;
+				var pls = "xnbzp_"
+				DAIH=DAIH.replace(repls,pls)	
+				if(not_escape==1){DAIH=unescape(DAIH)}else{DAIH=escape(DAIH)}
+    			byId("cearea").innerHTML +="<textarea name="+pdcn+">"+DAIH+"</textarea>"
+			}	
+		}
+	}
+	saving=1;
+	if(byId('saveitas').value==""){
+		resave()
+	}
+	byId('ceSaveForm').submit()
+}
+function resave(){
+	if(saving==1){
+		byId('saveitbutton').innerHTML="$SAVING"
+		setTimeout("resave2()",1000)
+	}
+}
+function resave2(){
+	if(saving==1){
+		byId('saveitbutton').innerHTML="<i>$SAVING</i>"
+		setTimeout("resave()",1000)
+	}
+}
+function csShrink(obj,xn){
+	imOb="img_"+obj
+	tbOb="tbl_"+obj
+	hlOb="hol_"+obj
+	titOb="tit_"+obj
+	if(byId(imOb).className.match(/_dn/) && xn!=1){
+		byId(imOb).className="modal_up"
+		byId(imOb).title="$ExpandWidget"
+		byId(hlOb).style.display="none"
+		if(!obj.match(/htmleditMain/)){
+			byId(tbOb).width=180
+			if(isIE){
+				if(parseInt(byId(obj).currentStyle.left) >40 ){
+					byId(obj).style.left=parseInt(byId(obj).currentStyle.left)+(byId(tbOb).className-180)+"px"
+				}else{
+					byId(obj).style.left=parseInt(byId(obj).currentStyle.left)+"px"
+				}
+			}else{
+				if(parseInt(byId(obj).style.left) >byId(tbOb).className ){
+					byId(obj).style.left=parseInt(byId(obj).style.left)+(byId(tbOb).className-180)+"px"
+				}else{
+					byId(obj).style.left=parseInt(byId(obj).style.left)+"px"
+				}
+			}
+		}
+	}
+	else if(byId(imOb).className.match(/_up/)){
+		byId(imOb).className="modal_dn"
+		byId(imOb).title="$ShrinkWidget"
+		byId(hlOb).style.display="block"
+		byId(hlOb).style.visibility="visible"
+		if(!obj.match(/htmleditMain/)){
+			byId(tbOb).width=byId(tbOb).className
+			if(isIE){
+				if(parseInt(byId(obj).currentStyle.left) >180 ){
+					byId(obj).style.left=parseInt(byId(obj).currentStyle.left)-(byId(tbOb).className-180)+"px"
+				}
+			}else{
+				if(parseInt(byId(obj).style.left) >byId(tbOb).className ){
+					byId(obj).style.left=parseInt(byId(obj).style.left)-(byId(tbOb).className-180)+"px"		
+				}	
+			}
+		}
+		if(isIE && activeBod!=''){byId(activeBod).style.filter="alpha(opacity:100)"}
+	}
+}
+activeBod=''
+function uncsShrink(obj){
+	imOb="img_"+obj
+	tbOb="tbl_"+obj
+	hlOb="hol_"+obj
+	if(byId(imOb).className.match(/_up/)){
+		byId(imOb).className="modal_dn"
+		byId(hlOb).style.display="block"
+		if(!obj.match(/htmleditMain/)){
+			byId(tbOb).width=byId(tbOb).className
+			if(isIE){
+				if(parseInt(byId(obj).currentStyle.left) >byId(tbOb).className ){
+					byId(obj).style.left=parseInt(byId(obj).currentStyle.left)-(byId(tbOb).className-180)+"px"
+				}
+			}else{
+				if(parseInt(byId(obj).style.left) >byId(tbOb).className ){
+					byId(obj).style.left=parseInt(byId(obj).style.left)-(byId(tbOb).className-180)+"px"
+				}			
+			}
+		}
+	}
+}
+function setStatus(){}
+function loaded(){
+	setTimeout("loaded2()",500)
+}
+function loaded2(){
+byId('tbBar').style.visibility="hidden"
+byId('onOffSwitch').src="$utif/icon_off.png"
+noteditable=0
+pageClassesArray=new Array()
+if(!skip_css){getClasses()}
+
+	if(isIE){
+		dbdyHeight=document.documentElement.offsetHeight?document.documentElement.offsetHeight:document.body.clientHeight 
+		padAll=editPad.document.getElementsByTagName("*")
+		with (doc().createStyleSheet()) {
+			addRule(".editxblock","border:1px $editable_color dotted !important")
+			addRule(".includexblock","border:1px $includeable_color dotted !important")
+			addRule(".excludexblock","cursor:not-allowed;background-color:#eeeeee;border:1px $excludeable_color dotted !important")
+			addRule(".anchorblock","border-bottom:4px $editable_color double !important")	
+			addRule(".formblock","border:4px $editable_color double !important")	
+			addRule(".editablecellborder","border:1px $editablecellborder dotted")	
+			addRule(".ccc","font-size:1px;background-color:#000000;border:2px outset !important")
+		}
+		doc().execCommand("LiveResize", true, true);
+		if(!editPad.document.body.innerHTML.match(/editblock|includeblock|userblock/)){noteditable=1}
+		doc().onkeypress = dokeypress	
+		for(i=0;i<doc().getElementsByTagName("OBJECT").length;++i){
+			doc().getElementsByTagName("OBJECT")[i].setAttribute("wmode","transparent")
+		}
+	}else{
+
+		dbdyHeight=window.innerHeight+5
+		padAll=byId('editPad').contentDocument.getElementsByTagName("*");
+		this.styleElement = doc().createElement("style"); 
+        doc().getElementsByTagName("head")[0].appendChild(this.styleElement); 
+        this.sheet = this.styleElement.styleSheet ? this.styleElement.styleSheet : this.styleElement.sheet;
+		this.sheet.insertRule(".editxblock{border:1px $editable_color dotted !important}", 0)
+		this.sheet.insertRule(".includexblock{border:1px $includeable_color dotted !important}", 1)
+		this.sheet.insertRule(".formblock{border:4px $editable_color double !important}", 2)
+		this.sheet.insertRule(".anchorblock{border-bottom:4px $editable_color double !important}", 3)
+		this.sheet.insertRule(".editablecellborder{border:1px $editablecellborder dotted}", 4)
+		this.sheet.insertRule(".ccc{font-size:1px;background-color:#000000;border:2px outset !important}", 5) 
+		this.sheet.insertRule(".excludexblock{-moz-user-select:none;cursor:not-allowed;background-color:#eeeeee;border:1px $excludeable_color dotted !important}", 6)
+		byId('editPad').contentDocument.addEventListener('mousedown', scat, false);
+		if(!byId('editPad').contentDocument.body.innerHTML.match(/editblock|includeblock|userblock/)){noteditable=1}
+		for(i=0; i<doc().embeds.length; i++) {
+			newE = doc().embeds[i].cloneNode(true);
+			newE.setAttribute('wmode', 'transparent');
+			doc().embeds[i].parentNode.replaceChild(newE, doc().embeds[i]);
+		}
+	}
+
+	byId("editPad").style.height=dbdyHeight-35+"px"
+	byId("editPad").style.visibility="visible"
+	byId('onOffSwitch').title="$titlechange"+editPad.location.pathname;
+	document.title="Editing => "+editPad.location.pathname.substring(editPad.location.pathname.lastIndexOf("/")+1)
+	byId('nameSpot').innerHTML=editPad.location.pathname.substring(editPad.location.pathname.lastIndexOf("/")+1)
+	byId('shadow').style.height="100%"
+	byId('shadow').style.width="100%"
+
+ 	if(noteditable==1){
+		byId('tbBar').style.visibility="hidden"
+		byId('onOffSwitch').src="$utif/icon_off.png"
+	}
+		var URL="$uttf?checkUser="+editPad.location.pathname
+		JITc(URL)
+		//checkFlash()
+		//checkScript()
+}
+function getClasses(){
+	pageClassesArray=new Array()		
+	for(i=0;i<doc().styleSheets.length;++i){	
+	if(doc().styleSheets[i].href && doc().styleSheets[i].href.match(/no_access/)){continue}
+	if(doc().styleSheets[i].href && doc().styleSheets[i].href.match(/^p7\w+/)){continue}
+	var locHos=location.host.replace(/www\\./,"")
+	if(doc().styleSheets[i].href && doc().styleSheets[i].href.match(/^http/) && !doc().styleSheets[i].href.match(locHos)){continue}
+		if(doc().styleSheets[i].cssRules != undefined){
+			for(j=0;j<doc().styleSheets[i].cssRules.length;++j){
+				if(doc().styleSheets[i].cssRules[j].selectorText!=undefined && doc().styleSheets[i].cssRules[j].selectorText.indexOf(".")==0){
+					pageClassesArray.push(doc().styleSheets[i].cssRules[j].selectorText.substring(1))
+				}
+			}
+		}else{
+			for(j=0;j<doc().styleSheets[i].rules.length;++j){
+				if( doc().styleSheets[i].rules[j].selectorText.indexOf(".") ==0){
+					pageClassesArray.push(doc().styleSheets[i].rules[j].selectorText.substring(1))
+				}
+			}
+		}
+	}	
+	if(savingCss==1){listXSS();savingCss==0}
+	pageClassesArray=pageClassesArray.sort()	
+}
+function checkFlash(){
+	paramFnd=0;wmodFnd=0;
+	paramObjs=new Array()
+	paramObjs=editPad.document.getElementsByTagName("PARAM")
+	if(paramObjs.length>0){paramFnd=1}
+	for(i=0;i<paramObjs.length;++i){
+		if(paramObjs[i].name.match(/wmode/i) &&  paramObjs[i].value.match(/transparent/i)){wmodFnd=1}
+	}
+	if(paramFnd==1){
+		if(wmodFnd==0){
+			if(doc().body.innerHTML.match(/AC_FL_RunContent/)){
+				wurl="$uttf?flashNote=1"
+			}else{
+				wurl="$uttf?flashNote=0"
+			}
+			LeftPos = (screen.availWidth) ? (screen.availWidth-450)/2 : 0;
+			TopPos = (screen.availHeight) ? (screen.availHeight-200)/2 : 0;
+			window.open(wurl,"FNWWIN","scrollbars=1,top="+TopPos+",left="+LeftPos+",width=450,height=220")
+		}
+	}
+}
+function checkScript(){
+	scriptElems=doc().body.innerHTML.match(/type=text\\/javascript/i)
+	 if(scriptElems!=null){
+	 	if(doc().body.innerHTML.match(/excludeblock/i)){return false}
+	 	surl="$uttf?scriptNote=0"
+		LeftPos = (screen.availWidth) ? (screen.availWidth-450)/2 : 0;
+		TopPos = (screen.availHeight) ? (screen.availHeight-200)/2 : 0;
+		window.open(surl,"SCNWIN","scrollbars=1,top="+TopPos+",left="+LeftPos+",width=450,height=220")
+	 }
+}
+function scat(){
+	setTimeout("scatter()",10)
+}
+function scatter(){
+	cecheck_selected()
+	if(ceinside==0){
+		ceinside=0
+		byId('spot').focus()
+	}
+}
+function ceexit(){
+	byId('yesBut').innerHTML="$yes"
+	active_alert="<b>$logoutalert1</b><BR><br><table border=0 cellpadding=0 cellspacing=0><tr><td align=left><input type=radio checked name=yuiop id=yuiop_1></td><td align=left class=widgetText11>&nbsp;$logoutalert2</td></tr><tr><td align=left><input type=radio name=yuiop id=yuiop_2></td><td align=left class=widgetText11>&nbsp;$logoutalert3</td></tr></table>"
+	doAlert("confirm")
+	active_function = new Function("erase_login();")
+	cancel_function = new Function("closeAlert()")
+}
+function erase_login(){
+	var when=new Date()
+	when.setMonth(when.getMonth()-12)
+	var expires=when.toGMTString()	
+	if(demo==1){
+		byId('yuiop_1').checked=true
+		alert("$demonote")
+		document.cookie = "ceuser=;domain=.$host_;expires="+expires+";path=/"
+	}
+	document.cookie = "loginParams=;expires="+expires+";path=/"
+	if(byId('yuiop_1').checked==true){parent.location=editPad.location.href}
+	if(byId('yuiop_2').checked==true){
+		editPad.location="about:blank";
+		editPad.onload=parent.location="$uttf"
+	}
+}
+function doc(){
+	if(isFF){return byId('editPad').contentDocument}
+	if(isIE){return editPad.document}
+}
+keyprees=0
+function insertList(obj){
+	if(isIE){
+			if(obj=="InsertOrderedList" && byId('olImg').src=="$utif/ol.png"){byId('olImg').src="$utif/olnot.png";byId('olImg').title="$turn1"}
+			else if(obj=="InsertOrderedList" && byId('olImg').src=="$utif/olnot.png"){byId('olImg').src="$utif/ol.png";byId('olImg').title="$turn2"}
+			if(obj=="InsertUnorderedList" && byId('ulImg').src=="$utif/ul.png"){byId('ulImg').src="$utif/ulnot.png";byId('ulImg').title="$turn3"}
+			else if(obj=="InsertUnorderedList" && byId('ulImg').src=="$utif/ulnot.png"){byId('ulImg').src="$utif/ul.png";byId('ulImg').title="$turn4"}	
+		if(doc().queryCommandState(obj)==false){
+			doc().onkeypress = dumbkeypress
+		}else{
+			doc().onkeypress = dokeypress
+		}
+	}
+	doc().execCommand(obj,false,null)
+}
+function dokeypress(){
+	if(isFF){return false}
+	if(enterKey==1){dumbkeypress()}else{
+	if (editPad.event.keyCode == 13 && editPad.event.shiftKey == false){
+		ky = doc().selection.createRange();
+			if (ky.htmlText.length == 0){
+				ky.pasteHTML('<br>'+ky.htmlText);
+				ky = doc().selection.createRange();
+				ky.select()
+			}else{
+				ky.pasteHTML('<br>')
+			}	
+		editPad.event.keyCode = 0;				
+	}
+	else if(editPad.event.keyCode == 13 && editPad.event.shiftKey == true){
+		ky = doc().selection.createRange();
+			if (ky.htmlText.length == 0){
+				ky.pasteHTML('<p></p>');
+				ky = doc().selection.createRange();
+				ky.select()
+			}
+		editPad.event.keyCode = 0;				
+	}	
+	}
+}
+function dumbkeypress(){}
+enterKey=0
+function ceset_para(){
+	if(isIE){
+		if(enterKey==0){
+			enterKey=1
+			byId('paraImg').title="$paratitle1"
+			byId('paraImg').src="$utif/paranot.png"
+		}else{
+			enterKey=0
+			byId('paraImg').title="$paratitle2"
+			byId('paraImg').src="$utif/para.png"
+		}
+	}
+	if(isFF){
+		doc().execCommand("insertParagraph",false,null)
+	}
+}
+function ceset_chars(){
+	if(byId('charplace').innerHTML==""){
+		var URL="$uttf?getChars";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('charMain','charplace',410)
+	}
+}
+function unstater(){
+byId("statu").value=""
+}
+function stater(obj){
+byId("statu").value=obj
+}
+updateTo=''
+function availUpdates(){
+	if(byId('updateplace').innerHTML==""){
+		var URL="$uttf?getUpdate="+updateTo
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('updateMain','updateplace',400)
+	}
+}
+function excludeNote(){
+	basicAlert("$excludeNote")
+}
+function editblockNote(){
+	closeAlert();editorOn=1;ceonOff(1);
+}
+active_alert=""
+function doAlert(typ,actEnd){
+	byId('alertText').innerHTML=active_alert
+	byId('alertMain').style.paddingTop=widgetTop+31+"px"
+	if(typ=="alert"){
+		byId('tit_alert').innerHTML="$attention"
+		byId('alertIMG').src="$utif/alert.png"
+		byId('cancelBut').style.display="none"
+		if(actEnd=="close"){byId('yesBut').innerHTML="$OK";active_function = new Function("closeAlert()")}
+	}
+	if(typ=="confirm"){
+		byId('tit_alert').innerHTML="$confirm"
+		byId('alertIMG').src="$utif/confirm.png"
+		byId('cancelBut').style.display="block"
+	}
+	byId('barricade').style.display="block"
+	byId('alertplace').style.display="block"
+}
+function closeAlert(){
+	byId("barricade").style.display="none";
+	byId("alertplace").style.display="none"
+}
+function uncursor(){
+	byId('yesBut').innerHTML="$OK"
+	active_alert="$notinside"
+	doAlert("alert")
+	active_function = new Function("closeAlert()")	
+}
+function basicAlert(msg){
+	byId('yesBut').innerHTML="$OK"
+	active_alert=msg
+	doAlert("alert")
+	active_function = new Function("closeAlert()")	
+}
+function ceunformat(){
+	if(byId('unformatplace').innerHTML==""){
+		var URL="$uttf?getUnformat"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('unformatMain','unformatplace',180)
+	}
+}
+function ceopenfolder(){
+	if(byId('openplace').innerHTML==""){
+		var URL="$uttf?getOpenfolder"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('openMain','openplace',500)
+		byId('propertyplace').style.display="none"
+		byId('propImg').style.visibility="hidden"
+		unButtonPT()
+		if(pad1.dir){pad1.reloader()}
+	}
+}
+function csHeadContent(){
+	if(byId('headcontentplace').innerHTML==""){
+		var URL="$uttf?headContent"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('headcontentMain','headcontentplace',500)
+		hed=doc().getElementsByTagName('head')[0].innerHTML
+		if(hed.match(/\\?prompt/)){
+			byId('czaddPrompt').checked=true
+		}
+		if(hed.match(/meta name="*description"* content="(.)+"/i)){
+			hedD=hed.match(/meta name="*description"* content="([^"]+)"/i)
+			byId('czdescription').value=hedD[1]
+		}
+		if(hed.match(/meta name="*keywords"* content="(.)+"/i)){
+			hedK=hed.match(/meta name="*keywords"* content="([^"]+)"/i)
+			byId('czkeywords').value=hedK[1]
+		}
+		if(hed.match(/meta content="(.+)" name="*description"*/i)){
+			hedD=hed.match(/meta content="([^"]+)" name=description/i)
+			byId('czdescription').value=hedD[1]
+		}
+		if(hed.match(/meta content="(.+)" name="*keywords"*/i)){
+			hedK=hed.match(/meta content="([^"]+)" name=keywords/i)
+			byId('czkeywords').value=hedK[1]
+		}		
+		
+		byId('cztitle').value=doc().title	
+		bd=doc().getElementsByTagName('body')[0]
+		byId('czbgColor').value=bd.getAttribute("bgcolor").toUpperCase()
+		byId('cztxColor').value=bd.getAttribute("text").toUpperCase()
+		byId('czlkColor').value=bd.getAttribute("link").toUpperCase()
+		byId('czalColor').value=bd.getAttribute("alink").toUpperCase()
+		byId('czvlColor').value=bd.getAttribute("vlink").toUpperCase()
+		byId('czhlColor').value=bd.getAttribute("hover").toUpperCase()
+		ceA=byId('editPad').contentDocument.getElementsByTagName("A");
+		if(isIE){if(ceA[0] && ceA[0].currentStyle.getPropertyValue("text-decoration")!="none"){byId('czUnder').checked=true}
+		}else{if(ceA[0] && window.getComputedStyle(ceA[0], null).getPropertyValue("text-decoration")!="none"){byId('czUnder').checked=true}}
+		if(bd.getAttribute("leftmargin")){byId('czmarHor').value=bd.getAttribute("leftmargin")}
+		if(bd.getAttribute("topmargin")){byId('czmarVer').value=bd.getAttribute("topmargin")}
+		if(bd.getAttribute("background")){byId('czbgImg').value=bd.getAttribute("background")}
+		if(external_css){listXSS()}
+		
+	}
+}
+function cejustify(e){
+	if(byId('just_slide_down').style.display=="none"){
+		if(isIE){evt=event}
+		if(isFF){evt=e}
+		byId('just_slide_down').style.left=evt.clientX-10+"px"
+		byId('just_slide_down').style.top=$jsd
+		byId('just_slide_down').style.display="block"
+	}else{
+		byId('just_slide_down').style.display="none"	
+	}
+}
+xplace=""
+	function setUp(main,place,wid){
+		if(!xplace.match(place)){
+			if(!place.match(/tableeditplace|inputplace|htmleditplace|backupplace|imgeditplace|inserthtmlplace|insertwordplace|fontstyleplace|linksplace|filmplace|searchplace|charplace|flashplace|commentsplace|audioplace|lockplace|linkseditplace/)){xplace+=place}
+			if(widgetLeft=="center"){
+				LeftPos = (document.body.clientWidth-wid)/2;
+			}
+			if(widgetLeft=="right"){
+				LeftPos = (document.body.clientWidth-20)-wid;
+			}
+			if(widgetLeft=="left"){
+				LeftPos = 2;
+			}
+			byId(main).style.position="absolute"
+			byId(main).style.left=LeftPos+"px"
+			byId(main).style.top=scroll_top+widgetTop+"px"
+		}
+		byId(place).style.display="block"
+		hol="hol_"+main
+		byId(hol).style.visibility="visible";
+		byId(hol).style.display="block";
+		csShrink(main,1)
+		zindx(place)
+		zindx(main)
+	}
+	function setUpPad(){
+		if(byId("tableeditMain").currentStyle){
+			byId("colorPadMain").style.left=parseInt(byId("tableeditMain").currentStyle.left)+20+"px"
+			byId("colorPadMain").style.top=parseInt(byId("tableeditMain").currentStyle.top)+20+"px"
+		}else{
+			byId("colorPadMain").style.left=parseInt(byId("tableeditMain").style.left)+20+"px"
+			byId("colorPadMain").style.top=parseInt(byId("tableeditMain").style.top)+20+"px"
+		}
+		byId('colorplace').style.display="block"
+		zindx('colorplace')
+		zindx("colorPadMain")
+	}
+function ceaddUser(){
+	if(navigator.userAgent.match(/Firefox/i)){basicAlert("$FirefoxAlert");return false}
+	if(byId('adduserplace').innerHTML==""){
+		var URL="$uttf?getAddUser";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('adduserMain','adduserplace',660)
+	}
+}
+function csSearch(){
+	if(byId('searchplace').innerHTML==""){
+		var URL="$uttf?getSearch"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('searchMain','searchplace',400)
+	}
+}
+function csFilm(){
+	if(byId('filmplace').innerHTML==""){
+		var URL="$uttf?getFilm"
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('filmMain','filmplace',520)
+	}
+}
+function loadchangelog(){
+	URL="$uttf?getChangeLog="+username
+	editPad.location=URL
+}
+function csPubLog(){
+	active_alert="$Loadlistofpendingpagestopublish?"
+	doAlert("confirm")
+	active_function = new Function("loadchangelog();closeAlert()")
+	cancel_function = new Function("closeAlert()")
+
+}
+function csComment(){
+	if(byId('commentsplace').innerHTML==""){
+		var URL="$uttf?getComments=author";
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('commentsMain','commentsplace',460)
+	}
+}
+function csAudio(){
+	if(byId('audioplace').innerHTML==""){
+		var URL="$uttf?getAudio"		
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('audioMain','audioplace',500)
+	}
+}
+function csLock(){
+	if(byId('lockplace').innerHTML==""){
+		var URL="$uttf?getLock"		
+		JITc(URL);
+	}else{
+		scrolledTop()
+		setUp('lockMain','lockplace',500)
+	}
+}
+languages="$LANGS_";
+function init(){
+	if(isIE){
+		dbdyHeight=document.documentElement.offsetHeight?document.documentElement.offsetHeight:document.body.clientHeight 
+	}else{
+		dbdyHeight=window.innerHeight+5
+	}	
+	docAll=document.getElementsByTagName("*");
+	document.getElementById("barricade").style.width="100%"
+	document.getElementById("barricade").style.height="100%"
+	document.getElementById("barricade").style.zIndex=999999
+	document.getElementById("alertplace").style.width="100%"
+	document.getElementById("alertplace").style.height="100%"
+	document.getElementById("alertplace").style.zIndex=1000000
+	byId("editPad").style.height=dbdyHeight-35+"px"
+	var url="http://www.gphrs.com/updater/check_version.cgi?$version=$domain_license=$host_"
+	if(updateICO){JITc(url)}	
+}
+function analize(theID){
+	theID=theID.replace(/.png/,"")
+	theID=theID.replace(/.*\\//,"")
+	qs="pro="+theID+"=$domain_license=$ENV{'HTTP_HOST'}"
+	var url="http://www.gphrs.com/editor_stats/record.cgi?"+escape(qs)
+	JITc(url)
+	
+}
+function openTut(){
+	basicArray=basic_icons.split(/,/);
+	basicBar='<td align=center><img style="margin:5px 3px 3px 3px" width=16 height=16 src="$utif/icon_on.png" border="0" onclick=openThisTut("icon_on")></td>'
+	basicBar+='<td align=center><img style="margin:5px 3px 3px 3px" width=16 height=16 src="$utif/openfolder.png" border="0" onclick=openThisTut("openfolder")></td>'
+	for(i=0;i<basicArray.length;++i){
+		if(basicArray[i]==''){continue}
+		if(basicArray[i]=='help'){continue}
+		if(basicArray[i]=='left'){basicArray[i]='justify'}
+		if(basicArray[i].match(/center|full|right|outdent|indent/)){continue}
+		basicArrayi=basicArray[i];basicArrayF=basicArray[i]
+		if(basicArray[i].match(/pub/)){basicArrayi="aplog";basicArrayF="author"}
+		if(basicArray[i].match(/auth/)){basicArrayi="comments";basicArrayF="author"}
+		if(basicArray[i].match(/redo/)){basicArrayF="undo"}
+		basicBar+='<td align=center><img style="margin:5px 3px 3px 3px" width=16 height=16 src="$utif/'+basicArrayi+'.png" border="0" onclick=openThisTut("'+basicArrayF+'")></td>'
+	}
+	byId('tutbar').innerHTML='<DIV style="display:table;border:1px solid #aaa;border-radius:5px;padding:0px 5px;background-color:#dcdcdc;"><table border=0 cellpadding=0 cellspacing=0><tr valign=bottom>'+basicBar+'</tr></table></DIV>'
+	LeftPos = (document.body.clientWidth-980)/2;
+	byId('demoBuilder').style.left=LeftPos+"px"
+	byId('demoBuilder').style.top="10px";
+	byId('demoBuilder').style.display="block"
+}
+function closeTut(){
+	byId('demoBuilder').style.display="none"
+}
+function openThisTut(obj){
+	if(dbdyHeight < 700){
+		tutWH='Width="787" Height="574"'
+	}else if(dbdyHeight < 850){
+		tutWH='Width="910" Height="650"'
+	}else{
+		tutWH='Width="1050" Height="750"'
+	}
+	if(obj=="picture"){
+		if(dbdyHeight < 700){
+			tutWH='Width="787" Height="624"'
+		}else if(dbdyHeight < 850){
+			tutWH='Width="910" Height="700"'
+		}else{
+			tutWH='Width="1050" Height="800"'
+		}
+	}
+	theTut='<OBJECT CLASSID="CLSID:D27CDB6E-AE6D-11cf-96B8-444553540000" CODEBASE="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,22,0" ID="IncrediFlash" '+tutWH+'>'+
+'<PARAM NAME="movie" VALUE="http://ezwysiwyg.com/pro_user_tutorials/'+obj+'.swf?317338960">'+
+'<PARAM NAME="bgcolor" VALUE="#2E2E2E">'+
+'<PARAM NAME="allowfullscreen" VALUE="true">'+
+'<EMBED NAME="IncrediFlash" SRC="http://ezwysiwyg.com/pro_user_tutorials/'+obj+'.swf?317338960" BGCOLOR="#2E2E2E" ALLOWFULLSCREEN="true" '+tutWH+' TYPE="application/x-shockwave-flash" pluginspage=http://www.macromedia.com/go/getflashplayer">'+
+'</EMBED>'+
+'</OBJECT>'
+	byId('tutbar').style.display="none"
+	byId('tutUp').style.display="none"
+	byId('tutDn').style.display="inline"	
+	byId('db_content').innerHTML=theTut
+}
+function rollUpDn(){
+	byId('tutDn').style.display="none"	
+	byId('tutUp').style.display="inline"
+	byId('tutbar').style.display="block"
+	byId('db_content').innerHTML=''
+}
+MaxTutDrag=false
+function startTutMove(e,obj){
+ 	if(!e){var e=window.event};
+    offsetX=e.clientX;
+    offsetY=e.clientY;
+    coordX=parseInt(byId(obj).style.left);
+    coordY=parseInt(byId(obj).style.top);
+    MaxTutDrag=true;
+	activeDrag=obj;
+	document.onmousemove=dragTutMove;
+	document.onmouseup=stopTutMove;
+}
+function dragTutMove(e){
+	if(!MaxTutDrag){return};
+	if(!e){var e=window.event};
+   	drgLeft=coordX+e.clientX-offsetX;
+   	drgTop=coordY+e.clientY-offsetY;
+   	byId(activeDrag).style.left=drgLeft+'px';
+  	byId(activeDrag).style.top=drgTop+'px';
+   	return false;
+}
+function stopTutMove(){
+	if(MaxTutDrag==true){
+		MaxTutDrag=false;
+	}
+}
+
+</script>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+</head>
+
+<body onload=init() scroll="no" class="editorToolbar">
+$IFRAMETOP
+<DIV style="height:28px;padding-left:2px;border:0px">
+<DIV id=toolBR style="display:none;$tlbBrd">
+<table style="table-layout:auto" border=0 cellpadding=0 cellspacing=0><tr><td>
+<img class=editorToolbarLeft src="$utif/spacer.png" width="6" height="29"></td>
+<td class=editorToolbarCenter>$BASIC</td>
+<td><img class=editorToolbarRight src="$utif/spacer.png" width="6" height="29"></td></tr></table></DIV></DIV>
+$IFRAMEBOTTOM
+<iframe name=hole style="display:none"></iframe>
+<img style="position:absolute;left:0px;top:30px;display:none" onmouseup=stopModal(); id=shadow src="$utif/spacer.png">
+<div id=poster></div>
+<div id="alertplace" style="position:fixed;top:0px;left:0px;display:none;text-align:center">
+<DIV id="alertMain" style="display:block;" $uns>
+<table align=center id=alertTable border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img class=widgetImg1 src="$utif/spacer.png" width="7" height="26" border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_alertMain width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td style="-moz-user-select:none;text-align:left;padding-left:2px;" class=widgetTitle $uns>
+			<DIV $uns>
+				<img align=$abs src="$utif/exclamation.png" $uns>
+				<SPAN style="padding-left:7px;font-weight:bold" id=tit_alert $uns>$attention</SPAN>
+			</DIV>
+		</td>
+		<td style="width:26px;text-align:right;" $uns>&nbsp;
+				</td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" width="42" height="25" border="0" title="$closealert" 
+				style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img class=widgetImg7 src="$utif/spacer.png" width="10" height="26" border="0" align=absmiddle $uns></td></tr>
+<tr><td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class="widgetBody" $uns>
+	<DIV id="hol_alertMain" $uns>
+<table border=0 cellpadding=0 cellspacing=0><tr>
+<td valign=top align=center><img id=alertIMG src="$utif/alert.png" $uns style="margin:10px"></td>
+<td id=alertText style="padding:10px 10px 10px 0px;text-align:left;line-height:1.5" class=widgetText11></td></tr>
+<tr><td align=center colspan=2 style="padding-bottom:10px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="padding-right:5px"><table border=0 cellpadding=0 cellspacing=0><tr>
+<td><img class=buttonLeft src=$utif/spacer.png width=5 height=18></td>
+<td align=center onclick=active_function() $button_class style="width:40px" id=yesBut>$yes</td>
+<td><img class=buttonRight src=$utif/spacer.png width=5 height=18></td></tr></table></td><td style="padding-left:5px"><table id=cancelBut border=0 cellpadding=0 cellspacing=0><tr>
+<td><img class=buttonLeft src=$utif/spacer.png width=5 height=18></td>
+<td align=center onclick=cancel_function() $button_class style="width:40px">$Cancel</td>
+<td><img class=buttonRight src=$utif/spacer.png width=5 height=18></td></tr></table></td></tr></table></td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr><tr><td style="width:4px"><img class=widgetImg3 src="$utif/spacer.png" width="7" height="10" $uns></td>
+	<td  class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img class=widgetImg5 src="$utif/spacer.png" width="10" height="10" border="0" $uns></td></tr></table></DIV></div>
+	<DIV id='barricade' style="$opacity;position:absolute;left:0px;top:0px;display:none">&nbsp;</DIV>
+	<DIV class=$just_slide_down id=just_slide_down style="position:absolute;display:none;text-align:center" onclick=this.style.display="none" $uns>$JUST</DIV>
+	<DIV class=$block_slide_down id=block_slide_down style="position:absolute;display:none;text-align:center" onclick=this.style.display="none" $uns>$HEADZ</DIV>
+<DIV id=spaces></DIV>
+<form id=ceSaveForm name="ceForm" method=post action="$uttf?saveWrite" target=hole>
+<input type=hidden id=username name=username value="$editorusername">
+<input type=hidden name=authpub value="$iscomments">
+<input type=hidden id=convertpending name=convertpending value="">
+<input type=hidden id=saveitas name=saveitas value="">
+<input type=hidden name=backitup id=backitup value="">
+<input type=hidden id=saveastitle name=saveastitle value="">
+<input type=hidden name=remove_gallery id=remove_gallery value="">
+<input type=hidden id=pageURL name=pageURL value=""></form>
+<iframe name=setUp style="display:none" src="$uttf?set"></iframe>
+<div id=backupdiv style="position:absolute;left:0px;top:0px;display:none;">
+<textarea id=backups style="width:0px;height:0px"></textarea></div>
+
+<DIV id=demoBuilder style="display:none">
+	<DIV id=db_header style="margin-top:5px">
+	<DIV style="padding-bottom:10px"><table style="border-bottom:1px solid #ccc" width=100% border=0 cellpadding=0 cellspacing=0><tr><td align=left id=title onmousedown=startTutMove(event,"demoBuilder")><strong>Editor Tutorials</strong> &#126; <SPAN id=tutUp>click a tool to see it's tutorial....</SPAN><SPAN id=tutDn style="display:none" onclick=rollUpDn()><SPAN style="cursor:pointer;color:#000;background-color:#C0FA64;border-radius:3px;border:1px solid #bbb;font-weight:bold">&nbsp;click&nbsp;</SPAN> to display tool selector again....</SPAN></td><td align=right>
+	<img align=right src="$utif/x.png" width="23" height="23" border="0" style="cursor:pointer;margin-right:5px" onclick=closeTut()></td></tr></table></DIV>
+	</DIV>
+	<DIV id="tutbar" align=center></DIV>
+	<DIV id=db_content align=center>&nbsp;</DIV>
+</DIV>
+
+</body></html>~;
+
+
+sub seed{
+$onmdu=qq~onmousedown=activeSRC=this.src;this.src="$utif/throbber.gif" onmouseup=this.src=activeSRC;analize(this.src) ~;
+$onoff_=qq~<img id=onOffSwitch class=icon $onmdu vspace=4 src="$utif/icon_off.png" width="16" height="16" border="0" title="$tooltitleonoff" $unz onclick=ceonOff()>~;
+$exit_=qq~<img class=icon $onmdu vspace=4 src="$utif/exit.png" width="16" height="16" border="0" title="$tooltitleexit" $unz onclick=ceexit()>~;
+$openfolder_=qq~<img vspace=4 class=icon $onmdu src="$utif/openfolder.png" width="16" height="16" border="0" title="$tooltitleopenfolder" $unz onclick=ceopenfolder()>~;
+$save_=qq~<img class=icon $onmdu vspace=4 src="$utif/save.png" width="16" height="16" border="0" title="$tooltitlesave" $unz onclick=cesave()>~;
+$backups_=qq~<img class=icon $onmdu vspace=4 src="$utif/backups.png" width="16" height="16" border="0" title="$tooltitlebackups" $unz onclick=cebackups()>~;
+$reload_=qq~<img class=icon $onmdu vspace=4 src="$utif/reload.png" width="16" height="16" border="0" title="$tooltitlereload" $unz onclick=cereload()>~;
+$picture_=qq~<img class=icon $onmdu vspace=4 src="$utif/picture.png" width="16" height="16" border="0" title="$tooltitlepicture" $unz onclick=cephoto()>~;
+$color_=qq~<img class=icon $onmdu vspace=4 src="$utif/color.png" width="16" height="16" border="0" title="$tooltitlecolor" $unz onclick=color_what="ForeColor";cecolor()>~;
+$fonts_html_=qq~<img class=icon $onmdu  vspace=4 src="$utif/fonts_html.png" width="16" height="16" border="0" title="$tooltitlefonts_html" $unz onclick=cefonts_html()>~;
+$fonts_style_=qq~<img class=icon $onmdu  vspace=4 src="$utif/fonts_style.png" width="16" height="16" border="0" title="$tooltitlefonts_style" $unz onclick=cefonts_style()>~;
+$heads_=qq~<img class=icon $onmdu  vspace=4 src="$utif/heads.png" width="16" height="16" border="0" title="$tooltitleheads" $unz onclick=ceget_head(event)>~;
+$unformat_=qq~<img class=icon $onmdu vspace=4 src="$utif/unformat.png" width="16" height="16" border="0" title="$tooltitleunformat" $unz onclick=ceunformat()>~;
+$link_=qq~<img class=icon $onmdu vspace=4 src="$utif/link.png" width="16" height="16" border="0" title="$tooltitlelink" $unz onclick=celink()>~;
+$table_=qq~<img id=tblImg class=icon $onmdu  vspace=4 src="$utif/table.png" width="16" height="16" border="0" title="$tooltitletable" $unz onclick=cetable()>~;
+$left_=qq~<img class=icon $onmdu vspace=4 src="$utif/left.png" width="16" height="16" border="0" title="$tooltitleleft" $unz onclick=cetoggle("JustifyLeft")>~;
+$center_=qq~<img class=icon $onmdu vspace=4 src="$utif/center.png" width="16" height="16" border="0" title="$tooltitlecenter" $unz onclick=cetoggle("JustifyCenter")>~;
+$right_=qq~<img class=icon $onmdu vspace=4 src="$utif/right.png" width="16" height="16" border="0" title="$tooltitleright" $unz onclick=cetoggle("JustifyRight")>~;
+$outdent_=qq~<img class=icon $onmdu vspace=4 src="$utif/outdent.png" width="16" height="16" border="0" title="$tooltitleoutdent" $unz onclick=cetoggle("Outdent")>~;
+$indent_=qq~<img class=icon $onmdu vspace=4 src="$utif/indent.png" width="16" height="16" border="0" title="$tooltitleindent" $unz onclick=cetoggle("Indent")>~;
+$justify_=qq~<img class=icon $onmdu  vspace=4 src="$utif/justify.png" width="16" height="16" border="0" title="$tooltitlejustify" $unz onclick=cejustify(event)>~;
+$full_=qq~<img class=icon $onmdu  vspace=4 src="$utif/full.png" width="16" height="16" border="0" title="$tooltitlefull" $unz onclick=cetoggle("JustifyFull")>~;
+$hr_=qq~<img class=icon $onmdu vspace=4 src="$utif/hr.png" width="16" height="16" border="0" title="$tooltitlehr" $unz onclick=cetoggle("InsertHorizontalRule")>~;
+$ul_=qq~<img id=ulImg class=icon $onmdu vspace=4 src="$utif/ul.png" width="16" height="16" border="0" $unz onclick=insertList("InsertUnorderedList") title="$tooltitleul">~;
+$ol_=qq~<img id=olImg class=icon $onmdu  vspace=4 src="$utif/ol.png" width="16" height="16" border="0" $unz onclick=insertList("InsertOrderedList") title="$tooltitleol">~;
+$upload_=qq~<img class=icon $onmdu vspace=4 src="$utif/upload.png" width="16" height="16" border="0" title="$tooltitleupload" $unz onclick=ceupload()>~;
+$form_=qq~<img class=icon $onmdu vspace=4 src="$utif/form.png" width="16" height="16" border="0" title="$tooltitleform" $unz onclick=ceforms()>~;
+$saveas_=qq~<img class=icon $onmdu vspace=4 src="$utif/saveas.png" width="16" height="16" border="0" title="$tooltitleformsaveas" $unz onclick=cesaveas()>~;
+
+$key_=qq~<img class=icon $onmdu vspace=4 src="$utif/key.png" width="16" height="16" border="0" title="$tooltitlekey" $unz onclick=cepassword()>~;
+$edit_html_=qq~<img class=icon $onmdu vspace=4 src="$utif/edit_html.png" width="16" height="16" border="0" title="$tooltitleedit_html" $unz onclick=cehtml()>~; 
+$edit_source_=qq~<img class=icon $onmdu vspace=4 src="$utif/edit_source.png" width="16" height="16" border="0" title="$tooltitleedit_source" $unz onclick=cesrc()>~;
+$chars_=qq~<img class=icon $onmdu vspace=4 src="$utif/chars.png" width="16" height="16" border="0" title="$tooltitlechars" $unz onclick=ceset_chars()>~;
+$para_=qq~<img id=paraImg class=icon $onmdu vspace=4 src="$utif/para.png" width="16" height="16" border="0" title="$paratitle" $unz onclick=ceset_para()>~;
+$spacer_=qq~<img class=icon $onmdu src="$utif/spacer.png" width="16" height="16" border="0" title="" $unz>~;
+$undo_=qq~<img class=icon $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$tooltitleundo" $unz onclick=cetoggle("Undo")>~;
+$redo_=qq~<img class=icon $onmdu  vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$tooltitleredo" $unz onclick=cetoggle("Redo")>~;
+$updates_=qq~<img class=icon $onmdu vspace=4 src="$utif/updates.png" width="16" height="16" border="0" title="$tooltitleupdates" $unz onclick=availUpdates()>~;
+$gallery_=qq~<img class=icon $onmdu  vspace=4 src="$utif/gallery.png" width="16" height="16" border="0" title="$tooltitlegallery" $unz onclick=ceCreateGal()>~;
+$flash_=qq~<img class=icon $onmdu vspace=4 src="$utif/flash.png" width="16" height="16" border="0" title="$tooltitleflash" $unz onclick=csEmbedFlash()>~;
+$insert_html_=qq~<img class=icon $onmdu vspace=4 src="$utif/insert_html.png" width="16" height="16" border="0" title="$tooltitleinsert_html" $unz onclick=csInsertHtml()>~;
+$insert_word_=qq~<img class=icon $onmdu vspace=4 src="$utif/insert_word.png" width="16" height="16" border="0" title="$tooltitleinsertword" $unz onclick=csInsertWord()>~;
+$headcontent_=qq~<img class=icon $onmdu vspace=4 src="$utif/headcontent.png" width="16" height="16" border="0" title="$tooltitleheadcontent" $unz onclick=csHeadContent()>~;
+$adduser_=qq~<img class=icon $onmdu vspace=4 src="$utif/adduser.png" width="16" height="16" border="0" title="$tooltitleadduser" $unz onclick=ceaddUser()>~;
+$search_=qq~<img class=icon $onmdu vspace=4 src="$utif/search.png" width="16" height="16" border="0" title="$tooltitlesearch" $unz onclick=csSearch()>~;
+$film_=qq~<img class=icon $onmdu vspace=4 src="$utif/film.png" width="16" height="16" border="0" title="$tooltitlefilm" $unz onclick=csFilm()>~;
+$author_=qq~<img class=icon $onmdu vspace=4 src="$utif/comments.png" width="16" height="16" border="0" title="$tooltitleauthor" $unz onclick=csComment()>~;
+$publisher_=qq~<img class=icon $onmdu vspace=4 src="$utif/comments.png" width="16" height="16" border="0" title="$tooltitlepublisher" $unz onclick=csComment()>~;
+$publog_=qq~<img class=icon $onmdu vspace=4 src="$utif/aplog.png" width="16" height="16" border="0" title="$tooltitlepublisherlog" $unz onclick=csPubLog()>~;
+$audio_=qq~<img class=icon $onmdu vspace=4 src="$utif/audio.png" width="16" height="16" border="0" title="$tooltitleaudio" $unz onclick=csAudio()>~;
+$lock_=qq~<img class=icon $onmdu vspace=4 src="$utif/lock.png" width="16" height="16" border="0" title="$tooltitlelock" $unz onclick=csLock()>~;
+$help_=qq~<img class=icon $onmdu vspace=4 src="$utif/help.png" width="16" height="16" border="0" title="$tooltitleformhelp" $unz onclick=openTut()>~;
+#ceuserhelp()openTut()
+}#seed
+
+sub get_login{
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie,2);
+		$name =~ s/^\s*//;
+		if($name =~ /loginParams/){
+			($editorusername,$editorpassword,$editorremember,$urlToEdit)=split(/\|/,$value);
+			if($editorusername eq "admin"){$editorusername=''}
+			if($editorusername eq "guest"){$editorusername=''}
+		}
+	}
+}#get_cookie
+
+
+sub adminit{
+$KRF=$incs_folder_PATH."/krypt.htm";
+open(KR,$KRF);
+while(<KR>){
+	$KRYPT.=$_;
+}
+if($noRememberPassword){$noREM=qq~style="display:none"~}
+if($noEmailPassword){$noEML=qq~style="display:none"~}
+$commfolder=$incs_folder_PATH."/lang";
+@commfolder=<$commfolder/*>;
+foreach $comm (@commfolder){
+	$comm=~m`/lang/(.+)`;$commF=$1;
+	$commfile=$comm."/common.txt";
+	open(COMM,"$commfile");
+	$commName=<COMM>;
+	chomp($commName);
+	($n,$v)=split(/=/,$commName);$$n=$v;
+	if($commF ne $defaultLang){$COPTS.=qq~<option value="$commF">$langName~;}else{$COPTS_=qq~<option value="$commF">$langName~;}
+	++$copts;
+}
+if($copts>1){
+	$CSEL=qq~<tr><td colspan=2 align=center><select class=select onchange=setLang(this.options[this.selectedIndex].value)>$COPTS_$COPTS</select></td></tr>~;
+	$setLang=qq~document.cookie = "lang=$defaultLang;domain=."+location.hostname+";expires="+expires+";path=/"~;
+}else{
+	$setLang=qq~document.cookie = "lang=en;domain=."+location.hostname+";expires="+expires+";path=/"~;
+}
+if($demo){$dem="none"}else{$dem="inline"}
+if($no_email_password_change){$dem="none"}
+$RETURN=qq~<html><head><META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"><title></title>
+<link rel=STYLESHEET href="$uttf?getCSS" type="text/css">
+<script type="text/javascript">
+when=new Date();when.setMonth(when.getMonth()+12);expires=when.toGMTString();
+$setLang
+
+function setLang(val){
+	document.cookie = "lang="+val+";domain=."+location.hostname+";expires="+expires+";path=/"
+}
+	function set(){
+		krypt()
+		if(document.getElementById("sendpw").checked==true){
+			if(document.getElementById("un").value==""){alert("$adminitalert1");return false}
+			if(document.getElementById("un").value=="admin"){alert("$adminitalert2");return false}
+			url="$uttf?adminLogin=sendPw="+document.getElementById("un").value
+			JITc(url)
+			return false;
+		}
+		if(document.getElementById("un").value=="admin"){
+			document.getElementById("pw").value=PWORD
+			document.forms[0].submit()
+		}else{
+			strng=document.getElementById("un").value+'|'+PWORD+'|'+document.getElementById("rem").checked+'|none'
+			document.cookie="loginParams="+strng+";path=/"
+			if(document.getElementById("rem").checked==true){
+				if(localStorage){
+					localStorage.setItem("cepword",document.getElementById("pw").value)
+				}else{
+					document.cookie = "cepword="+document.getElementById("pw").value+";domain=."+location.hostname+";expires="+expires+";path=/"
+				}
+			}else{
+				if(localStorage){
+					localStorage.removeItem("cepword")
+				}else{
+					document.cookie = "cepword=;domain=."+location.hostname+";expires="+expires+";path=/"
+				}
+			}
+			location.reload(true)
+		}
+	}
+	function check(obj){
+		if(obj!="admin"){
+			document.getElementById("remTR").style.display="inline"
+		}
+	}
+	function checkLogin(){
+		cookies=document.cookie.split(";")
+		for(i=0;i<cookies.length;++i){
+			var kook=cookies[i].split("=")
+			kook[0]=kook[0].replace(/^ /,"")
+			if(kook[0] == "ceuser" && kook[1]=="undefined"){return false}
+			if(kook[0] == "ceuser"){document.getElementById("remTR").style.display="inline";document.getElementById("un").value=kook[1]}
+			if(kook[0] == "cepword" && kook[1]!="undefined"){document.getElementById("pw").value=kook[1]}
+			if(localStorage){
+				if(localStorage.getItem("cepword")){
+					document.getElementById("pw").value=localStorage.getItem("cepword")
+				}
+			}
+			if(kook[0] == "ceremem" && kook[1]==1){
+				document.getElementById("remTR").style.display="inline"
+				document.getElementById("rem").checked=true
+			}
+		}		
+	}
+	$KRYPT
+</script>
+
+</head><BODY onload=checkLogin() class=loginBody>
+<center>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr>
+<td class=widgetImg1><img src="$utif/spacer.png" width="7" height="26" border="0" alt=""></td>
+<td class="widgetText11 widgetImg8 widgetTitle">
+<img class="widgetLogoImg" src="$utif/spacer.png" width="16" height="16" border="0" align=absmiddle> $adminitWidgettitle</td>
+<td class=widgetImg7><img src="$utif/spacer.png" width="10" height="26" border="0" alt=""></td>
+</tr>
+<tr><td class=widgetImg2></td>
+<td class=widgetBody style="padding:10px" align=center>
+<img src="$utif/brand.png" width="125" height="145" style="border:4px double #6C7474" hspace=7 vspace=5><br>
+<form method=post action="$uttf?adminLogin">
+<input type=hidden name=cycle value=login>
+<table border=0 cellpadding=5 cellspacing=0>
+<tr><td class=widgetText12>$adminitWidget1</td><td style="width:125px"><input onchange=check(this.value) size=14 type=text id=un name=un value=""></td></tr>
+<tr><td class=widgetText12>$adminitWidget2</td><td style="width:125px"><input size=14 type=password id=pw name=pw value=""></td></tr>
+<tr><td colspan=2 align=center><table style="margin:0px" border=0 cellpadding=0 cellspacing=0><tr>
+<td><img class=buttonLeft src=$utif/spacer.png width=5 height=18></td>
+<td align=center onclick=set() $button_class><b>$adminitWidgetButton</b></td>
+<td><img class=buttonRight src=$utif/spacer.png width=5 height=18></td></tr></table></td></tr>
+$CSEL
+<tr $noREM><td colspan=2 align=center><table id=remTR style="display:none" border=0 cellpadding=0 cellspacing=0><tr>
+<td><input type=checkbox id=rem></td><td class=widgetText11 style="width:125px">$adminitWidget3</td></tr></table></td></tr>
+<tr><td colspan=2 align=center $noEML><table style="display:$dem" border=0 cellpadding=0 cellspacing=0>
+<tr><td><input type=checkbox id=sendpw></td>
+<td class=widgetText11 style="width:125px">$adminitWidget4</td></tr></table></td></tr>
+</table>
+</form>
+</td><td class=widgetImg6></td></tr>
+<tr><td class=widgetImg3><img src="$utif/spacer.png" width="7" height="10" border="0" alt=""></td>
+<td class=widgetImg4><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+<td class=widgetImg5><img src="$utif/spacer.png" width="10" height="10" border="0" alt=""></td></tr></table></center>
+</body></html>~;
+&respondhtml;
+}#adminit 
+1;

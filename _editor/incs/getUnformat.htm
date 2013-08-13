@@ -1,0 +1,49 @@
+lang("getUnformat");
+$main="unformatMain";
+$place="unformatplace";
+$title="$widgettitle";
+$wigWid="180";
+$ico="unformat";
+require 'widgetBody.htm';
+
+&parseUser;
+
+if($basic =~ /fonts_html/){
+	$fonts_htmlON="";
+}else{
+	$fonts_htmlON="none";
+}
+$RETURN=qq~unformatTbl='$BODY_TOP
+	<table align=center border=0 cellpadding=0 cellspacing=0>
+	<tr><td align=center style="font-family:tahoma,arial;font-size:11px;padding:10px">$text</td></tr>
+	<tr><td align=center><table style="margin:10px 0px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr>
+	<td>$LBUT</td><td align=center onclick=cleanFormat() $button_class $uns>$AllHTMLCodebutton</td><td>$RBUT</td></tr></table></td></tr>
+	<tr id=fntRow><td align=center><table align=center style="margin:10px 0px 5px 0px" border=0 cellpadding=0 cellspacing=0><tr>
+	<td>$LBUT</td><td align=center onclick=cetoggle("RemoveFormat") $button_class $uns>$FontFormattingbutton</td><td>$RBUT</td></tr></table></td></tr>
+	<tr><td align=center><table style="margin:10px 0px 15px 0px" border=0 cellpadding=0 cellspacing=0><tr>
+	<td>$LBUT</td><td align=center onclick=cetoggle("Unlink") $button_class $uns>$LinkCodeOnlybutton</td><td>$RBUT</td></tr></table></td></tr>
+</table>
+
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function cleanFormat(){
+	 if(editPad.getSelection){
+	       	cesel= byId('editPad').contentWindow.getSelection(); 
+		 	cstxt=cesel.toString()
+	}else if (doc().selection && doc().selection.createRange){
+       cssel=doc().selection.createRange();   
+	   cstxt=cssel.text;
+	}
+	if(isIE){
+		cssel=doc().selection.createRange(); 
+		cssel.pasteHTML(cstxt);
+	}else{
+		doc().execCommand("InsertHTML", false, cstxt); 
+	}
+
+}
+byId('unformatplace').innerHTML=unformatTbl
+byId('fntRow').style.display="$fonts_htmlON"
+ceunformat()
+~;

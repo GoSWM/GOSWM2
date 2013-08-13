@@ -1,0 +1,62 @@
+lang("getCaptcha");
+use Crypt::Lite;
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+
+@keys=();
+&get_key;
+
+sub get_key{
+open(USRS,"$users_txt");
+$adm=<USRS>;$adm=~s`\s+$``;
+($x,$kryptKey)=split(/=/,$adm);
+$kryptKey=~s`\W``g;$kryptKey=~s`^ce``;
+
+$emit=reverse(time);
+$key=crypt($emit,"aa");
+$key=~s/\W//g;$key=~s/\d//g;
+$key=$key.$key.$key;
+$xxrand=substr($emit,0,1);
+if($xxrand>5){$key=lc($key);$lc=1}else{$key=uc($key);$uc=1}
+$key=~s/[qlpvVwU]//g;
+$key=substr($key,2,6);
+$rand=rand(14);
+$randx=substr($rand,2);
+$random=int($rand);
+$key=$key.$random;
+}
+
+&check_key;
+
+$crypt = Crypt::Lite->new( debug => 0 );
+$encrypted = $crypt->encrypt($key, $kryptKey);
+$encrypted=~s/[\n]/Br_bR/g;$encrypted=~s/=/eQuAl/g;
+if($lc){$case="$lowercase"}
+if($uc){$case="$UpperCase"}
+
+$RETURN= qq~secKEY="$encrypted"
+secCase="$case"
+document.getElementById("secnum").value=""
+document.getElementById("sec_key").value="$encrypted"
+document.getElementById("sec_image").src="$uttf?secImage=$encrypted"
+document.getElementById("sec_case").innerHTML="$case";
+document.getElementById("$params").disabled=true;~;
+
+sub check_key{
+	$kfile="$txts_folder_PATH/captcha.txt";
+	if($#keys==-1){
+		open(K,"$kfile");
+		@keys=<K>;
+		close(K);
+	}
+	@test=@keys;
+if(test($key)){
+	sleep(1);
+	&get_key;
+}else{
+	push(@keys,$key);
+	if($#keys>4112){shift(@keys)}
+	open(K,">$kfile");
+	print K "@keys";
+	close(K);
+}
+}#check_key

@@ -1,0 +1,9 @@
+widgettitle=Insert Audio
+BackOneFolderLeveltitle=Back One Folder Level
+text1=Select Audio File To Link To
+StartButton=Create Start Link
+StopButton=Create Stop Link
+AutoStartButton=Auto Start Insert
+AutoStartRemove=Auto Start Remove
+htmlalert1=Select content to apply the link to
+htmlalert2=Your selection is not inside of an editable area

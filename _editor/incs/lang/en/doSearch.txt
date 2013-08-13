@@ -1,0 +1,7 @@
+text1=Open in
+text2=this tab
+text3=new tab
+text4=No Matches Found
+text5=Found
+text6=Matches
+title=Close Search

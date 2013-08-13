@@ -1,0 +1,61 @@
+widgettitle=Community Builder
+#INTROPAGE
+text1=This tool will create a process that allows new users to automatically add themselves to the editor list of users and create a personal WebSpace within your WebSite.  There are two types of processes:
+text2=<b>Process Without A Payment Interval.</b> This process requires <b>one page</b> for a form.
+text3=This is a single step process. The visitor simply completes a form requesting their desired username, a password and their email address. The process then checks for the availability of the username and creates a new $brand user account for the visitor. The new user inherits a predetermined user setup. The process also creates a folder for the new user using the username and populates that folder with a predetermined set of files and folders.
+text4=<b>Process With A Payment Interval.</b> This process requires <b>three pages</b> for forms and an account with a payment processor (Example: PayPal)
+text5=<b>Step One:</b> The visitor submits only their desired username. This step verifies the availability of the username and sets an encrypted cookie containing the username. This step redirects to Step Two.
+text6=<b>Step Two:</b> The visitor processes a payment transaction. This page needs to contain a form prepared for the payment processor.  Click <span style="cursor:hand;color:blue" onclick=tutorial()>HERE </span>for a Flash tutorial on setting up PayPal Recurring Payments for this Step.
+text7=<b>Step Three:</b> When the visitor returns from the payment process this page requests them to submit a password to use. This submission will read the cookie set in Step One to verify that this is the username that just paid (preventing the setting up of multiple accounts with one payment), and then create a new $brand user account for the visitor. The new user will inherit a predetermined user setup. The process also creates a folder for the new user using the username and populates that folder with a predetermined set of files and folders. 
+Continuebutton=Continue
+
+#PROCESS WITH
+StepOnetab=Step One
+StepTwotab=Step Two
+StepThreetab=Step Three
+text8=<b>Process With A Payment Interval:</b><br><br>You must create three pages (one for each Step) before continuing so their URLs can be referred to for redirects. <br><br>You can name the pages any name you want and place them in any folder you want. They will be referred to as <br><u>Step One page</u>, <u>Step Two page</u> and <u>Step Three page</u> in instructions.
+#Step1
+text9=<b>Step One:</b><br><br>Load the <u>Step One page</u> into the editor so a form can be inserted into the page.<br><br>This form will simply ask the visitor for their preferred username. The form will check to see if that username has not already been used. If the username is available, this form will set an encrypted cookie on the visitor&#39;s computer and redirect the browser to the <u>Step Two page</u>.<br><br>You need to locate and select the <u>Step Two page</u>:
+locatepagebutton=Locate Page
+locatepagebuttontitle=Click to toggle display On/Off
+InsertStepOneFormbutton=Insert Step One Form
+#Step2
+text10=<b>Step Two:</b><br><br>Load the <u>Step Two page</u> into the editor so a form can be inserted into the page.<BR><BR>Prepare this form at your payment processor&#39;s website. This form must direct the visitor to the payment process and <b>must redirect the visitor back to the Step Three Page</b> upon completion of payment. Click 
+HERE=HERE
+text11=for a Flash tutorial on setting up PayPal Recurring Payments for this Site.
+text12=Paste Processor Form into the textarea below:
+text13=This form will not be editable once inserted into the page.
+InsertStepTwoFormbutton=Insert Step Two Form
+#Step3
+text14=<b>Step Three:</b><br><br>Load the <u>Step Three page</u> into the editor so a form can be inserted into the page.<br><br>Visitors are returned to this page when their payment has been processed.  The visitor will enter their choice of username and a password.<BR><BR><ol><li>When the form is submitted the encrypted username cookie will be validated and a new user account will be set up. To setup the new user account you must specify a "default" user for this form.  All new users added through this form will inherit the toolbar icons that you specify for the "default" user. 
+text15=Select this form&#39;s "default" user
+text16=Enter a Notification email address
+optional=(optional)
+text17=A new folder will be created using the username submitted by the new user.  <b>You need to locate the base folder</b> that the editor will create all new user folders in. The user&#39;s image folder will be the user&#39; folder. If you need to have different groups of users in different base folders, create an entirely separate signup process for each group.
+locatefolderbutton=Locate Folder
+locatefolderbuttontitle=Click to toggle display On/Off
+text18=The tool will also automatically populate the new user&#39;s folder with any files you place in a default populate-from folder. This folder may contain templates, images etc. and may contain nested folders (the editor will copy all contents to the user&#39;s folder). <b>You need to locate the folder to populate-from</b>.  <br><br>Submitting this form will redirect the user to a page in the user&#39;s new folder named "instructions.html". Include a page named "instructions.html" in the populate-from folder with instructions for logging into the editor and for utilizing their WebSpace on your WebSite.
+text19=The form will insert where your cursor is at on the page. The form will be
+outlined=outlined
+text20=while the editor is turned on. You can adjust default text and form element sizes and position on the page. Do not move elements outside of the form&#39;s outline. Four hidden elements are visible while the editor is turned on.<BR><BR>After inserting this form, you can use the Form Widget 
+text21=to add other fields to the form. All fields in the form are emailed to the Notification Email above when a visitor signs up.
+InsertFormbutton=Insert Form
+
+#PROCESS WITH OUT
+text22=You need to devise a way to control access to this form page if you require some form of registration for hosting the new user&#39;s WebSpace.<BR><BR><ol><li>To setup the new user account you must specify a "default" user for this form.  All new users added through this form will inherit the toolbar icons that you specify for the "default" user. 
+text23=Select the this form&#39;s "default" user
+text24=Enter a Notification email address
+text25=A new folder will be created using the username submitted by the new user (the form automatically verifies if the username is available).  You need to locate the base folder to create all new user folders in.  The user&#39;s image folder will be their user folder.
+text26=The tool will also automatically populate the new user&#39;s folder with any files you place in a default populate-from folder. This folder may contain templates, images etc. and may contain nested folders (the editor will copy all contents to the user&#39;s folder). You need to locate the folder to populate from. <br><br>Submitting this form will redirect the user to a page in the user&#39;s new folder named "instructions.html". Include a page named "instructions.html" in the populate-from folder with instructions for logging into the editor and for utilizing their WebSpace on your WebSite.
+text27=The form will insert where your cursor is at on the page. The form will be
+text28=while the editor is turned on. You can adjust default text and form element sizes and position on the page. Do not move elements outside of the form&#39;s outline. Four hidden elements are visible while the editor is turned on. <BR><BR>After inserting this form, you can use the Form Widget
+text29=to add other fields to the form. All fields in the form are emailed to the Notification Email above when a visitor signs up.
+
+text30=Enter User Name
+text31=Enter A Password
+text32=Enter Your Email Address
+SUBMIT=SUBMIT
+LocateAndSelect=Locate And Select
+alert1=Your browser prevented the Preview window from opening.\n\nTurn off all popup window blocking programs for this website.
+TheFolderToCreateNewUserFoldersIn=The  Folder To Create New User Folders In
+TheFolderToPopulateNewUsersFrom=The  Folder To Populate New Users From

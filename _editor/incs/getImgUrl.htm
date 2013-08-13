@@ -1,0 +1,70 @@
+lang("getImgUrl");
+
+$RETURN=qq~inputTblImg='<DIV id="inputImgMain" style="padding-top:80px;display:block;left:1px;top:1px;position:absolute" $uns onmousedown=zindx("inputimgplace")>
+<table align=center border=0 cellpadding=0 cellspacing=0 $uns><tr>
+	<td style="width:7px" $uns>
+	<img src="$utif/spacer.png" class=widgetImg1 border="0" $uns></td>
+	<td class=widgetImg8 $uns>
+	<table id=tbl_inputImgMain class=200 width=100% border=0 cellpadding=0 cellspacing=0 $uns><tr>
+		<td width=98% style="-moz-user-select:none;text-align:left;padding-left:2px;" $uns>
+			<DIV onmousedown=startModal(event,"inputImgMain","hol_inputImgMain") style="cursor:move;" $uns>
+			<table border=0 cellpadding=0 cellspacing=0><tr><td>
+				<img align="$abs" src="$utif/scanner.gif" ></td>
+				<td style="font-weight:bold;padding-left:7px;" class=widgetTitle id=tit_inputImgMain $uns>$OnlineImage </td></tr></table>
+			</DIV>
+		</td>
+		<td style="visibility:hidden;text-align:right;" $uns>
+				<img id="img_inputImgMain" src="$utif/spacer.png" class=modal_dn border="0" title="$ShrinkWidget" 
+				onclick=csShrink("inputImgMain")
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+		<td style="text-align:right;" $uns>
+				<img src="$utif/spacer.png" class=modal_close_ border="0" title="$Close" 
+				onclick=uncsShrink("inputImgMain");byId("inputimgplace").innerHTML=""
+				 style="margin:1px 0px 0px 0px;cursor:pointer" $uns></td>
+	</tr></table></td>
+	<td style="width:10px" $uns><img src="$utif/spacer.png" class=widgetImg7 align=absmiddle border="0" $uns></td></tr>
+<tr>
+	<td class=widgetImg2 $uns>
+	<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td class=widgetBody $uns>
+	<DIV id="hol_inputImgMain" style="padding-top:6px" class=widgetBody $uns>
+<table style="width:194px" border=0 cellpadding=5 cellspacing=0>
+<tr>
+<td align=center style="font-family:tahoma,arial;font-size:11px">$EnterOnlineImageURL</td></tr>
+<tr><td align=center><input class=input id=PTurl value="http://" onfocus=this.value="" style="width:300px"></td></tr>
+<tr><td align=center style="">
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=center>
+<table align=center style="margin:4px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class onclick=PTseturl() $uns>$ApplyURL</td><td>$RBUT</td></tr></table></td><td align=center>
+<table align=center style="margin:4px 10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class onclick=uncsShrink("inputImgMain");byId("inputimgplace").innerHTML=""; $uns>$Cancel</td><td>$RBUT</td></tr></table></td></tr></table>
+</td></tr></table>
+</DIV></td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td style="width:4px"><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~byId('inputimgplace').innerHTML=""
+function PTseturl(){
+	cedisplayphoto(byId('PTurl').value)
+	byId('inputimgplace').style.display="none";
+	byId('ytDelete').style.visibility="hidden";
+	byId('thmTD_').style.visibility="hidden";
+	byId('popTD_').style.visibility="hidden";
+	byId('ytRewrite').style.visibility="hidden";
+}
+byId('inputimgplace').style.zIndex=10000;
+LeftPos = (document.body.clientWidth-332)/2
+byId('inputimgplace').style.position="absolute"
+byId('inputimgplace').style.left=LeftPos+"px";
+byId('inputimgplace').style.top="100px"
+byId('inputimgplace').innerHTML=inputTblImg;
+byId('inputimgplace').style.display="block";
+~;
+
+
+1;

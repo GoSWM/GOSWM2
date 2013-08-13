@@ -1,0 +1,6 @@
+widgettitle=Color Widget
+SiteColors=Site Colors
+ShrinkWidgettitle=Shrink Widget
+CloseColorWidgettitle=Close Color Widget
+TextBackgroundbutton=Text Background
+TextColorbutton=Text Color

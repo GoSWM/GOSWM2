@@ -1,0 +1,94 @@
+/*Style sheet is executed before being sent it the browser. Do not alter variable $imgs_folder_URL*/
+
+#demoBuilder{
+	display:none;
+	position:absolute;
+	border:1px solid #ccc;
+	border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	background-color:#f7f7f7;
+	//min-width:1078px;
+	min-width:980px;
+	min-height:300px;
+	left:1px;
+	top:1px;
+	box-shadow: 2px 2px 3px #aaa;
+}
+#db_content{
+	background-color:#2E2E2E;
+	color:#fff;
+	padding:2px 2px 2px 2px;
+	margin:5px 10px 10px 10px;
+	min-height:310px;
+}
+#title{
+	font-family:arial;
+	font-size:13px;
+	padding-left:15px;
+	cursor:move;
+}
+
+#barricade{background-color:#dcdcdc;}
+#fonts_div{background-color:#FFFFFF;}
+
+FIELDSET{font-size:10px;font-family:tahoma;border:4px double #aaaaaa;padding:5px;display:inline}
+LEGEND{color:#0033ff;font-family:tahoma,arial;font-size:10px}
+.just_slide_down1{border:1px solid #999999;border-top:1px solid #DBE2EC;background-color:#DBE2EC;padding:0px 5px}
+.block_slide_down1{border:1px solid #999999;border-top:1px solid #DBE2EC;background-color:#DBE2EC;padding:0px 5px;}
+.just_slide_down2{border:1px solid #999999;border-bottom:1px solid #DBE2EC;background-color:#DBE2EC;padding:0px 5px}
+.block_slide_down2{border:1px solid #999999;border-bottom:1px solid #DBE2EC;background-color:#DBE2EC;padding:0px 5px;}
+
+.icon{width:16px;height:16px}
+.adminBody{background-color:#FFFFFF;color:#000000;background-image:url($imgs_folder_URL/bg.png)}
+.loginBody{background-color:#FFF;background-image:url($imgs_folder_URL/bg.png)}
+.input{padding-left:2px;border:1px solid #999999;font-family:tahoma,arial;font-size:11px;}
+.select{border:1px solid #999999;font-family:tahoma,arial;font-size:11px;}
+.fontsoff{text-align:left;font-size:11px;background-color:#FFFFFF;color:#000;cursor:default}
+.fontson{text-align:left;font-size:11px;background-color:#999;color:#fff;cursor:default}
+.stylebox{font-family:tahoma;font-size:11px;background-color:#FFFFFF;
+		border:1px solid #777777;margin-right:0px;padding:2px;overflow-x:hidden;overflow-y:auto}
+.cbar{font-size:1px;border-left:1px solid #cccccc;border-right:1px solid #999999}
+.block_slide_off{background-color:#DBE2EC;color:#000000;text-align:left;font-size:11px;}
+.block_slide_on{background-color:#999999;color:#FFFFFF;text-align:left;font-size:11px;}
+.charTD{font-size:12px;font-family:Arial,Helvetica,sans-serif;width:22px;height:22px;font-weight:normal;
+		text-align:center;color:#000000;cursor:pointer}
+.tab{white-space:nowrap;cursor:pointer;padding:2px 10px 2px 2px;font-family:tahoma,aria;font-size:10px;border-style:solid;
+		border-width:1px;border-top-color:#ffffff;border-left-color:#ffffff;border-bottom-color:#FFFFFF;border-right-color:#999999;}
+.tab_{white-space:nowrap;cursor:default;padding:2px 10px 2px 2px;font-family:tahoma,aria;font-size:10px;
+		border-style:solid;border-width:1px;border-top-color:#FFFFFF;border-left-color:#FFFFFF;
+		border-bottom-color:#D9D9D6;border-right-color:#999999}
+
+
+.editorToolbar{overflow:hidden;background-color:#D9D9D6;margin:0px}
+/* .editorToolbarLeft{background-image:url($imgs_folder_URL/bar_lft.png)}
+.editorToolbarCenter{background-image:url($imgs_folder_URL/bar_cnt.png)}
+.editorToolbarRight{background-image:url($imgs_folder_URL/bar_rgt.png)} */
+
+/*button_center classes must remain on 1 line*/
+
+.buttonLeft{background-image:url($imgs_folder_URL/but_lt.png);width:5px;height:18px}
+.button_center{white-space:nowrap;font-family:tahoma,arial;font-size:11px;cursor:pointer;padding:0px 2px 1px 0px;color:#000000;background-image:url($imgs_folder_URL/but_cr.png)}
+.button_center_{white-space:nowrap;font-family:tahoma,arial;font-size:11px;cursor:pointer;padding:0px 2px 1px 0px;color:#DFE5EE;background-image:url($imgs_folder_URL/but_cr.png)}
+.button_centerD{white-space:nowrap;font-family:tahoma,arial;font-size:11px;cursor:no-drop;padding:0px 2px 1px 0px;color:#aaaaaa;background-image:url($imgs_folder_URL/but_cr.png)}
+.buttonRight{background-image:url($imgs_folder_URL/but_rt.png);width:5px;height:18px}
+	
+.widgetText12{font-size:12px;font-family:tahoma;color:#000}
+.widgetText11{font-size:11px;font-family:tahoma;color:#000}
+.widgetText10{font-size:10px;font-family:tahoma;color:#000}
+.widgetImg1{background-image:url($imgs_folder_URL/modal_1.png);width:7px;height:26px}
+.widgetImg2{background-image:url($imgs_folder_URL/modal_2.png);width:4px;height:1px}
+.widgetImg3{background-image:url($imgs_folder_URL/modal_3.png);width:7px;height:10px}
+.widgetImg4{background-image:url($imgs_folder_URL/modal_4.png);height:10px;height:1px}
+.widgetImg5{background-image:url($imgs_folder_URL/modal_5.png);width:10px;height:10px}
+.widgetImg6{background-image:url($imgs_folder_URL/modal_6.png);width:10px;height:1px}
+.widgetImg7{background-image:url($imgs_folder_URL/modal_7.png);width:10px;height:26px}
+.widgetImg8{background-image:url($imgs_folder_URL/modal_8.png);height:26px;height:1px}
+.widgetTitle{font-family:tahoma;font-size:10px;font-weight:normal;color:#445C8C}
+.widgetLogoImg{background-image:url($imgs_folder_URL/logo.png)}
+.widgetBody{background-color:#D9D9D6}
+.widgetBrandBorder{border:4px double #6C7474}
+.modal_close_{background-image:url($imgs_folder_URL/modal_close_.png);width:42px;height:25px}
+.modal_close{background-image:url($imgs_folder_URL/modal_close.png);width:42px;height:25px}
+.modal_dn{background-image:url($imgs_folder_URL/modal_dn.png);width:26px;height:25px}
+.modal_up{background-image:url($imgs_folder_URL/modal_up.png);width:26px;height:25px}

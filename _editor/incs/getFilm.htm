@@ -1,0 +1,432 @@
+lang("getFilm");
+$main="filmMain";
+$place="filmplace";
+$title="$widgettitle";
+$wigWid="520";
+$ico="film";
+require 'widgetBody.htm';
+if($isFF){$ffWid="size=70"}
+if($isIE){$ieWid="align=right";$ieBrd="border:1px solid #999999;background-color:#EBEBE4"}
+$uttfx="$uttf";$uttfz="$uttf";$uttfz=~s`$host``;
+$uttfx=~s`https*://``;
+$host_x=$host_;
+$host_x=~s/^www\.//;
+$wrd='\w';
+if($demo!=1){$demo=0}
+&getMonth;
+if($isIE){
+$BTN=qq~<table align=center  id=InsertThumbnailToVideobutton style="display:none;margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReInsertThumbnailtitle" $unz onclick=ceCopies("Redo")></td><td align=center><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=insertPlayer()>$InsertThumbnailToVideobutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$RemoveThumbnailtitle" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr><tr><td colspan=3 align="center" class=widgetText11 style="padding:10px">$placeCursor2</td></tr></table>~;
+
+$BTN2=qq~<table align=center style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN2 class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="$ReInsertVideotitle" $unz onclick=ceCopies("Redo") ></td><td align=center><table border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=insertVideo()>$InsertVideobutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN2 class=icon  style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="$RemoveVideotitle" $unz onclick=byId("redoBTN2").style.visibility="visible";ceCopies("Undo")></td></tr>
+<tr><td colspan=3 align="center" class=widgetText11 style="padding:10px">$placeCursor</td></tr></table>~;
+
+$clickSpot=$clickSpot1;
+
+}else{
+$BTN=qq~<table id=InsertThumbnailToVideobutton style="display:none;margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=insertPlayer()>$InsertThumbnailToVideobutton</td><td>$RBUT</td></tr><tr><td colspan=3 align="center" class=widgetText11 style="padding:10px">$placeCursor2</td></tr></table>~;
+$BTN2=qq~<table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="" $uns onclick=insertVideo()>$InsertVideo</td><td>$RBUT</td></tr>
+<tr><td colspan=3 align="center" class=widgetText11 style="padding:10px">$placeCursor</td></tr></table>~;
+$clickSpot=$clickSpot2;
+}
+
+$RETURN=qq~filmTbl='$BODY_TOP	
+
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td width=1% id=tab1 onclick=roll_vidTabs("tab1","div1") class=tab_ $uns>$InsertMovieThumbnailtab</td>
+<td width=1% id=tab2 onclick=roll_vidTabs("tab2","div2") class=tab $uns>$InsertVideoOnlytab</td>
+<td width=1% id=tab3 onclick=roll_vidTabs("tab3","div3") class=tab $uns>About Converting Videos</td>
+<td width=97% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td></tr></table>
+
+
+<DIV id=div1 style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px">
+
+
+<DIV id=div4>
+<table style="margin-bottom:0px;" align=center border=0 cellpadding=3 cellspacing=0><tr>
+<td $uns>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 style="padding-left:4px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:3px">
+<img id=up_arrow11 onclick=upDIR11() src="$utif/up_arrow.png" width="16" height="16" border="0" 
+title="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+<td style="width:20px;padding-left:7px">
+<img id=nu_folders onclick=cenewFolder11() src="$utif/foldernew.png" width="16" height="16" border="0" 
+title="$CreateNewFoldertitle" style="cursor:pointer"></td>
+	<td style="padding-left:7px" class="widgetText11">$text1
+	
+</td></tr></table></td></tr>
+<tr><td colspan=3 align=center>
+<iframe name=pad11 id=pad11 style="margin:5px 0px 10px 0px;width:500px;height:150px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=film" $uns onload=setVidFolder()></iframe>
+</td></tr></table>
+</td></tr>
+</table>
+<table style="table-layout:fixed;width:450px;" align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center style="font-family:tahoma,arial;font-size:11px;padding:10px">
+<form id=uploadVidForm name=uploadVidForm method=post enctype="multipart/form-data" action="$uttf?uploadVideo=one" target=fole style="margin:0px" accept-charset="ISO-8859-1">
+<input type=hidden id=vid_folder name=vid_folder value="">
+<input type=hidden id=vid_name name=vid_name value="">
+<center><input $ffWid style="$ieBrd;font-size:11px;width:440px" type=file id=uploadfield1 name=upload1 value=""></center>
+
+$text3</form></td></tr>
+<tr><td align=center style="font-family:tahoma,arial;font-size:11px;padding:10px">
+<form id=uploadThumbForm name=uploadThumbForm method=post enctype="multipart/form-data" action="$uttf?uploadThumb" target=fole2 style="margin:0px" accept-charset="ISO-8859-1">
+<input type=hidden id=thumb_folder name=thumb_folder value="">
+<input type=hidden id=thumb_name name=thumb_name value="">
+<center><input $ffWid style="$ieBrd;font-size:11px;width:440px" type=file id=uploadfield2 name=upload2 onchange=checkThumb() value=""></center>
+
+$text33</form>
+</td></tr>
+
+<tr><td align=center>
+<table id=UploadMovieFileToOpenedFolderbutton style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class $uns onclick=uploadMovi()>$UploadMovieFileToOpenedFolderbutton</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV><!-- div4 -->
+
+<iframe name=fole style="display:none"></iframe><iframe name=fole2 style="display:none"></iframe>
+
+<DIV id=thumbButt style="display:none;margin-top:10px" align=center>
+<DIV id=thumbButt2>
+<fieldset><legend>Thumbnail</legend>
+<table align=center border=0 cellpadding=5 cellspacing=0>
+<tr><td align=left class=widgetText11>$ThumbWidth:</td><td align=left><input class=input style="width:40px" onkeyup=proratV(this.id,this.value) id=thumbWidth value=""></td></tr>
+<tr><td align=left class=widgetText11>$ThumbHeight:</td><td align=left><input class=input style="width:40px" onkeyup=proratV(this.id,this.value) id=thumbHeight value=""></td></tr>
+<tr><td align=right class=widgetText11>$MaintainSizeRatio:</td><td align=left><input type=checkbox checked id=MaintainSizeRatio></td></tr>
+<tr><td align=left class=widgetText11 $uns>$ImageAlignment:</td>
+<td><select class=input style="font-family:tahoma,arial;font-size:11px" id="cVimgalign" $uns>
+<option value="">Not Set
+<option value="left">$optionleft
+<option value="right">$optionright
+<option value="texttop">$optiontexttop
+<option value="absmiddle">$optionabsmiddle
+<option value="baseline">$optionbaseline
+<option value="absbottom">$optionabsbottom
+<option value="bottom">$optionbottom
+<option value="middle">$optionmiddle
+<option value="top">$optiontop
+</select></td></tr>
+<tr><td align=left class=widgetText11 $uns>$BorderThickness:</td>
+<td align=left>
+<table border=0 cellpadding=0 cellspacing=0><tr><td align=left class=widgetText11>
+<input class=input style="width:22px" onfocus=select(this.value) id=cVimgborder value="0"></td></tr></table>
+</td></tr>
+</table>
+</fieldset><br>
+<fieldset style="margin-top:10px"><legend>Video</legend>
+<table align=center border=0 cellpadding=5 cellspacing=0>
+<tr><td colspan=2  class=widgetText11>Video Player Caption:</td><td colspan=2><input class=input style="width:140px" id=vidCaption></td></tr>
+<tr><td align=right class=widgetText11>$VideoWidth</td><td align=left><input class=input style="width:40px" id=vidWidth></td>
+<td align=right class=widgetText11 style="padding-left:20px">$VideoHeight</td><td align=right><input class=input style="width:40px" id=vidHeight></td></tr></table>
+</fieldset>
+<table id=saveThumbSizeButton align=center style="margin-bottom:10px;margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class $uns onclick=saveThumbSize()>$SaveSizes</td><td>$RBUT</td></tr></table>
+</DIV>
+$BTN
+</DIV>
+
+</DIV><!-- div1 -->
+
+
+
+
+<DIV id=div2 style="display:none;border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px;padding-bottom:10px">
+<table style="margin-bottom:0px;" align=center border=0 cellpadding=3 cellspacing=0><tr>
+<td $uns>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td colspan=2 style="padding-left:4px">
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:3px">
+<img id=up_arrow15 onclick=upDIR15() src="$utif/up_arrow.png" width="16" height="16" border="0" 
+alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+<td style="width:20px;padding-left:7px;visibility:hidden">
+<img id=nu_folders onclick=cenewFolder15() src="$utif/foldernew.png" width="16" height="16" border="0" 
+alt="$CreateNewFoldertitle" style="cursor:pointer"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$SelectVideoToInsert
+</td></tr></table>
+</td></tr>
+<tr><td colspan=3 align=center style="padding:0px">
+<iframe name=pad15 style="margin:5px 0px 10px 0px;width:500px;height:150px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=video" $uns onload=setVideo()></iframe>
+</td></tr></table>
+</td></tr></table>
+
+<DIV id=uploadVidDiv style="margin-top:10px">
+<form id=uploadVidForm2 name=uploadVidForm2 method=post enctype="multipart/form-data" action="$uttf?uploadVideo=two" target=fole style="margin:0px" accept-charset="ISO-8859-1">
+<center><input $ffWid style="$ieBrd;font-size:11px;width:440px" type=file id=uploadfield3 name=upload3 value=""></center>
+<DIV align=center class=widgetText11>$text3<br>
+<table id=UploadVideoFileToOpenedFolderbutton style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class $uns onclick=uploadVid()>$UploadVideoFileToOpenedFolderbutton</td><td>$RBUT</td></tr></table></DIV>
+<input type=hidden name=uploadVidURL id=uploadVidURL>
+</form>
+</DIV><!-- uploadVidDiv -->
+
+<div id=uploadedVidDiv style="display:none">
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center class=widgetText11 $uns>$VideoWidth:</td><td style="padding-left:5px">
+<input type=hidden name=uploadedVidURL id=uploadedVidURL>
+<input class=input style="width:30px" onfocus=select(this.value) id=cVDresizetowid4 name=cVDresizetowid4 value=""></td>
+</td><td align=center style="padding-left:20px" class=widgetText11>$VideoHeight:</td><td style="padding-left:5px">
+<input class=input style="width:30px" onfocus=select(this.value) id=cVDresizetohei4 name=cVDresizetohei4 value=""></td>
+</tr></table>
+<table align=center border=0 cellpadding=0 cellspacing=0><tr><td><input id=cVStart3 type=checkbox checked></td>
+<td style="padding-left:5px" class=widgetText11>$AutoStartVideo</td></tr></table>
+<DIV align=center>$BTN2</DIV>
+</div><!-- uploadedVidDiv -->
+</DIV><!-- div2 -->
+<DIV id=div3 style="display:none;padding:12px;line-height:1.5" class="widgetText12">
+$VID_NOTE
+</div><!-- div3 -->
+
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+demo="$demo";
+function checkThumb(){
+	if(!byId('uploadfield2').value.match(/jpg|png\$/i)){alert("$jpgORpng");byId('uploadfield2').value=""};
+}
+function insertPlayer(){
+	if(byId('classesIMGapply') && byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value!=''){
+		CLS=' class="'+byId('classesIMGapply').options[byId('classesIMGapply').selectedIndex].value+'"'
+	}else{
+		CLS=' '
+	}
+	//byId('thumb_folder').value+"/"+byId('thumb_name').value+"="+byId('thumbWidth').value+"="+byId('thumbHeight').value
+	ceimgalignment=byId('cVimgalign')[byId('cVimgalign').selectedIndex].value
+	
+	if(byId('cVimgborder').value!='' && byId('cVimgborder').value!=0){
+		imgBRD=' style="cursor:pointer;border:#000000 solid '+byId('cVimgborder').value+'px"'
+	}else{imgBRD=' style="cursor:pointer"'}
+	
+	vidURL=byId('uploadedVidURL').value
+	byId("vidCaption").value=byId("vidCaption").value.replace(/'/g,"&#39;")
+	cvimg='<table border=0 cellpadding=0 cellspacing=0 class=editablecellborder><tr>'+
+	'<td align=center style="FONT-SIZE: 10px; COLOR: black; FONT-FAMILY: verdana,helvetica;'+
+	' font-variant:small-caps;BACKGROUND-COLOR: transparent" class=editablecellborder>'+
+	'<img '+CLS+' name="'+vidURL+'" src="'+uploadedThumbURL+'" '+
+	'title="$clickToPlayVideo &bull; '+byId("vidCaption").value+'" align="'+ceimgalignment+'"'+
+	imgBRD+' width="'+byId("thumbWidth").value+'" height="'+byId("thumbHeight").value+'" '+
+	' onclick="playVid(this.name,'+byId('vidWidth').value+','+byId('vidHeight').value+',this.alt)" '+
+	'alt="'+byId("vidCaption").value+'"><br>'+byId("vidCaption").value+'</td></tr></table>'
+	if(!doc().getElementById("playerJS")){
+		cvimg+='\\n<script id=embedJS type="text/javascript" src="$flash_folder_URL/flowplayer.js"></script>'
+		cvimg+='\\n<script id=playerJS type="text/javascript" src="$uttfz?openPlayerJS"></script>'
+		script2 =editPad.document.createElement('script');	
+		script2.type = 'text/javascript';	
+		script2.defer = true;	
+		script2.id = 'embedJS';	
+		script2.src="$flash_folder_URL/flowplayer.js" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script2);		
+		script =editPad.document.createElement('script');	
+		script.type = 'text/javascript';	
+		script.defer = true;	
+		script.id = 'playerJS';	
+		script.src="$uttf?openPlayerJS" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script);		
+	}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+		return false
+	}else{
+		if(isIE){
+			capture()
+			byId('undoBTN').style.visibility="visible"
+			byId('redoBTN').style.visibility="hidden"
+			cesel.pasteHTML(cvimg)
+		}else{
+			doc().execCommand("InsertHTML", false, cvimg); 
+		}
+		cvimg=""
+	}	
+	roll_vidTabs("tab1","div1")
+	
+}
+activeVidUrl=''
+function insertVideo(){
+	if(byId('uploadedVidURL').value==''){return false}
+	if(byId('cVDresizetowid4').value==''){return false}
+	if(byId('cVDresizetohei4').value==''){return false}
+	activeVidUrl=byId('uploadedVidURL').value.replace(/https*:\\/\\//,"")
+	when=new Date()
+	when=when.getTime()
+	whenv=when+'v';whenvv=when+'vv'
+	cvimg2='<div class="videoSpot" id="'+when+'" style="border:1px dashed red">&nbsp;</div><!-- _videoSpot -->'
+	cvimg2+='\\n<script id=embedJS type="text/javascript" src="$flash_folder_URL/embed.js"></script>'	
+	qs=when+"="+activeVidUrl+"="+byId('cVDresizetowid4').value+"="+byId('cVDresizetohei4').value+"="+byId('cVStart3').checked
+	cvimg2+='\\n<script id='+whenv+' type="text/javascript" src="$uttfz?runPlayerJS='+qs+'"></script>'	
+	if(!doc().getElementById("embedJS")){
+		script2 =editPad.document.createElement('script');	
+		script2.type = 'text/javascript';	
+		script2.defer = true;	
+		script2.id = 'embedJS';
+		script2.src="$flash_folder_URL/embed.js" 	
+		editPad.document.getElementsByTagName('head')[0].appendChild(script2);		
+	}
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+		return false
+	}else{
+		if(isIE){
+			capture()
+			byId('undoBTN2').style.visibility="visible"
+			byId('redoBTN2').style.visibility="hidden"
+			cesel.pasteHTML(cvimg2)			
+		}else{
+			doc().execCommand("InsertHTML", false, cvimg2); 
+		}
+		cvimg2=""
+	}	
+		script =editPad.document.createElement('script');	
+		script.type = 'text/javascript';	
+		script.defer = true;	
+		script.id = whenvv;	
+		script.src="$uttf?runPlayerJS="+qs
+		editPad.document.getElementsByTagName('body')[0].appendChild(script);	
+		basicAlert("$clickSpot")
+	byId('uploadedVidDiv').style.display="none"			
+	byId('uploadVidDiv').style.display="block"
+	byId('uploadfield3').value=""
+	byId('UploadVideoFileToOpenedFolderbutton').style.visibility="visible"
+	
+}
+function setVideo(){
+	byId('uploadVidURL').value=pad15.dir
+}
+function roll_vidTabs(tb,dv){
+	byId('tab1').className="tab"
+	byId('tab2').className="tab"
+	byId('tab3').className="tab"
+	byId(tb).className="tab_"
+	byId('div1').style.display="none"
+	byId('div2').style.display="none"
+	byId('div3').style.display="none"
+	byId(dv).style.display="block"
+	if(tb=="tab1"){
+		byId('UploadMovieFileToOpenedFolderbutton').style.display="table";
+		parent.byId('div4').style.display="block";
+		byId('thumbButt2').style.visibility="visible";
+		byId('thumbButt2').style.display="none"
+		byId('InsertThumbnailToVideobutton').style.display="none"
+	}
+	if(tb=="tab3"){
+		byId('uploadedVidDiv').style.display="none"			
+		byId('uploadVidDiv').style.display="block"
+	}
+}
+function selection11(dir,path,url){
+	if(dir == "dir"){
+		pad11.location="$uttf?pathTree=x=film="+path
+		//pad12.location="$uttf?pathTree=x=thumb="+path
+		pad15.location="$uttf?pathTree=x=video="+path
+	}
+}
+function upDIR11(){
+	pad11.location="$uttf?pathTree=up=film="+pad11.updir
+	//pad12.location="$uttf?pathTree=up=thumb="+pad12.updir
+	pad15.location="$uttf?pathTree=up=video="+pad15.updir
+}
+function selection15(dir,path,url){
+	if(dir == "dir"){
+		pad15.location="$uttf?pathTree=x=video="+path
+		pad11.location="$uttf?pathTree=x=film="+path
+		//pad12.location="$uttf?pathTree=x=thumb="+path
+	}
+	if(dir == "bin"){
+		activeVidUrl=url
+	}
+}
+function upDIR15(){
+	pad15.location="$uttf?pathTree=up=video="+pad15.updir
+	pad11.location="$uttf?pathTree=up=film="+pad11.updir
+	//pad12.location="$uttf?pathTree=up=thumb="+pad12.updir
+}
+
+function setVidFolder(){
+	byId('vid_folder').value=pad11.dir
+	byId('thumb_folder').value=pad11.dir
+}
+function cenewFolder11(){
+	if(byId('inputplace').innerHTML==""){
+		var URL="$uttf?getInput=folder11="+pad11.urldir
+		JITc(URL)
+	}else{
+		scrolledTop()
+		setUp('inputMain','inputplace',200)
+	}
+}
+~;
+$RETURN.=qq~
+uploadingVid=0;smp=0;
+function uploadMovi(){
+	if(demo==1){alert("$disabled");return false}
+	if(byId('uploadfield1').value=="" || byId('uploadfield2').value==""){
+		byId('yesBut').innerHTML="$OK"
+		active_alert="$htmlalert"
+		doAlert("alert")
+		active_function = new Function("closeAlert()")
+		return false
+	}
+	byId('uploadVidForm').submit()
+	byId('UploadMovieFileToOpenedFolderbutton').style.display="none"
+}
+function uploadVid(){
+	if(demo==1){alert("$disabled");return false}
+	if(byId('uploadfield3').value==""){
+		byId('yesBut').innerHTML="$OK"
+		active_alert="$htmlalert2"
+		doAlert("alert")
+		active_function = new Function("closeAlert()")
+		return false
+	}
+	byId('uploadVidForm2').submit()
+	byId('UploadVideoFileToOpenedFolderbutton').style.visibility="hidden"
+
+}
+wratio=0
+hratio=0
+function proratV(n,v){//alert(n)
+	if(byId('MaintainSizeRatio').checked==false){return false}
+	if(n=="thumbWidth"){
+		ratio=v/ceimgwid
+		byId('thumbHeight').value=parseInt(ceimghei*ratio)
+	}
+	if(n=="thumbHeight"){
+		ratio=v/ceimghei
+		byId('thumbWidth').value=parseInt(ceimgwid*ratio)
+	}
+}
+
+thumbButtOn=0
+function saveThumbSize(){
+	byId('saveThumbSizeButton').style.display="none"
+	if(byId('thumbWidth').value==ceimgwid){
+		byId('saveThumbSizeButton').style.display="none"
+		byId('thumbButt2').style.visibility="hidden"
+		byId('InsertThumbnailToVideobutton').style.display="table"
+	}else{
+		url="$uttf?resizeThumb="+byId('thumb_folder').value+"/"+byId('thumb_name').value+"="+byId('thumbWidth').value+"="+byId('thumbHeight').value
+		JITc(url)
+	}
+}
+
+byId('filmplace').innerHTML=filmTbl
+
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassoption'
+for(i=0;i<pageClassesArray.length;++i){
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+if(byId('classesIMGapply')){
+	byId('clasesIMGapply').innerHTML='<select id=classesIMGapply class=input style="max-width:100px">'+sopts+'</select>'
+	byId('clasesIMGapply').width="230"
+}
+csFilm()
+}
+
+~;
+
+
+sub getMonth{
+$datetime = localtime;
+($wkday, $month, $date, $time, $yr) = split(/\s+/,$datetime);
+}#getMonth
+1;

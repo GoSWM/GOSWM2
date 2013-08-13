@@ -1,0 +1,118 @@
+lang("htmlEdit");
+$main="htmleditMain";
+$place="htmleditplace";
+$title="$widgettile";
+$wigWid="350";
+$ico="edit_html";
+$close_img="modal_close_";
+require 'widgetBody.htm';
+
+
+if($isFF){$ffHid="display:none"}
+
+$RETURN.=qq~htmlTbl='$BODY_TOP
+	<DIV id=notespace style="font-family:tahoma,arial;font-size:12px;text-align:center;margin:10px">
+	$text1
+	<DIV id=selectspace style="margin-top:10px;max-height:300px;overflow-y:auto;overflow-x:hidden"></DIV>
+	</DIV>
+	<div id=editspace style="display:none">	
+	
+	<div style="text-align:center">
+	<table width=100% align=center border=0 cellpadding=0 cellspacing=0><tr><td width=1%>
+	<table style="margin:0px 0px 2px 5px;$ffHid" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center id=wrapBut onclick=WrapHTML() $button_class>$button1</td><td>$RBUT</td></tr></table>
+	</td><td align=right width=99%>
+	<table style="margin:0px 5px 2px 0px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+	<td align=center onclick=applyHtmlEdits() $button_class>$button2</td><td>$RBUT</td></tr></table></td></tr></table></DIV>
+
+<textarea id=htmlTXT style="overflow:auto;padding:3px;font-size:12px;width:660px;height:300px;border:1px solid #999999"></textarea>
+		</DIV>
+		<DIV id=editDrag style="display:none;text-align:right;background-image:url($utif/resizebar.png);">
+		<img src="$utif/resizecornor.png" width="12" height="12" border="0" title="$Resizetitle" ondragstart="return false"  onmousedown=dragCornor(event) style="cursor:nw-resize"></DIV>
+</div>
+		</td>
+	<td class=widgetImg6 $uns>
+		<img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+</tr>
+<tr>
+	<td><img src="$utif/spacer.png" class=widgetImg3 $uns></td>
+	<td class=widgetImg4 $uns><img src="$utif/spacer.png" width="1" height="1" border="0" $uns></td>
+	<td><img src="$utif/spacer.png" class=widgetImg5 border="0" $uns></td>
+</tr>
+</table></DIV>';~;
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function WrapHTML(){
+	if(byId("htmlTXT").getAttribute("wrap")=="off"){
+		byId('wrapBut').innerHTML="Wrap Off"
+		byId("htmlTXT").setAttribute("wrap","soft")
+	}else{
+		byId("htmlTXT").setAttribute("wrap","off")
+		byId('wrapBut').innerHTML="Wrap On"
+	}
+}
+function dragCornor(e){
+ 	if(!e){var e=window.event};
+    offsetX=e.clientX;
+    offsetY=e.clientY;
+    coordX=parseInt(byId('htmlTXT').style.width);
+    coordY=parseInt(byId('htmlTXT').style.height);
+    MaxCornorDrag=true;
+    document.onmousemove=dragCornorMax;	
+	document.onmouseup=nodragCornor;
+}
+function nodragCornor(){
+	if(MaxCornorDrag==true){
+		MaxCornorDrag=false;
+		byId('shadow').style.display="none"
+		document.onmouseup=''
+	}
+}
+function dragCornorMax(e){
+	if(!MaxCornorDrag){return};
+	byId('shadow').style.display="block"
+	if(!e){var e=window.event};
+   	var drgWid=coordX+e.clientX-offsetX
+   	var drgHei=coordY+e.clientY-offsetY
+	if(drgWid<460){return false}
+	if(drgHei<200){return false}
+	byId('htmlTXT').style.width=drgWid+"px"
+	byId('htmlTXT').style.height=drgHei+"px"
+	byId('tbl_htmleditMain').style.width=drgWid+10+"px"
+	return false;
+}
+function setHtmlEdits(obj){
+	obj=obj.replace(/_/g," ")
+ 	if(obj == 'bodycontent'){byId('htmlTXT').value=editPad.document.body.innerHTML;activeHTML=editPad.document.body}
+	for(i=0;i<padAll.length;++i){
+	if(padAll[i].name){continue}
+		if(padAll[i].className.indexOf(obj)!=-1){
+			activeHTML=padAll[i]
+			byId('htmlTXT').value=padAll[i].innerHTML
+		}
+		if(padAll[i].id.indexOf(obj)!=-1){
+			activeHTML=padAll[i]
+			byId('htmlTXT').value=padAll[i].innerHTML
+		}
+	}
+	byId('notespace').style.display="none"
+	byId('editspace').style.display="block"
+	byId('editDrag').style.display="block"
+	byId('img_htmleditMain').style.visibility="visible"
+	byId('htmleditMain').style.left="0px"
+	byId('htmleditMain').style.top="0px"
+	byId('tbl_htmleditMain').style.width="670px"
+	byId('htmleditMain').style.width="660px"
+}
+function applyHtmlEdits(){
+	activeHTML.innerHTML=byId('htmlTXT').value
+}
+
+byId('htmleditplace').innerHTML=htmlTbl
+byId('img_$main').style.display="none"
+cehtml()
+~;
+
+
+1;

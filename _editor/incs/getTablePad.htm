@@ -1,0 +1,281 @@
+lang("getTablePad");
+$main="tablePadMain";
+$place="tableplace";
+$title="$widgettitle";
+$wigWid="360";
+$ico="table";
+require 'widgetBody.htm';
+
+
+$RETURN=qq~tableTbl='$BODY_TOP
+<form name=ceTableForm style="margin:0px">
+<table width=100% height=20 border=0 cellpadding=0 cellspacing=0 style="margin-bottom:10px"><tr>
+<td width=1% id=Ltab onclick=cetswap("Ptab") $uns" class=tab_>$Layouttab</td>
+
+<td width=1% id=Ptab class=tab onclick=cetswap("Ltab") $uns>$Propertiestab</td>
+<td width=98% style="border-bottom:1px solid #FFFFFF;" align=right>
+
+<table style="margin:0px 12px 1px 0px" border=0 cellpadding=0 cellspacing=0><tr>
+<td>$LBUT</td><td align=center onclick=insertTable() $button_class $uns>$InsertTablebutton</td><td>$RBUT</td></tr></table></td>
+</tr></table>
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf">
+
+<table align=center border=0 cellpadding=0 cellspacing=5 style="width:320px">
+<tr><td align=center style="border:0px solid #999999;padding:0px">
+<table align=center border=0 cellpadding=0 cellspacing=0 style="">
+<tr height=140><td width=99% style="padding:5px">
+<span id=tbl_span>
+<table id=cetbl width=300 height=130 border=0 cellpadding=0 bgcolor=white cellspacing=1 style="border:1px solid black">
+<tr>
+<td $uns onclick=sel(event) style="border:1px solid black" bgcolor=C0C0C0>&nbsp;</td>
+<td $uns onclick=sel(event) style="border:1px solid black" bgcolor=C0C0C0>&nbsp;</td></tr>
+<tr><td $uns onclick=sel(event) style="border:1px solid black" bgcolor=C0C0C0>&nbsp;</td>
+<td $uns onclick=sel(event) style="border:1px solid black" bgcolor=C0C0C0>&nbsp;</td></tr>
+</table></span>
+</td>
+<td $uns id=row_set rowspan=2 valign=top width=1% align=center style="font-family:tahoma,arial;font-size:11px">$Row<br>
+<img $uns src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=add_row() style="margin-top:2px"><br>
+<img $uns src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=minus_row() style="margin-top:2px">
+
+
+<div $uns style="margin-top:10px;margin-bottom:3px;font-family:tahoma,arial;font-size:11px">$RowSpan</div>
+<img $uns src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=add_rowspn() style="margin-top:2px"><br>
+<img $uns src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=minus_rowspn() style="margin-top:2px"></td></tr>
+<tr>
+<td colspan=2 id=cell_set style="font-family:tahoma,arial;font-size:11px">
+<table style="width:300px" border=0 cellpadding=0 cellspacing=0><tr>
+<td $uns width=1% nowrap style="font-family:tahoma,arial;font-size:11px">$Column </td><td width=1%>
+<img $uns align="$abs" src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=add_col() style="margin-left:2px;margin-right:2px"></td><td width=1%>
+<img $uns align="$abs" src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=minus_col() style="margin-right:2px"></td>
+<td $uns width=1% nowrap style="font-family:tahoma,arial;font-size:11px;padding-left:30px">$ColumnSpan </td><td width=1%>
+<img $uns src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=add_colspn() style="margin-left:2px;margin-right:2px">
+</td><td width=1%>
+<img $uns align="$abs" src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=minus_colspn() style="margin-right:2px"></td>
+<td $uns width=94% align=right style="font-family:tahoma,arial;font-size:11px">$Cell 
+<img $uns align="$abs" src="$utif/plus.png" width="17" height="17" border="0" alt="" onclick=add_cell() style="margin-left:2px;margin-right:2px">
+<img $uns align="$abs" src="$utif/minus.png" width="17" height="17" border="0" alt="" onclick=minus_cell() style="margin-right:4px"></td></tr></table></td>
+</tr></table></td></tr>
+<tr><td style="font-family:tahoma,arial;font-size:11px">
+
+<div id=notes_div style="border:1px solid #999999;padding:3px 5px;background-color:#f9f9f9;display:;width:335px">
+<div style="margin:0px 0px">
+&bull; $text1<br>
+&bull; $text2<br>
+&bull; $text3<br>
+&bull; $text4</div>
+<div style="margin-top:10px">
+$text5: <br>
+&bull; $text6<br>
+&bull; $text7<br>
+&bull; $text8</div></div>
+<div id=tbl_prop_div style="padding:3px 5px;display:none;">
+$text10<br>
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td><input style="font-family:tahoma,arial;font-size:11px;width:30px" onfocus=select() name=tableWidth1 value=""></td>
+<td style="font-family:tahoma,arial;font-size:11px">$Width %&nbsp;&nbsp;</td>
+<td><input  style="font-family:tahoma,arial;font-size:11px;width:30px" onfocus=select() name=tableWidth2 value="100"></td>
+<td style="font-family:tahoma,arial;font-size:11px">$Width px&nbsp;&nbsp;</td>
+<td><input style="font-family:tahoma,arial;font-size:11px;width:30px" onfocus=select() name=tableHeight value="100"></td>
+<td style="font-family:tahoma,arial;font-size:11px">$Height px&nbsp;&nbsp;</td></tr>
+<tr><td colspan=2 style="font-family:tahoma,arial;font-size:11px;visibility:hidden;">&nbsp;</td>
+<td><input style="font-family:tahoma,arial;font-size:11px;width:20px" onfocus=select() name=tablePadding value="0"></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CellPadding&nbsp;&nbsp;</td>
+<td><input style="font-family:tahoma,arial;font-size:11px;width:20px" onfocus=select() name=tableSpacing value="0"></td>
+<td style="font-family:tahoma,arial;font-size:11px">$CellSpacing&nbsp;&nbsp;</td></tr>
+</table>
+</div>
+
+<center><div style="border:1px solid #999999;padding:3px 5px;background-color:#f9f9f9;margin:5px 0px;width:290px;">
+$text9 </div></center>
+
+</td></tr>
+</table></form>
+</div>
+$BODY_BOT'~;
+
+
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+noTableCellWord="$noTableCellWord"
+byId('tableplace').innerHTML=tableTbl
+cetable()
+cycle=1
+var undus
+var selectedTD
+var selectedTR
+var selectedTBL
+
+function undu(){
+undus=byId("tbl_span").innerHTML
+}
+function re_du(){
+byId("tbl_span").innerHTML=undus
+}
+function sel(e){
+if(isIE){selectedTD=event.srcElement}
+if(isFF){selectedTD=e.target}
+selectedTR=selectedTD.parentNode
+selectedTBL=selectedTR.parentNode
+cls=selectedTD.cellIndex
+	for(i=0;i<selectedTBL.rows.length;++i){
+		for(j=0;j<selectedTBL.rows[i].cells.length;++j){
+		selectedTBL.rows[i].cells[j].style.backgroundColor="#C0C0C0"
+		}
+	}
+selectedTD.style.backgroundColor="#808080"
+}
+function add_row(){
+undu()
+trx=byId("cetbl").rows.length
+trx_len=byId("cetbl").rows[trx-1].cells.length
+trnu=byId("cetbl").insertRow(trx)
+for(i=0;i<trx_len;++i){
+	 tdx=trnu.insertCell(i);
+	 tdx.style.borderStyle="solid"
+	 tdx.style.borderWidth="1px"
+	 tdx.style.borderColor="black"
+	 tdx.style.backgroundColor="C0C0C0"
+	 tdx.innerHTML="&nbsp;"
+	 tdx.onclick=sel
+	 tdx.$uns
+	 }
+}
+function add_col(){
+undu()
+for(i=0;i<byId("cetbl").rows.length;++i){
+tdindx=byId("cetbl").rows[i].cells.length
+tdx=byId("cetbl").rows[i].insertCell(tdindx)
+	 tdx.style.borderStyle="solid"
+	 tdx.style.borderWidth="1px"
+	 tdx.style.borderColor="black"
+	 tdx.style.backgroundColor="C0C0C0"
+	 tdx.innerHTML="&nbsp;"
+	 tdx.onclick=sel
+	 tdx.$uns
+}}
+function minus_row(){
+undu()
+	byId("cetbl").deleteRow(byId("cetbl").rows.length-1)
+}
+function minus_col(){
+undu()
+for(i=0;i<byId("cetbl").rows.length;++i){
+tdindx=byId("cetbl").rows[i].cells.length-1
+tdx=byId("cetbl").rows[i].deleteCell(tdindx)
+}
+}
+function add_rowspn(){
+	undu()
+	if(selectedTD==undefined){return false}
+	cl_x=selectedTD.cellIndex
+	tr_x=selectedTR.rowIndex
+	if(selectedTD.getAttribute("rowSpan")==null){selectedTD.setAttribute("rowSpan",1)}
+  	tr_x+=parseInt(selectedTD.getAttribute("rowSpan"))
+		while(!selectedTBL.rows[tr_x].cells[cl_x]){--cl_x} 
+	selectedTBL.rows[tr_x].deleteCell(cl_x)
+	selectedTD.setAttribute("rowSpan",parseInt(selectedTD.getAttribute("rowSpan"))+1)
+}
+
+function add_colspn(){
+	undu()
+	if(selectedTD==undefined){return false}
+	if(selectedTD.getAttribute("colSpan")==null){selectedTD.setAttribute("colSpan",1)}
+	td_x=selectedTD.cellIndex
+	++td_x
+	selectedTR.deleteCell(td_x)
+	selectedTD.setAttribute("colSpan",parseInt(selectedTD.getAttribute("colSpan"))+1)
+}
+
+function minus_rowspn(){
+	undu()
+	selectedTD.setAttribute("rowSpan",selectedTD.getAttribute("rowSpan")-1)
+}
+function minus_colspn(){
+	undu()
+	selectedTD.setAttribute("colSpan",selectedTD.getAttribute("colSpan")-1)
+}
+function add_cell(){
+	undu()
+if(selectedTBL != undefined){
+tdx=selectedTR.insertCell(selectedTD.cellIndex+1)
+	 tdx.style.borderStyle="solid"
+	 tdx.style.borderWidth="1px"
+	 tdx.style.borderColor="black"
+	 tdx.style.backgroundColor="C0C0C0"
+	 tdx.innerHTML="&nbsp;"
+	 tdx.onclick=sel
+}}
+
+function minus_cell(){
+undu()
+	selectedTR.deleteCell(selectedTD.cellIndex)
+}
+function re_set(){
+ind=0
+for(i=0;i<docAll.length;++i){if(docAll[i].id=="tbl"){ind=i}}
+	byId('yesBut').innerHTML="$YES"
+	active_alert="$htmlalert1?"
+	doAlert("confirm")
+	active_function = new Function("byId('tbl_span').innerHTML=byId('bu_table').innerHTML;closeAlert()")
+	cancel_function = new Function("closeAlert()")
+docAll[ind].id="tbl"
+}
+function tbl_lay(){
+	byId("notes_div").style.display=""
+	byId("tbl_prop_div").style.display='none'
+	byId('row_set').style.visibility='visible'
+	byId('cell_set').style.display='block'	
+	byId("tbl_span").style.display=""
+}
+function tbl_prop(){
+	byId("notes_div").style.display="none"
+	byId("tbl_prop_div").style.display=''
+	byId('row_set').style.visibility='hidden'
+	byId('cell_set').style.display='none'
+	byId("tbl_span").style.display=""
+}
+function cetswap(obj){
+if(obj=="Ptab"){
+	byId("Ltab").className="tab_"
+	byId("Ptab").className="tab"
+	tbl_lay()
+}else{
+	byId("Ltab").className="tab"
+	byId("Ptab").className="tab_"
+	tbl_prop()
+}
+}
+function insertTable(){
+	Form=document.ceTableForm
+	if(Form.tableWidth1.value!=''){
+		tblWid=Form.tableWidth1.value+"%"
+	}else{
+		tblWid=Form.tableWidth2.value
+	}
+	ceTBL='<table class=editablecellborder width="'+tblWid+'" height="'+Form.tableHeight.value+'"  cellPadding="'+Form.tablePadding.value+'" cellSpacing="'+Form.tableSpacing.value+'"><tbody>'
+	for(i=0;i<byId("cetbl").rows.length;++i){
+	ceTBL += '<tr>\\n'
+		for(j=0;j<byId("cetbl").rows[i].cells.length;++j){
+			if(noTableCellWord==1){
+			ceTBL += '<td class=editablecellborder colSpan="'+byId("cetbl").rows[i].cells[j].colSpan+'" rowSpan="'+byId("cetbl").rows[i].cells[j].rowSpan+'"></td>'
+			}else{
+			ceTBL += '<td class=editablecellborder colSpan="'+byId("cetbl").rows[i].cells[j].colSpan+'" rowSpan="'+byId("cetbl").rows[i].cells[j].rowSpan+'">CELL</td>'
+			}
+		}
+	ceTBL += '</tr>\\n'
+	}
+	ceTBL += '</tbody></table>'
+	cecheck_selected()
+	if(ceinside==0){
+		basicAlert("$notinside")
+	}else{
+		if(isIE){
+			cesel.pasteHTML(ceTBL)
+		}else{
+			doc().execCommand("InsertHTML", false, ceTBL); 
+		}
+	}
+	show_cells()
+}
+~;
+1;

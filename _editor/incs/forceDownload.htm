@@ -1,0 +1,12 @@
+$file_=$params;$file_=~s`/``;
+
+$file=$root.$params;
+
+$file_name = "$file_";
+print "Content-Type: application/x-unknown\n";
+print "Content-Disposition: attachment; filename=$file_\n\n"; 
+open(R,"$file");
+while(<R>){print}
+close(R);
+
+1;

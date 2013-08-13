@@ -1,0 +1,77 @@
+lang("createThumbnail");
+($file,$wid,$hei)=split(/=/,$params);
+$file="http://".$file;
+$url=$file;
+$file=~s`$host`$root`;
+$wh=$wid."x".$hei;
+$thumb=$file;
+$thumb=~s`(\.[^\.]+)$`_th$1`;
+use Image::Size;
+($width, $height) = imgsize("$file");
+$isIM=eval { require Image::Magick; } ? 1 : 0;
+$isGD=eval { require GD; } ? 1 : 0;
+$isLWP=eval { require LWP::Simple } ? 1 : 0;
+if($isIM==1 && !$disableIM){	
+	require 'useImageMagick.htm';
+	$img = new Image::Magick;
+  	$img->Read("$file");
+	$img -> Resize($wh);
+	$img -> Write($thumb);
+	$ok=1;
+}elsif($isGD && !$disableGD){
+	require 'useGDLibrary.htm';
+	if($wid>$hei){$WH=$wid}else{$WH=$hei}
+	$file =~ m`\.(\w+)$`;$ext=$1;
+    open IN, "$file"  or die "Could not open.";
+	if($ext =~/png/i){
+        $srcImage = GD::Image->newFromPng(*IN);
+	}
+	if($ext =~/jpg/i){
+        $srcImage = GD::Image->newFromJpeg(*IN);
+	}
+    close IN;
+    ($thumbvar,$x,$y) = createGD($srcImage,$WH);
+    open OUT, ">$thumb" or die "Could not save ";
+    binmode OUT;
+	if($ext =~/jpg/i){
+		print OUT $thumbvar->jpeg;
+	}
+ 	if($ext =~/png/i){
+       	print OUT $thumbvar->png;
+	}
+    close OUT;
+	$ok=1;		
+}else{
+	$ok=2;
+}
+
+
+$thumb_=$url;
+$thumb_=~s`(\.[^\.]+)$`_th$1`;
+if($ok==1){
+$RETURN=qq~basicAlert("$htmlalert1 $thumb_ $htmlalert2")
+cedisplayphoto("$thumb_");
+pad4.reloader()
+~;
+}elsif($ok==2 && $isLWP){
+	$URL=qq~http://gphrs.com/cgi/imagemagick_createThumbnail.cgi?resize=$url=$wid=$hei=$domain_license=$uttf~;
+	$RETURN=qq~JITc("$URL")~;
+}else{
+	$RETURN=qq~basicAlert("$htmlalert3 $thumb_ $htmlalert4")~;
+}
+1;
+
+
+sub createGD { my ($orig,$max) = (shift,shift);
+	($ox,$oy) = $orig->getBounds();
+	($maxx, $maxy);
+	if (($maxx, $maxy) = $max =~ /^(\d+)x(\d+)$/i){
+		$max = ($ox>$oy)? $maxx : $maxy;
+	} else {
+		$maxx = $maxy = $max;
+	}
+	$r = ($ox/$maxx) > ($oy/$maxy) ? ($ox/$maxx) : ($oy/$maxy);
+	$thumbvar = GD::Image->new($ox/$r,$oy/$r);
+	$thumbvar->copyResized($orig,0,0,0,0,$ox/$r,$oy/$r,$ox,$oy);
+	return $thumbvar, sprintf("%.0f",$ox/$r), sprintf("%.0f",$oy/$r);
+}

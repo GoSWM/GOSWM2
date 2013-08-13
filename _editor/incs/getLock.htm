@@ -1,0 +1,144 @@
+lang("getLock");
+$main="lockMain";
+$place="lockplace";
+$title="$widgettitle";
+$wigWid="494";
+$ico="lock";
+require 'widgetBody.htm';
+if($demo){$DEMO=qq~demoing();return false~}
+
+
+$RETURN=qq~lockTbl='$BODY_TOP
+<table width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td id=LK1 onclick=lkSwap(1) class=tab_ $uns>$ProtectFoldertab</td>
+<td id=LK2 onclick=lkSwap(2) class=tab $uns>$ManageProtectedFoldertab</td>
+<td id=LK3 onclick=lkSwap(3) class=tab $uns>$CreateMemberSignupFormtab</td>
+<td width=97% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td></tr></table>
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px">
+
+<table align=center border=0 cellpadding=1 cellspacing=0>
+<tr><td colspan=2 align=left>
+<table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:3px">
+<img id=up_arrow17 onclick=upDIR17() src="$utif/up_arrow.png" width="16" height="16" border="0" 
+alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px" id=LKhead>$text1
+</td></tr></table>
+</td></tr>
+<tr><td colspan=2 align=center class=widgetText11 style="padding:0px">
+<iframe id=padframe name=pad17 style="margin:5px 0px 10px 0px;width:470px;height:150px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=lock" $uns onload=setLockFold(pad17.dirvirtual)></iframe>
+</td></tr></table>
+<DIV id=LKdv1>
+<table align=center border=0 cellpadding=1 cellspacing=0>
+<tr>
+<td align=left class=widgetText11>$Foldertoprotect</td>
+<td align=left><input readonly id=Foldertoprotect class=input value="" style="width:280px;background-color:#cccccc"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Defaultmembersname</td>
+<td align=left><input id=Defaultmembersname class=input value="" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Defaultmemberspw</td>
+<td align=left><input type=password id=Defaultmemberspw class=input value="" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11 style="white-space:nowrap">$Repeatmemberpw</td>
+<td align=left><input type=password id=Repeatmemberpw class=input value="" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11 style="white-space:nowrap">$Defaultmembersem</td>
+<td align=left><input id=Defaultmembersem class=input value="" style="width:180px"></td>
+</tr>
+<tr>
+<td align=left class=widgetText11>$Realmname</td>
+<td align=left><input id=Realmname class=input value="" style="width:180px"></td>
+</tr>
+
+<tr><td colspan=2 align=center>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td><td align=center $button_class title="Insert Form" $uns onclick=ceCreateHtaccess()>$Createbutton</td><td>$RBUT</td></tr></table>
+</td>
+</tr></table>
+</div><!-- LKdv1 -->
+<DIV id=LKdv2 style="display:none" class=widgetText11 align=center>
+<DIV id=memberopts>2</DIV>
+</DIV>
+<DIV id=LKdv3 style="display:none" class=widgetText11 align=center>
+<DIV id=signupdiv>3</DIV>
+</DIV>
+</div><!-- OUTSIDEDIV -->
+		$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+
+$RETURN.=qq~
+LKheadtxt1="$text1"
+LKheadtxt2="$text2"
+LKheadtxt3="$text3"
+
+function selection17(dir,path,url){
+	if(dir == "dir"){
+		pad17.location="$uttf?pathTree=x=lock="+path
+	}
+}
+function upDIR17(){
+	pad17.location="$uttf?pathTree=up=lock="+pad17.updir
+}
+function setLockFold(val){
+	byId('Foldertoprotect').value="/"+val
+	isProtected()
+}
+function lkSwap(n){
+	byId('LK1').className="tab"
+	byId('LK2').className="tab"
+	byId('LK3').className="tab"
+	byId('LKdv1').style.display="none"
+	byId('LKdv2').style.display="none"
+	byId('LKdv3').style.display="none"
+	var LK="LK"+n
+	byId(LK).className="tab_"
+	LKdv="LKdv"+n
+	byId(LKdv).style.display="block"
+	LKheadtxt="LKheadtxt"+n
+	byId('LKhead').innerHTML=eval(LKheadtxt)
+}
+function isProtected(){
+	var url="$uttf?isProtected="+pad17.dir
+	JITc(url)
+}
+function ceCreateHtaccess(){
+$DEMO
+	if(byId('Repeatmemberpw').value != byId('Defaultmemberspw').value){alert("$nomatch");return false}
+	qs="Type=Create&Foldertoprotect="+byId('Foldertoprotect').value+"&Defaultmembersname="+byId('Defaultmembersname').value+"&Defaultmemberspw="+byId('Defaultmemberspw').value+"&Realmname="+byId('Realmname').value+"&Defaultmembersem="+byId('Defaultmembersem').value
+	var url="$uttf?doProtect="+escape(qs)
+	JITc(url)
+}
+function ceAddMember(){
+$DEMO
+	if(byId('RepeatNewPassword').value != byId('NewPassword').value){alert("$nomatch");return false}
+	qs="Type=Add&Foldertoprotect="+byId('Foldertoprotect').value+"&NewMemberName="+byId('NewMemberName').value+"&NewPassword="+byId('NewPassword').value+"&NewMemberEmail="+byId('NewMemberEmail').value
+	var url="$uttf?doProtect="+escape(qs)
+	JITc(url)
+}	
+function ceRemoveMember(){
+$DEMO
+	if(byId('RemoveMember').options[byId('RemoveMember').selectedIndex].value==''){return false}
+	qs="Type=Remove&Foldertoprotect="+byId('Foldertoprotect').value+"&RemoveMemberName="+byId('RemoveMember').options[byId('RemoveMember').selectedIndex].value
+	var url="$uttf?doProtect="+escape(qs)
+	JITc(url)
+}	
+function ceRemoveProtection(){
+	active_alert="$htmlalert4?<br><BR>&nbsp;&nbsp;"+pad17.urldir
+	doAlert("confirm")
+	active_function = new Function("doRemoveProtection()")
+	cancel_function = new Function("closeAlert()")
+}
+function doRemoveProtection(){
+	qs="Type=DeleteAll&Foldertoprotect="+byId('Foldertoprotect').value
+	var url="$uttf?doProtect="+escape(qs)
+	JITc(url)
+}
+byId('lockplace').innerHTML=lockTbl;
+csLock();
+~;
+
+1;

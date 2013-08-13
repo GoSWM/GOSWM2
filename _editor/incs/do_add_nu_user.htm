@@ -1,0 +1,223 @@
+&get_input;
+lang("do_add_nu_user");
+&get_cookie;
+
+if($folder_to_populate_from eq $create_username_folder_in_folder){&stop}
+
+if($Sign_Up_Username){
+	($un,$pwk)=split(/\|/,$Sign_Up_Username);
+	if($un ne $user_name){&different_name}
+	$kryp=crypt($un,"ce");
+	$kryp=substr($kryp,2);
+	if($kryp ne $pwk){&wrong_username}
+}
+if($create_username_folder_in_folder =~ /www\./ && $host !~ /www\./){$host=$http."www.".$ENV{'HTTP_HOST'}}
+$in_folder=$create_username_folder_in_folder;
+$in_folder=~s`$host``;
+$create_username_folder_in_folder=~s`$host``;
+$folder_to_populate_from=~s`$host``;
+$root=~s`/$``;
+$create_username_folder_in_folder=$root.$create_username_folder_in_folder;
+$create_username_folder_in_folder.="/$user_name";
+$create_username_folder_in_folder=~s`//`/`g;
+$folder_to_populate_from=$root.$folder_to_populate_from;
+$folder_to_populate_from=~s`//`/`g;
+$in_folder.="/$user_name";
+$PW=crypt($password,"ce");
+
+open(U,"$users_txt");
+while(<U>){
+	if(/^$user_name=/){&found;last}
+	if(/^$default_user=/){
+		s`\s+$``;
+		($ceuser,$pw,$urls,$basic,$imgfldr,$utype,$nu_folders,$del_folders,$del_files,$ren_files,$site_colors_only,$ren_folders)=split(/=/);
+	}
+}
+$entry=qq~$user_name=$PW=$in_folder=$basic=$in_folder=$utype=$nu_folders=$del_folders=$del_files=$ren_files=$site_colors_only=$ren_folders\n~;
+
+open(U,">>$users_txt");
+print U "$entry";
+
+open(EM,"$txts_folder_PATH/emails.txt");
+while(<EM>){
+	if(/^$user_name=/){$fnde=1;$_=qq~$user_name=$user_email\n~}
+	$SAVE_E.=$_;
+}
+if($fnde){
+	open(EM,">$txts_folder_PATH/emails.txt");
+	print EM "$SAVE_E";
+}else{
+	open(EM,">>$txts_folder_PATH/emails.txt");
+	print EM qq~$user_name=$user_email\n~;
+}
+if($create_username_folder_in_folder =~ m/\w+/){
+mkdir($create_username_folder_in_folder,0755);chmod(0755,"$create_username_folder_in_folder");
+
+&catalog;
+	foreach $nu_dir (@DIRS){
+		$nu_dir=~s!$folder_to_populate_from!$create_username_folder_in_folder!;
+		if(!-e $nu_dir){mkdir($nu_dir,0755);chmod(0755,"$nu_dir")}
+	}	
+
+	foreach $file (@FILES){
+		$nu_file=$file;$nu_file=~s!$folder_to_populate_from!$create_username_folder_in_folder!;
+		$FILE="";
+		open(OLD,"$file");
+			if ($^O eq 'MSWin32' && -B $file){binmode OLD;}
+		while(<OLD>){
+			$FILE.= $_;
+		}
+		open(NU,">$nu_file");
+			if ($^O eq 'MSWin32' && -B $file){binmode NU;}
+			print NU "$FILE";
+		close(NU);
+	}
+}#if $create_username_folder_in_folder
+
+if($notice_email =~ m/\w+/){
+	&dekrypt;
+	&notice_email;
+}
+$location=$create_username_folder_in_folder."/instructions.html";
+$RETURN=qq~alert("$alert1");parent.location="$location";location="about:blank"~;
+&holeRespond;
+
+sub found{
+	$RETURN=qq~alert("$alert2  $user_name $alert3")~;
+	&holeRespond;
+}#found
+1;
+
+sub get_input{
+	read(STDIN, $input, $ENV{'CONTENT_LENGTH'});
+	@pairs = split(/&/,$input);
+	foreach $pair (@pairs){
+		$pair =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+		($name, $value) = split(/=/,$pair,2);
+		$value =~ tr/+/ /;
+		$value =~ s/pLuS/+/g;
+		$value =~ s/~!/ ~!/g;
+		$value =~ s/[\r]//g;
+		$$name=$value;
+		push(@names,$name);
+	}
+}#get_input
+
+sub get_cookie{
+	@jar = split(/\;/,$ENV{'HTTP_COOKIE'});
+	foreach $cookie (@jar){
+		$cookie =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+  		($name, $value) = split(/=/,$cookie);
+		$name =~ s/^\s*//;
+		if($name =~ /^\D/){$$name=$value}
+	}
+}#get_cookie
+
+
+sub dekrypt{
+	$alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	$mess="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX";
+	@alf=split(//,$alf);
+	$alf_=@alf;
+	@mess=split(//,$mess);
+	$mess_=@mess;
+	$notice_email=~s`\.com$``;$notice_email=~s`\.net$``;$notice_email=~s`\.org$``;
+	@chars=split(//,$notice_email);
+	$chars_=@chars;
+	foreach $c (@chars){
+		$xx=$c;
+		for($m=0;$m<$mess_;++$m){
+			if($c eq $mess[$m]){
+				$xx=$alf[$m];
+			}		
+		}
+		$krypt.=$xx;
+	}
+}#dekrypt
+
+
+sub notice_email{
+foreach $name (@names){
+	if($name eq "notice_email"){next}
+	$$name=~s`\Q$root\E`$host`;
+	$EX.=qq~$name => $$name\n~;
+}
+&find_mail;
+if($found_sendmail && !$use_sendmailpm){
+open(MAIL,"|$found_sendmail -t -f $krypt");
+print MAIL qq~From: $host_  <$krypt>
+To: $krypt
+Subject: $EMsubject
+
+$EX
+=========end=========~;
+close(MAIL);
+}else{
+		$sm_recipient=$krypt;
+		$sm_from="$host_ <$krypt>";
+		$sm_subject="$EMsubject";
+		$sm_message=qq~$EX
+		~;
+		&sendmail;
+}
+
+}#notice_email#
+
+sub find_mail{
+if($path_to_sendmail){$found_sendmail=$path_to_sendmail}else{
+  if(-e "/usr/sbin/sendmail"){ $found_sendmail="/usr/sbin/sendmail"; }
+  elsif(-e "/usr/lib/sendmail"){ $found_sendmail="/usr/lib/sendmail"; }
+  elsif(-e "/usr/bin/sendmail"){ $found_sendmail="/usr/bin/sendmail"; }
+  elsif(-e "/usr/local/sbin/sendmail"){ $found_sendmail="/usr/local/sbin/sendmail"; }
+  elsif(-e "/usr/local/lib/sendmail"){ $found_sendmail="/usr/local/lib/sendmail"; }
+  elsif(-e "/usr/local/bin/sendmail"){ $found_sendmail="/usr/local/bin/sendmail"; }
+  elsif(-e "/sendmail/sendmail.exe"){ $found_sendmail="/sendmail/sendmail.exe"; }
+}
+}#find_mail
+
+sub catalog{
+$U = "a";
+$V = 1;
+$W = $U.$V;
+$folder_to_populate_from=~s` `\\ `g;
+@things=<$folder_to_populate_from/*>;
+foreach $thing (@things){
+	if(-f $thing){push(@FILES,$thing)}
+	if(-d $thing){
+		push(@DIRS,$thing);
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@dir=<$THNG/*>;
+		push(@$W,@dir);
+	}
+}
+&cycle;
+}
+sub cycle{
+	foreach $thing (@$W){
+	if(-f $thing){push(@FILES,$thing)}
+	if(-d $thing){
+		push(@DIRS,$thing);	
+		$THNG=$thing;
+		$THNG=~s` `\\ `g;
+		@dir=<$THNG/*>;
+		push(@X,@dir);
+		}
+	}
+if($#X > -1){++$V;$W = $U.$V;@$W=@X;@X=();&cycle}
+}#cycle
+
+sub different_name{
+	$RETURN=qq~alert("$alert4 $user_name $alert5");parent.document.getElementById("user_name").value="$un"~;
+	&holeRespond;
+}#different_name
+
+sub wrong_username{
+	$RETURN=qq~alert("$alert4 $user_name $alert5");parent.document.getElementById("user_name").value="$un"~;
+	&holeRespond;
+}#wrong_username
+
+sub stop{
+	$RETURN=qq~alert("ERROR!!!\n\nThe folder_to_populate_from ($folder_to_populate_from) is the same as the create_username_folder_in_folder ($create_username_folder_in_folder)!!\n\nNo changes were made!!");~;
+	&holeRespond;
+}#stop

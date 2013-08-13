@@ -1,0 +1,55 @@
+widgettitle=Video Widget
+ReInsertThumbnailtitle=ReInsert Thumbnail
+RemoveThumbnailtitle=Remove Thumbnail
+ReInsertVideotitle=ReInsert Video
+InsertVideobutton=Insert Video Into Page
+RemoveVideotitle=Remove Video
+InsertThumbnailToVideobutton=Insert Thumbnail Into Page That Opens Video
+InsertVideo=Insert The Video Into Page
+
+InsertVideoOnlytab=Video In Page
+InsertMovieThumbnailtab=Thumbnail In Page Opening Video
+
+clickToPlayVideo=Click To Play Video
+text1=Open&nbsp;Folder&nbsp;To&nbsp;Upload&nbsp;Video&nbsp;&&nbsp;Thumbnail&nbsp;To
+text2=Video&nbsp;Conversions&nbsp;Available&nbsp;For
+text3=<b>mp4</b> or <b>flv</b> &nbsp;Video
+text33=<b>jpg</b> or <b>png</b> &nbsp;Thumbnail (thumbnail can be resized later)
+VideoWidth=Video Width
+VideoHeight=Video Height
+ThumbWidth=Thumbnail Width
+ThumbHeight=Thumbnail Height
+jpgORpng=Your choice of Thumbnail must be a jpg or png file.
+text4=Name For Video & Thumbnail File
+UploadMovieFileToOpenedFolderbutton=Upload Video & Thumbnail Files To Opened Folder
+UploadVideoFileToOpenedFolderbutton=Upload Video File To Opened Folder
+SaveSizes=Save Thumbnail and Video Specs
+text5=Select Image To Us As Thumbnail For Opening Video
+
+ImageAlignment=Image Alignment
+optionleft=left
+optionright=right
+optiontexttop=texttop
+optionabsmiddle=absmiddle
+optionbaseline=baseline
+optionabsbottom=absbottom
+optionbottom=bottom
+optionmiddle=middle
+optiontop=top
+BorderThickness=Border Thickness
+width=Width
+height=Height
+placeCursor=Place cursor at top of video
+placeCursor2=Place cursor at top of thumbnail
+MaintainSizeRatio=Maintain Size Ratio
+
+AutoStartVideo=Auto Start Video
+VideoPlayerCaption=Video Player Caption
+SelectVideoToInsert=Select Folder To Upload Video To
+VideoWidth=Video Width
+VideoHeight=Video Height
+htmlalert=Enter both files to upload
+htmlalert2=Enter file to upload
+clickSpot1=Click the red bordered area three<br>times to activate the inserted video.<br><br>The red dashed border will be<br>removed when you save the edits.
+clickSpot2=Click the red bordered area <br>to activate the inserted video.<br><br>The red dashed border will be<br>removed when you save the edits.
+VID_NOTE=Converting movie files to video mp4 or flv formats can be done for free at <A href="http://convertfiles.com/" target=_blank>http://convertfiles.com</a>. You can upload files and <A href="http://convertfiles.com/" target=_blank>http://convertfiles.com</a> will automatically convert them for download. Select <b>flv</b> for the Output format if using <i>Auto Play Video</i>.<BR><BR>The program at <A href="http://convertfiles.com/" target=_blank>http://convertfiles.com</a> can also extract 17 thumbnails from the video for download in a zip file. The thumbnails are the same size as the video and can be resized by this widget after uploading with this widget.<br><br>A thumbnail uploaded on the Thumbnail In Page Opening Video tab on this widget will automatically be renamed to the same name as the video file by the upload process.

@@ -1,0 +1,348 @@
+lang("headContent");
+$main="headcontentMain";
+$place="headcontentplace";
+$title="$widgettitle";
+$wigWid="500";
+$ico="headcontent";
+require 'widgetBody.htm';
+
+if($demo==1){
+	$FUNC=qq~demoing()~;
+}else{
+	$FUNC=qq~saveHed()~;
+}
+
+if(!$meta_tags){$BH1X="display:none"}
+if(!$body_attributes){$BH2X="display:none"}
+if(!$external_css){$BH3X="display:none"}
+
+if(!$meta_tags && !$body_attributes && !$external_css){$both="display:none";$pageFull="display:none";$note="display:block"}else{$note="display:none"}
+
+$BH1tab="tab";
+$BH2tab="tab";
+$BH3tab="tab";
+
+if($meta_tags){
+	$BH2XX="display:none";
+	$BH3XX="display:none";
+	$BH1tab="tab_"
+}
+if(!$meta_tags && $body_attributes){
+	$BH1XX="display:none";
+	$BH3XX="display:none";
+	$BH2tab="tab_"
+}
+if(!$meta_tags && !$body_attributes && $external_css){
+	$BH1XX="display:none";
+	$BH2XX="display:none";
+	$BH3tab="tab_"
+}
+
+$RETURN=qq~headcontentTbl='$BODY_TOP
+<table style="$both" width=100% border=0 cellpadding=0 cellspacing=0>
+<tr><td id=BH1 onclick=bhSwap(1) class=$BH1tab $uns style="$BH1X">$hbHeadtab</td>
+<td id=BH2 onclick=bhSwap(2) class=$BH2tab $uns style="$BH2X">$hbBodytab</td>
+<td id=BH3 onclick=bhSwap(3) class=$BH3tab $uns style="$BH3X">$hbCSStab</td>
+<td width=97% style="font-family:tahoma,aria;font-size:10px;border-bottom:1px #FFFFFF solid">&nbsp;</td></tr></table>
+
+<DIV style="border-left:1px solid #FFFFFF;border-right:1px solid #bfbfbf;border-bottom:1px solid #bfbfbf;padding-top:10px;$pageFull">
+<DIV id=bd_Div  style="$BH2XX">
+	<table style="margin-top:10px" align=center align=center border=0 cellpadding=2 cellspacing=0>
+<tr>
+	<td align=left class=widgetText11 style="width:130px;white-space:nowrap">$text6</td>
+	<td style="width:100px" align=left><input style="width:80px" class=input id=czbgColor value=""></td>
+	<td>&nbsp;</td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text7</td>
+	<td align=left><input style="width:80px" class=input id=cztxColor value=""></td>
+	<td>&nbsp;</td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text8</td>
+	<td align=left><input style="width:80px" class=input id=czlkColor value=""></td>
+	<td align=left class=widgetText11></td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text9</td>
+	<td align=left><input style="width:80px" class=input id=czalColor value=""></td>
+	<td align=left class=widgetText11></td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text10</td>
+	<td align=left><input style="width:80px" class=input id=czvlColor value=""></td>
+	<td align=left class=widgetText11></td>
+</tr>	
+
+<tr>
+	<td align=left class=widgetText11>$text16</td>
+	<td align=left><input style="width:80px" class=input id=czhlColor value=""></td>
+	<td align=left class=widgetText11></td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text17</td>
+	<td align=left class=widgetText11><input id=czUnder type=checkbox></td>
+	<td>&nbsp;</td>
+</tr>	
+<tr>
+	<td align=left class=widgetText11>$text11</td>
+	<td align=left><input style="width:20px" class=input id=czmarHor value=""></td>
+	<td>&nbsp;</td>
+</tr>
+<tr>
+	<td align=left class=widgetText11>$text12</td>
+	<td align=left><input style="width:20px" class=input id=czmarVer value=""></td>
+	<td>&nbsp;</td>
+</tr>
+<tr><td colspan=3>	
+<table border=0 cellpadding=0 cellspacing=0>
+<tr><td align=left class=widgetText11>$text13</td>
+<td align=left>&nbsp;
+<input class=input style="width:200px;background-color:#fff" id=czbgImg value=""></td>
+<td align=left><table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=locatBod()>$LocateButton</td><td>$RBUT</td></tr></table>
+</td></tr></table> </td></tr></table>
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td colspan=3>
+<DIV id=locBdBg style="display:none;padding-left:10px"><table border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px">
+<img id=up_arrow4 onclick=upDIR19() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text14
+</td></tr>
+<tr><td colspan=2><iframe id=locatBodyHole name=pad19 style="margin:0px 0px 0px 0px;width:460px;height:150px;border:1px solid #999999;" frameborder=0 src="$uttf?pathTree=x=insert_image"></iframe>
+ </td></tr></table></td></tr></table>
+
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td align=center colspan=3><table style="margin-top:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=applyBod()>$ApplyChangesbutton</td><td>$RBUT</td></tr></table>
+</td></tr>
+
+<tr><td align=center colspan=3><table id=SaveChangesbutton2 style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=saveBod()>$SaveChangesbutton2</td><td>$RBUT</td></tr></table>
+</td></tr></table>
+</DIV>
+<DIV id=hd_Div  style="$BH1XX">
+	<table style="margin-top:10px" align=center width=90% align=center border=0 cellpadding=2 cellspacing=0>
+<tr><td align=left class=widgetText11>$text1</td>
+<td align=left><input style="width:280px" class=input id=cztitle value=""></td></tr>	
+<tr valign=top><td align=left class=widgetText11>$text2</td>
+<td align=left><textarea style="width:280px;height:100px" class=input id=czkeywords></textarea></td></tr>	
+<tr valign=top><td align=left class=widgetText11>$text3</td>
+<td align=left><textarea style="width:280px;height:100px" class=input id=czdescription></textarea></td></tr>	
+<tr><td align=right><input type=checkbox id=czaddPrompt></td>
+<td align=left class=widgetText11>$text4</td></tr>	
+
+<tr><td align=center colspan=2>
+<table style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=$FUNC>$SaveChangesbutton1</td><td>$RBUT</td></tr></table>
+</td></tr>	</table>
+</DIV>
+<DIV id=cs_Div style="$BH3XX">
+<table align=center border=0 cellpadding=0 cellspacing=0>
+<tr><td colspan=2 class=widgetText11 style="padding:5px 0px"><input class=input id=czCSSurl readonly style="width:360px;margin-right:10px;background-color:#ccc"> $selectedFile</td></tr>
+<tr><td align=left style="width:20px;padding-left:4px"><img id=up_arrow20 onclick=upDIR20() src="$utif/up_arrow.png" width="16" height="16" border="0" style="cursor:pointer;visibility:hidden"></td><td style="font-family:tahoma,arial;font-size:11px;padding-left:7px">$text15</td></tr>
+<tr><td colspan=2 align=left>
+<iframe id=locatBodyHole name=pad20 style="margin:0px 0px 10px 0px;width:460px;height:150px;border:1px solid #999999;" frameborder=0 src="$uttf?pathTree=x=find_css"></iframe>
+</td></tr>
+<tr><td colspan=3><div id=currApplied style="max-height:100px;overflow:auto"></div></td></tr>
+<tr id=availRow style="display:none"><td align=center style="padding:5px 0px"><input id=czCSSavail type=checkbox checked></td>
+<td align=left colspan=2 class=widgetText11 style="padding:5px 0px">$MakeAvail
+</td></tr>
+<tr><td align=center colspan=2 style="padding:5px 0px">
+<DIV align=center id=notRemove class=widgetText11 style="color:red;font-weight:bold;display:none;padding-bottom:10px">$notRemovable</DIV>
+<DIV align=center id=savButCss style=""><table align=center style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=saveCSS()>$SaveChangesbutton3</td><td>$RBUT</td></tr></table>
+</DIV>
+<DIV align=center id=remButCss style="">
+<table align=center style="margin:10px" border=0 cellpadding=0 cellspacing=0><tr><td>$LBUT</td>
+<td align=center $button_class title="" $uns onclick=remCSS()>$RemoveChangesbutton3</td><td>$RBUT</td></tr></table></DIV>
+</td></tr></table>
+</DIV>
+</DIV>
+<DIV style="padding:20px 0px;font-family:tahoma;$note" align=center>All Features Are Disabled In Custom Features</DIV>
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function upDIR19(){
+	pad19.location="$uttf?pathTree=up=insert_image="+pad19.updir
+}
+function selection4(dir,path,url){
+	if(dir == "dir"){
+		pad19.location="$uttf?pathTree=x=insert_image="+path
+	}
+	if(dir=="bin"){		
+		url=url.substring(url.indexOf(editPad.location.host))
+		byId('czbgImg').value=url.substring(url.indexOf("/"))
+	}
+}
+function upDIR20(){
+	pad20.location="$uttf?pathTree=up=find_css="+pad20.updir
+	byId('czCSSurl').value=''
+	byId('notRemove').style.display="none"
+	byId('savButCss').style.display="none"
+	byId('availRow').style.display="none"
+	byId('remButCss').style.display="none"
+}
+function selection20(dir,path,url){
+	if(dir == "dir"){
+		pad20.location="$uttf?pathTree=x=find_css="+path
+		byId('czCSSurl').value=''
+		byId('notRemove').style.display="none"
+		byId('savButCss').style.display="none"
+		byId('availRow').style.display="none"
+		byId('remButCss').style.display="none"
+	}
+	if(dir=="txt"){
+		url=url.substring(url.indexOf(editPad.location.host))
+		byId('czCSSurl').value=url.substring(url.indexOf("/"))
+		checkCSS();listXSS()
+	}
+}
+function checkCSS(){
+	byId('remButCss').style.display="none"
+	byId('notRemove').style.display="none"
+	byId('savButCss').style.display="block"
+	byId('availRow').style.display="table-row"
+	for(i=0;i<doc().styleSheets.length;++i){
+		if(doc().styleSheets[i].href && doc().styleSheets[i].href.match(byId('czCSSurl').value)){
+			if(doc().styleSheets[i].href.match(/not_removable/i)){
+				byId('notRemove').style.display="block"
+				byId('savButCss').style.display="none"
+				byId('availRow').style.display="none"
+			}else{
+				byId('remButCss').style.display="block"
+				byId('savButCss').style.display="none"
+				byId('availRow').style.display="none"
+			}
+		}
+	}
+}
+function saveCSS(){
+	if(byId('czCSSurl').value==''){return false}
+	url="$uttf?saveCSS="+editPad.location.pathname+"=apply="+escape(byId('czCSSurl').value)+"="+escape(byId('czCSSavail').checked)
+	savingCss=1
+	JITc(url)
+}
+function remCSS(){
+	if(byId('czCSSurl').value==''){return false}
+	url="$uttf?saveCSS="+editPad.location.pathname+"=remove="+escape(byId('czCSSurl').value)
+	savingCss=1
+	JITc(url)
+}
+function remCSS2(obj){
+	url="$uttf?saveCSS="+editPad.location.pathname+"=remove="+escape(obj)
+	savingCss=1
+	JITc(url)
+}
+
+function locatBod(){
+	if(byId('locBdBg').style.display=="block"){
+		byId('locBdBg').style.display="none"
+	}else{
+		byId('locBdBg').style.display="block"
+	}
+}
+function saveBod(){
+	qs=byId('czbgColor').value+"="+byId('cztxColor').value+"="+byId('czlkColor').value+"="+byId('czalColor').value+"="+byId('czvlColor').value+"="+byId('czhlColor').value+"="+byId('czmarHor').value+"="+byId('czmarVer').value+"="+byId('czbgImg').value+"="+byId('czUnder').checked
+	url="$uttf?saveBody="+editPad.location.pathname+"="+escape(qs)
+	JITc(url)
+}
+dssrl=7
+function applyBod(){
+	doc().body.setAttribute('background',byId('czbgImg').value)
+	doc().body.style.backgroundImage='url('+byId('czbgImg').value+')'
+	doc().body.setAttribute('bgcolor',byId('czbgColor').value)
+	doc().body.style.backgroundColor=byId('czbgColor').value
+	doc().body.setAttribute('text',byId('cztxColor').value);
+	doc().body.style.color=byId('cztxColor').value
+	doc().body.setAttribute('link',byId('czlkColor').value);
+	doc().body.setAttribute('vlink',byId('czvlColor').value);
+	doc().body.setAttribute('hover',byId('czhlColor').value);
+	doc().body.setAttribute('alink',byId('czalColor').value);
+	doc().body.style.margin=byId('czmarVer').value+"px "+byId('czmarHor').value+"px"
+	doc().body.setAttribute('leftmargin',byId('czmarHor').value)
+	doc().body.setAttribute('topmargin',byId('czmarVer').value)
+	docss = doc().styleSheets[doc().styleSheets.length-1]
+	if(isFF){
+		docss.insertRule("a:link{color:"+byId('czlkColor').value+" !important}", docss.cssRules.length)
+		docss.insertRule("a:visited{color:"+byId('czvlColor').value+" !important}", docss.cssRules.length)
+		docss.insertRule("a:hover{color:"+byId('czhlColor').value+" !important}", docss.cssRules.length)
+		docss.insertRule("a:active{color:"+byId('czalColor').value+" !important}", docss.cssRules.length)
+		if(byId('czUnder').checked==true){
+			docss.insertRule("a{text-decoration:underline !important}", docss.cssRules.length)
+		}else{
+			docss.insertRule("a{text-decoration:none !important}", docss.cssRules.length)
+		}
+	}
+	if(isIE){
+		docss.addRule("a:link","color:"+byId('czlkColor').value+" !important")
+		docss.addRule("a:visited","color:"+byId('czvlColor').value+" !important")
+		docss.addRule("a:hover","color:"+byId('czhlColor').value+" !important")
+		docss.addRule("a:active","color:"+byId('czalColor').value+" !important")
+		if(byId('czUnder').checked==true){
+			docss.addRule("a","text-decoration:underline !important", docss.cssRules.length)
+		}else{
+			docss.addRule("a","text-decoration:none !important", docss.cssRules.length)
+		}
+	}
+}
+function saveHed(){
+	qs=byId('cztitle').value+"="+byId('czkeywords').value+"="+byId('czdescription').value+"="+byId('czaddPrompt').checked
+	url="$uttf?saveHead="+editPad.location.pathname+"="+escape(qs)
+	JITc(url)
+}
+function bhSwap(n){
+	byId('BH1').className="tab"
+	byId('BH2').className="tab"
+	byId('BH3').className="tab"
+	byId('bd_Div').style.display="none"
+	byId('hd_Div').style.display="none"
+	byId('cs_Div').style.display="none"
+	if(n==1){
+		byId('BH1').className="tab_"
+		byId('hd_Div').style.display="block"
+	}
+	if(n==2){
+		byId('BH2').className="tab_"
+		byId('bd_Div').style.display="block"
+	}
+	if(n==3){
+		byId('BH3').className="tab_"
+		byId('cs_Div').style.display="block"
+		byId('availRow').style.display="none"
+		byId('remButCss').style.display="none"
+		byId('savButCss').style.display="none"
+	}
+}
+function listXSS(){
+	xxcssA = new Array()
+	for(i=0;i<doc().styleSheets.length;++i){
+		if(doc().styleSheets[i].href && !doc().styleSheets[i].href.match(/not_removable/i) && doc().styleSheets[i].href.match(/$host_/i)){
+			xxss=doc().styleSheets[i].href.replace(/^.+$host_/,"")
+			xxcssA[xxcssA.length]=xxss
+		}
+	}
+	xxcssAA=xxcssA.sort()
+	listXSS2()
+}
+
+function listXSS2(){
+	xssList='<table align=center border=0 cellpadding=4 cellspacing=0><tr>'+
+	'<td align=left colspan=2 class=widgetText11 style="text-decoration:underline">$currently_allied</td></tr>'
+	for(i=0;i<xxcssAA.length;++i){
+		xxss=xxcssAA[i].replace(/^.+$host_/,"")
+		xxss_=xxss.replace(/%20/g," ");xxss_=xxss_.replace(/^./g,"");
+		if(!xxss.match(/no_remove|no_access/)){
+			xssList+="<tr><td class=widgetText11>"+xxss_+"</td><td align=right class=widgetText11><span style='cursor:pointer;color:#1e90ff' onclick=remCSS2('"+xxss+"')>$Remove</span></td></tr>"
+		}
+	}
+	xssList+="</table>"
+	if(xxcssAA.length<1){
+		byId('currApplied').innerHTML=''
+	}else{
+		byId('currApplied').innerHTML=xssList
+	}
+}
+
+byId('headcontentplace').innerHTML=headcontentTbl
+csHeadContent()
+~;

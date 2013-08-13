@@ -1,0 +1,4 @@
+widgettitle=Save Edits
+text1=Save Changes To This Page
+text2=Save backup before saving new edits
+text3=Publish edits to the original file<BR>and delete this pending file

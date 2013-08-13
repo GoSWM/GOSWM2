@@ -1,0 +1,16 @@
+$RETURN=qq~function openGallery(fszImg){
+	var URL="$uttf?listGallery="+fszImg
+	if(document.getElementById('JAX')){
+		document.getElementsByTagName('head')[0].removeChild(document.getElementById('JAX'))
+	};
+	script = document.createElement('script');	
+	script.type = 'text/javascript';	
+	script.defer = true;	
+	script.id = 'JAX';	
+	script.src=URL 	
+	document.getElementsByTagName('head')[0].appendChild(script);
+}
+~;
+
+1;
+

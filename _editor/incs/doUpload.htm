@@ -1,0 +1,155 @@
+&check_cookie;
+use CGI qw/:standard :html3/;
+lang("doUpload");$space="%20";
+	if ($^O =~ /MSWin32/i){	
+		$temp = $ENV{'TEMP'} || $ENV{'TMP'} || $ENV{'WINDIR'};
+		if($temp =~ /Temp/i){
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp";
+			}
+		}else{
+			$temp=$temp."/Temp";
+			if(-w $temp){
+				$TempFile::TMPDIRECTORY="$temp"; 
+				$CGITempFile::TMPDIRECTORY="$temp"; 
+			}else{
+				$tmp="$path_to_domain/Temp";
+				mkdir($tmp,0755);
+				$TempFile::TMPDIRECTORY="$tmp"; 
+				$CGITempFile::TMPDIRECTORY="$tmp"; 
+			}
+		}
+	}
+if($fake_temp){$TempFile::TMPDIRECTORY="$fake_temp";$CGITempFile::TMPDIRECTORY="$fake_temp";}
+$imgfldr=$root.$imgfldr;
+	$path = param('imgDIR');
+	$cap=param('imgCAP');
+	$path=~s`/$``;
+    $file = param('upload');
+    if (!$file) {holealert("$htmlalert1")}
+    $file =~ m!([^/:\\]*)$!; 
+    $short_name = $1;$short_name=~s`\.`PERIoD`g;$short_name=~s`\-`DaSh`g;$short_name=~s`\W``g;$short_name=~s`PERIoD`.`g;$short_name=~s`DaSh`-`g;
+	$file_name=$path."/".$short_name;
+	$file_name=~s` `_`g;$file_name=~s`$space`_`g;
+    open (SAVE,">$file_name") || holealert("$htmlalert2 <b>$file_name</b>");
+	binmode SAVE if $^O eq 'MSWin32';
+    while ($size = read($file,$data,1024)) {
+        print SAVE $data;
+        $total_size += $size; 
+    }
+    close SAVE;
+	chmod(0644,"$file_name");
+    if ($total_size < 1) {unlink($file_name);holealert("$htmlalert3 <b>$short_name</b> $htmlalert4")}
+
+	if($cap=~m`\w+`){&cap}
+	if($params eq "gallery"){
+		&shrink;
+		$RETURN=qq~parent.ceUploadFiles2();~;
+	}
+	if($params eq "uploads"){
+		&shrink;
+		$RETURN=qq~parent.ceUploadFiles();~;
+	}
+		
+sub cap{
+	$txt=$file_name;$txt=~s`\.\w+$`.txt`;
+	$cap=~s`'`&#39;`g;
+	iso_utf($cap);
+	$short_name=~s`\.\w+$``;
+	open(TXT,">$txt");
+	print TXT qq~$cap~;
+	close(TXT);
+}
+1;
+
+sub createGD { my ($orig,$max) = (shift,shift);
+	($ox,$oy) = $orig->getBounds();
+	($maxx, $maxy);
+	if (($maxx, $maxy) = $max =~ /^(\d+)x(\d+)$/i){
+		$max = ($ox>$oy)? $maxx : $maxy;
+	} else {
+		$maxx = $maxy = $max;
+	}
+	$r = ($ox/$maxx) > ($oy/$maxy) ? ($ox/$maxx) : ($oy/$maxy);
+	$thumb = GD::Image->new($ox/$r,$oy/$r);
+	$thumb->copyResized($orig,0,0,0,0,$ox/$r,$oy/$r,$ox,$oy);
+	return $thumb, sprintf("%.0f",$ox/$r), sprintf("%.0f",$oy/$r);
+}
+
+sub shrink{
+		if($max_image_upload_size && $short_name !~ /pdf$/){
+			$isIM=eval { require Image::Magick; } ? 1 : 0;
+			$isGD=eval { require GD; } ? 1 : 0;
+			($wid,$hei)=split(/x/,$max_image_upload_size);
+			use Image::Size;
+			($width, $height) = imgsize("$file_name");
+			if($isIM && ($width > $wid || $height > $hei)){
+				require 'useImageMagick.htm';
+				$wh=$wid."x".$hei;
+				$img = new Image::Magick;
+  				$img->Read("$file_name");
+				$img -> Resize($wh);
+				$img -> Write($file_name);
+			}elsif($isGD && ($width > $wid || $height > $hei)){
+				require 'useGDLibrary.htm';
+				if($wid>$hei){$WH=$wid}else{$WH=$hei}
+				$file_name =~ m`\.(\w+)$`;$ext=$1;
+    			open(IN, "$file_name") || die;
+				if($ext =~/png/i){
+    			    $srcImage = GD::Image->newFromPng(*IN);
+				}
+				if($ext =~/jpg/i){
+   				     $srcImage = GD::Image->newFromJpeg(*IN);
+				}
+   				close(IN);
+    			if($srcImage){
+					($thumb,$x,$y) = createGD($srcImage,$WH);
+   					open(OUT, ">$file_name");
+    				binmode OUT;
+					if($ext =~/jpg/i){
+						print OUT $thumb->jpeg;
+					}
+ 					if($ext =~/png/i){
+     				  	print OUT $thumb->png;
+					}
+   					close(OUT);
+				}
+			}
+		}
+
+}#shrink
+
+sub spec_chars{
+	if($native_utf==0){
+		open(CT,"$txts_folder_PATH/specialcharacters.txt");
+		while(<CT>){++$r;
+			s`\s+$``;
+			unless(/gt|lt|nbsp|amp/){
+				($qwr,$spe)=split(/=/);
+				$spec{$qwr}=$spe;
+				push(@qwr,$qwr);
+			}
+		}
+	}
+	if($native_utf==1){
+		open(NT,"$txts_folder_PATH/nativecharacters.txt");
+		while(<NT>){++$rr;
+			s`\s+$``;
+			($qwr,$spe)=split(/=/);
+			$natv{$spe}=$qwr;
+			push(@spe,$spe);
+		}
+	}
+}#
+sub iso_utf{
+	if($#qwr<0){&spec_chars}
+	$_[0]=~s`xnbzp_`&nbsp;`g;
+	$_[0]=~s`hTtXp`http`ig;
+	foreach $q (@qwr){
+		$_[0]=~s`$q`$spec{$q}`g;
+	}
+	foreach $s (@spe){
+		$_[0]=~s`$s`$natv{$s}`g;
+	}
+}

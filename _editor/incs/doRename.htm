@@ -1,0 +1,24 @@
+($old,$nu,$type)=split(/=/,$params);
+lang("doRename");
+if($nu !~ m`.+\.\w+` && $type !~ /folder/){$RETURN=qq~alert("$alert")~;&respond}
+if($type =~ /folder/){$htmlalert=$htmlalert2}
+$old=~s`$host`$root`;
+$old=~m`(.+/)[^/]+$`;$path=$1;
+$nu=$path.$nu;
+
+rename($old,$nu);
+if($type eq "page"){$empty="byId('openURL').value='';pad1.reloader()"}
+if($type eq "img"){$empty="ceimgForm.csimgurl.value='';pad4.reloader()"}
+if($type eq "flash"){$empty="ceflashForm.csflashurl.value='';pad9.reloader()"}
+if($type eq "folder"){$empty="upDIR1()"}
+
+
+print "Pragma: no-cache\n"; 
+	print "Content-type: text/html\n\n";
+	print qq~document.body.style.cursor="default";
+	byId('yesBut').innerHTML="$OK"
+	active_alert="$htmlalert"
+	doAlert("alert")
+	active_function = new Function("byId('inputplace').innerHTML='';$empty;closeAlert()")~;
+	exit;
+1;

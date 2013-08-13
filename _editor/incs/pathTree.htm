@@ -1,0 +1,400 @@
+lang("pathTree");
+($TYPE,$ACTION,$DIR)=split(/=/,$params);
+sub test{for(@test){if($_ eq $_[0]){return true}}}
+$x=$DIR;
+if($isIE){$absmiddle="absmiddle"}
+if($isFF){$absmiddle="absbottom"}
+if(!$DIR){$DIR=$root}
+$root=~s`/$``;
+$root_=$root;
+$root.="/";
+$host=~s`/$``;
+$host_=$host;
+$host.="/";
+if(!$audiofiles){$audiofiles="mp3|wav|mid"}
+&check_cookie;
+
+$DIR=~s`/$``;
+$dirv=$DIR;
+$dirv=~s`$root_``;
+if($utype=~/5|6/ && $loginParams=~/\w+/){
+	if($dirv !~ /$urls/){
+		$DIR=$root_.$urls;	
+	}
+	$restr=1;
+}
+
+if($ACTION =~ /upload_file|embed_flash|insert_image|gallery|thumb|film|video|audio/){$img_DIR=$root_.$imgfldr;if($DIR !~ m`$img_DIR`){$DIR=$img_DIR}}
+$DIR_=$DIR;
+$DIR_.="/";
+
+$utif=~s!/$!!;
+$dir=qq~<img src="$utif/folder.png" vspace=1 hspace=2 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$bin=qq~<img src="$utif/picture.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$bin_=qq~<img src="$utif/picture_.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$flv=qq~<img src="$utif/film.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$flv_=qq~<img src="$utif/film_.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$aud=qq~<img src="$utif/audio.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$aud_=qq~<img src="$utif/audio_.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+$aro=qq~<img src="$utif/openedfolder.png" vspace=2 hspace=4 width="16" height="16" border="0" align=$absmiddle $uns>~;
+
+
+
+if(length($DIR)<length($root)){$DIR=$root}
+$un_url=$DIR;
+$un_url=~s!\Q$root\E!$host!;
+$dirvirtual=$un_url;
+$dirvirtual=~s!$host!!;
+$dirvirtual_="/".$dirvirtual;
+
+
+if($ACTION =~ /open_page/){$selTYP="selection1"}
+if($ACTION =~ /saveas/){$selTYP="selection2"}
+if($ACTION =~ /upload_file/){$selTYP="selection3"}
+if($ACTION =~ /insert_image/){$selTYP="selection4"}
+if($ACTION =~ /create_link/){$selTYP="selection5"}
+if($ACTION =~ /find_img_folder/){$selTYP="selection6"}
+if($ACTION =~ /find_files/){$selTYP="selection7"}
+if($ACTION =~ /find_folder/){$selTYP="selection13"}
+if($ACTION =~ /find_folders/){$selTYP="selection7a"}
+if($ACTION =~ /editsrc/){$allfiles=1;$selTYP="selection8"}
+if($ACTION =~ /embed_flash/){$selTYP="selection9"}
+if($ACTION =~ /gallery/){$selTYP="selection10"}
+if($ACTION =~ /film/){$selTYP="selection11"}
+if($ACTION =~ /thumb/){$selTYP="selection12"}
+if($ACTION =~ /search/){$selTYP="selection14"}
+if($ACTION =~ /video/){$selTYP="selection15"}
+if($ACTION =~ /audio/){$selTYP="selection16"}
+if($ACTION =~ /lock/){$selTYP="selection17"}
+if($ACTION =~ /find_css/){$selTYP="selection20"}
+
+$reloader=qq~parent.$selTYP("dir","$DIR","")~;
+
+@updir=split(/\//,$DIR);
+pop(@updir);
+$upDIR=join("/",@updir);
+
+
+opendir(DIR,"$DIR_");
+@files = readdir(DIR);
+@files = sort {lc($a) cmp lc($b)} @files;
+
+
+foreach $file (@files){
+	$exclude_folders=~s`\W$``;
+	if(!$ignore_underscore && $file =~ m`^_`i){next}
+	if($file =~ m`^\.`i){next}
+	if($exclude_folders){
+		$exclude_folders=~s`,`|`g;
+		if($file =~ m`$exclude_folders`){next}
+	}
+	$file_=$DIR_.$file;
+	$url=$file_;$url=~s!\Q$root\E!$host!;
+	if($ACTION =~ /audio/){$url=~s!$host!/!}
+	if(-d $file_){
+		if($ACTION eq "editsrc" && ($file_ =~ m`$txts_folder_PATH` || $file_ =~ m`$incs_folder_PATH`)){next}
+		push(@fldrs,$file);
+		$hrf=qq~parent.$selTYP("dir","$file_","$url")~;
+		$FLDR=qq~<div style="margin-left:2px" id="$file" onclick='setPT(this.id);$hrf' $uns>$dir<span id="x$file" class=reg>$file</span></div>
+		~;
+		push(@FLDRS,$FLDR);
+	}
+	if($file_ =~ m`thumbs\.db`i){next}
+	if($file_ =~ m`$ENV{'SCRIPT_NAME'}`){next}
+	$file_=~m!\.(\w+)$!;$ext=$1;
+	if($exclude_extensions =~ m`\w+` && $ACTION !~ /editsrc|find_css/){
+		if($exclude_extensions =~ m`$ext`){next}
+	}
+	if($image_extensions !~ /\b$ext\b/i && $ext ne '' && !-d $file_){
+		#$bell=1;
+		if(!$allfiles && !-B $file_){get_title("$file_");$pt=~s`"`\\"`g;}
+		if($ACTION =~ /upload_file|embed_flash|insert_image|find_img_folder|thumb|film|video|audio/){next}
+		#if($bell != 1){next}
+		if($PT ne ''){
+			if($ACTION eq "find_css" && $ext =~ /css/i){
+				$txt=qq~<img title="$PT" src="$utif/page.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+				$hrf=qq~parent.$selTYP("txt","$file_","$url","$pt")~;$reg="reg";
+			}else{
+				if($ACTION eq "find_css"){next}
+				$txt=qq~<img title="$PT" src="$utif/page.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+				if($ACTION !~ /upload_file|find_folder|search|lock/){$hrf=qq~parent.$selTYP("txt","$file_","$url","$pt")~;$reg="reg"}else{$hrf='';$reg="unreg"}
+			}
+		}else{
+			if($ACTION !~ /create_link|editsrc/ && $bell != 1){
+				$txt=qq~<img title="" src="$utif/blank.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;	
+				$hrf='';$reg="unreg";
+			}else{
+				$txt=qq~<img title="$PT" src="$utif/page.png" vspace=1 hspace=0 width="16" height="16" border="0" align=$absmiddle $uns>~;
+				$hrf=qq~parent.$selTYP("txt","$file_","$url","$pt")~;$reg="reg";
+			}
+		}
+		$qw='yes';
+		if($utype =~ /3|4/){
+			$qw="no";
+			@test=split(/,/,$urls);
+			$XX=$file_;$XX=~s`\Q$root\E``;$XX='/'.$XX;
+			if(test($XX)){$qw='yes'}
+		}
+		if($qw eq 'yes'){
+		$TXT=qq~<div style="margin-left:4px" id="$file" onclick='setPT(this.id);$hrf' title="$PT">$txt 
+		<span id="x$file" class=$reg $uns>$file</span></div>~;
+		}else{
+		$TXT=qq~<div style="margin-left:4px">$txt 
+		<span class=unreg $uns>$file</span></div>~;
+		}
+		push(@FILES,$TXT);
+		push(@ARRAY,$file);
+	}
+	if($image_extensions =~ /\b$ext\b/i && $ext ne '' && !-d $file_){
+		if($ACTION =~ /find_files|editsrc|search|lock|find_css/){next}
+		if($ACTION =~ /thumb/ && $ext =~ /flv|mp4|mov/){next}
+		if($ACTION =~ /video/ && $ext !~ /flv|mp4|mov/){next}		
+		if($ACTION =~ /audio/ && $ext !~ /mp3|wav|mid/){next}	
+		if($ACTION !~ /saveas|open_page|upload_file|gallery/){$hrf=qq~parent.$selTYP("bin","$file_","$url")~;$reg="reg"}
+		if($ACTION =~ /saveas|upload_file|open_page|gallery|find_folder|find_img_folder|film|video/){
+			if($ext =~ /flv|mp4|mov|swf/){$BIN_=$flv_}else{$BIN_=$bin_}
+			if($ext =~ /mp3|wav|mid/){$BIN_=$aud_}
+			$BIN=qq~<div style="margin-left:4px" id="$file">$BIN_<span id="x$file" class="unreg" $uns> $file </span></div>~;
+		}else{
+			if($ext =~ /flv|mp4|mov|swf/){$BIN=$flv_}else{$BIN=$bin}
+			if($ext =~ /$audiofiles/){$BIN=$aud}
+			$reg="reg";
+			$BIN=qq~<div style="margin-left:4px" id="$file" onclick='setPT(this.id);$hrf' $uns>$BIN<span id="x$file" class=$reg $uns> $file </span></div>~;
+		}
+		push(@FILES,$BIN);
+		push(@ARRAY,$file);	
+	}
+}
+
+@FLDRS = sort {lc($a) cmp lc($b)} @FLDRS;
+@FILES = sort {lc($a) cmp lc($b)} @FILES;
+$un_url_=$un_url;$un_url_=~s`/$``;
+if($ACTION =~ /open_page|saveas|editsrc/){$n=6;&lines}
+if($ACTION =~ /create_link|upload_file|insert_image|embed_flash|find_img_folder|find_files|gallery|find_folder|thumb|search|lock|film|video|audio|find_css/){$n=5;&lines}
+
+if($restr){$ruut=$root_.$urls}else{$ruut=$root_}
+$dr=$DIR;$dr=~s`/$``;$dr=~s`$\w:``;$rt=$root;$rt=~s`/$``;$rt=~s`$\w:``;
+if($ACTION eq "open_page"){
+	if($dr eq $rt){$X=1;
+		$CURRENT= qq~parent.document.getElementById("up_arrow1").style.visibility="hidden";
+		parent.document.getElementById("PTdfolder").className="button_centerD"
+		parent.document.getElementById("PTrfolder").className="button_centerD"~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow1").style.visibility="visible";
+		parent.document.getElementById("PTdfolder").className="button_center"
+		parent.document.getElementById("PTrfolder").className="button_center"~;	$X=2;
+	}
+}
+if($ACTION eq "saveas"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow2").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow2").style.visibility="visible";~;
+	}
+	$CURRENT.= qq~\nif(parent.document.getElementById("saveasURL")){
+		parent.document.getElementById("saveasURL").value="$un_url";
+		parent.saveasCheckUrl="$un_url"
+		parent.saveasCheckUrl_="$un_url_"}~;
+}
+if($ACTION eq "create_link"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow5").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow5").style.visibility="visible";~;
+	}
+}
+if($ACTION =~ /thumb|gallery|upload_file|embed_flash|insert_image|video|film|audio/){
+	$DIR=~s`/$``;
+	if($ACTION =~ /gallery/){$na=10}
+	if($ACTION =~ /thumb/){$na=12}
+	if($ACTION =~ /upload_file/){$na=3}
+	if($ACTION =~ /embed_flash/){$na=9}
+	if($ACTION =~ /insert_image/){$na=4}
+	if($ACTION =~ /video/){$na=15}
+	if($ACTION =~ /film/){$na=11}
+	if($ACTION =~ /audio/){$na=16}
+	if($DIR eq $img_DIR){
+		$CURRENT= qq~parent.document.getElementById("up_arrow$na").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow$na").style.visibility="visible";~;
+	}
+}
+$root=~s`/$``;
+if($ACTION eq "search"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow14").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow14").style.visibility="visible";~;
+	}
+}
+if($ACTION eq "find_css"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow20").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow20").style.visibility="visible";~;
+	}
+}
+
+if($ACTION eq "lock"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow17").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow17").style.visibility="visible";~;
+	}
+}
+if($ACTION eq "editsrc"){
+	if($dr eq $rt){
+		$CURRENT= qq~parent.document.getElementById("up_arrow8").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow8").style.visibility="visible";~;
+	}
+}
+if($ACTION =~ /find_img_folder(\d+)/){ 	$X=9;
+	if($DIR eq $root){
+		$CURRENT= qq~parent.document.getElementById("imgfldr").value="$un_url";parent.document.getElementById("up_arrow$1").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("imgfldr").value="$un_url";parent.document.getElementById("up_arrow$1").style.visibility="visible";~;
+	}
+}
+if($ACTION =~ /find_folder/){  
+	if($DIR eq $root){
+		$CURRENT= qq~parent.moveUrl2("$un_url")~;
+	}else{
+		$CURRENT= qq~if(parent.moveUrl){parent.moveUrl("$un_url")}~;
+	}
+}
+if($ACTION =~ /find_folders(\d)/){  
+	if($DIR eq $root){
+		$CURRENT= qq~parent.document.getElementById("fldrurls").value="$un_url";parent.document.getElementById("up_arrow7a").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("fldrurls").value="$un_url";parent.document.getElementById("up_arrow7a").style.visibility="visible";~;
+	}
+}
+
+if($ACTION =~ /find_files(\d)/){  
+	if($DIR eq $root){
+		$CURRENT= qq~parent.document.getElementById("up_arrow$1").style.visibility="hidden";~;
+	}else{
+		$CURRENT= qq~parent.document.getElementById("up_arrow$1").style.visibility="visible";~;
+	}
+}	
+
+if($ACTION =~ /upload_file|embed_flash|insert_image|audio/){
+	if(!$nu_folders){$nu_display="none"}
+	if($ACTION =~ /embed_flash|insert_image|audio/){$nu_display="none"}
+}
+
+$array=join("\",\"",@ARRAY);	
+$folders=join("\",\"",@fldrs);	
+$nu_folder_display="visible";
+@bins=split(/,/,$image_extensions);
+$bins=join("\",\"",@bins);
+$bins=uc($bins);
+$refresh=qq~<img src="$utif/refresh.png" style="cursor:pointer" onclick=location.reload(true) width="16" height="16" border="0" title="$title2" align=absmiddle $uns>~;
+$DIR=~s`[A-Z]:``;
+$vpage = qq~
+<html><head>
+<META http-equiv="Cache-Control" content="no-cache">
+<META HTTP-EQUIV="expires" CONTENT="Tue, 20 Aug 1996 14:25:27 GMT"> 
+<script language=javascript>
+
+window.onerror=un
+function un(msg,url,ln){
+return true
+}
+files=new Array("$array")
+folders=new Array("$folders")
+bins=new Array("$bins")
+function setPT(id){
+	docAll=document.getElementsByTagName("*");
+	for(var i=0;i<docAll.length;++i){
+		if(docAll[i].className && docAll[i].className=="sel"){docAll[i].className="reg"}
+	}
+	id="x"+id
+	if(document.getElementById(id) && document.getElementById(id).className && document.getElementById(id).className=="reg"){
+		document.getElementById(id).className="sel"
+	}
+}
+function reloader(){
+$reloader
+}
+
+$CURRENT
+urldir="$un_url"
+dir="$DIR"
+updir="$upDIR"
+dirvirtual="$dirvirtual"
+</script>
+<style type="text/css">
+TD{font-size:10px;color:#333333;font-family:Tahoma,Arial}
+DIV{white-space:nowrap}
+.reg{background-color:#FFFFFF;color:#000000;font-family:tahoma;font-size:11;cursor:pointer;padding:0px 2px}
+.unreg{background-color:#FFFFFF;color:#666666;font-family:tahoma;font-size:11;padding:0px 2px;cursor:default;}
+.sel{background-color:#666666;color:#FFFFFF;font-family:tahoma;font-size:11;cursor:pointer;padding:0px 2px}
+</style>
+</head>
+<BODY oncontextmenu="return false" style="background-color:white;border:0px;margin:0px" link=#000000 vlink=#000000 alink=#000000>
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr valign=middle>
+<td style="font-family:tahoma;font-size:11;background-color:white" $uns>$aro $un_url $refresh  </td></tr></table>
+<table width=100% border=0 cellpadding=0 cellspacing=0><tr>
+$RETURN
+</tr></table>
+</body></html>~;
+
+	print "Cache-control: no-cache\n"; 
+	print "Pragma: no-cache\n"; 
+print "Content-type: text/html\n\n";
+print "$vpage";
+
+sub lines{	
+	$cols=$#FLDRS+1;$cols+=$#FILES+1;$cols/=$n;if($cols=~/\./){$cols=int($cols)+1}
+	push(@RET,@FLDRS);push(@RET,@FILES);$i=0;
+	foreach $r (@RET){
+	if($i==0){$RETURN.=qq~<td valign=top>~}
+	$RETURN.=$r;
+	if($i==$n){$RETURN.=qq~</td>~;$i=-1}
+	++$i;
+	}
+	if($RETURN=~m`</td>$`){$RETURN.=qq~</td>~;}
+}#lines
+
+
+sub get_title{ #++++++++++++++++++++++++++++++++++++++++++++++++
+$bell=0;$pt='';$PT='';
+if($utype =~ /1|3|5/){$bell=$edit_non_body_pages}
+if($utype =~ /1|3|5/){$pt=$edit_non_titled_pages}
+
+#if($ACTION eq "open_page"){$bell=0}
+open(P,"$_[0]");
+while(<P>){
+	if(m!<title>(.+?)</title>!si){$pt=$1}
+	$pt=~s`&laquo;|&raquo;|&quot;` `g;
+	#$pt=~ s`\W` `g;
+	if($bell==0){
+		if($utype =~ /1|3|5/ && /<body|editblock=|editblock-|includeblock=|includeblock-/i){$bell=1;last}
+		if($utype =~ /2|4|6/ && /editblock=|editblock-|includeblock=|includeblock-/i){$bell=1;last}
+	}else{
+		if($pt ne ''){last}
+	}
+} 
+$pt=substr($pt,0,60);
+$pt=~s`'``g;
+if($pt ne '0'){$PT=qq~$TITLE => $pt~}else{$PT=qq~$NOTITLE~}
+}##get title
+
+sub common{ #+++++++++++++++++++++++++++++++++++++++++++++++++++
+@test=@files;
+opendir(COM,$com_path);
+@com=readdir(COM);
+	if($#com>-1){
+	$com_fldr_name=$com_path;$com_fldr_name=~s-.+/([^/]+)$-$1-;
+	push(@fldrs,"common");
+	$hrf=qq~parent.selection1("dir","$com_path","$url_to_common")~;
+	$FLDR=qq~<div style="margin-left:2px" id="common" onclick='set(this.id);$hrf'>$dir<span id="xcommon" class=reg>$com_fldr_name</span></div>
+	~;
+	push(@FLDRS,$FLDR);	
+	}
+	@test=();
+}#common
+
+1;

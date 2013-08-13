@@ -1,0 +1,3 @@
+alert=There is no extension on your file name!\n\nFile was not renamed!
+htmlalert=File was renamed
+htmlalert2=Folder was renamed

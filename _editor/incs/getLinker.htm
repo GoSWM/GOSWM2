@@ -1,0 +1,278 @@
+lang("getLinker");
+$main="linkMain";
+$place="linksplace";
+$title="$widgettitle";
+$wigWid="414px";
+$ico="link";
+require 'widgetBody.htm';
+
+
+$OPTIONS = qq~<option value="http://">http
+<option value="toanchor">$Toanchoronthispageoption
+<option value="createanchor">$Createanchoronthispageoption
+<option value="mailto">$Mailtooption
+<option value="dnld">$Forcefiledownloadoption
+~;
+
+if($isIE){
+$BTN=qq~<table align=center border=0 cellpadding=0 cellspacing=0><tr><td align=center><img id=redoBTN class=icon style="visibility:hidden;margin-right:10px" $onmdu vspace=4 src="$utif/redo.png" width="16" height="16" border="0" title="ReApply Text Content Changes" $unz onclick=;ceCopies("Redo")></td><td align=center><table style="margin:12px 0px" border=0 cellpadding=0 cellspacing=0><tr><td $uns>$LBUT</td><td align=center $button_class onclick=ceInsertLink() id=insertLinkButton $uns>$InsertLinkbutton</td><td>$RBUT</td></tr></table></td><td align=center><img id=undoBTN class=icon style="visibility:hidden;margin-left:10px" $onmdu vspace=4 src="$utif/undo.png" width="16" height="16" border="0" title="UnApply Text Content Changes" $unz onclick=byId("redoBTN").style.visibility="visible";ceCopies("Undo")></td></tr></table>~;
+}else{
+$BTN=qq~<table style="margin:12px 0px" border=0 cellpadding=0 cellspacing=0><tr><td $uns>$LBUT</td><td align=center $button_class onclick=ceInsertLink() id=insertLinkButton $uns>$InsertLinkbutton</td><td>$RBUT</td></tr></table>~;
+}
+
+$RETURN=qq~linkerTbl='$BODY_TOP
+
+<table width=400 align=center border=0 cellpadding=0 cellspacing=0><tr><td $uns>
+<table align=center border=0 cellpadding=5 cellspacing=0 width=100%>
+<tr><td width=75 align=right style="font-family:tahoma,arial;font-size:11px" $uns>$LinkType:</td><td $uns>
+<select id=ceLinkSelector style="font-family:tahoma,arial;font-size:11px" onchange=cemoveLink(this.options[this.selectedIndex].value) class=input $uns>
+<option value="">$SelectLinkTypeoption
+<option value="web">$Fileonthiswebsiteoption
+<option value="www">$Fileontheworldwideweboption
+<option value="toanchor">$Toanchoronthispageoption
+<option value="createanchor">$Createanchoronthispageoption
+<option value="mailto">$Mailtooption
+<option value="dnld">$Forcefiledownloadoption
+</select>
+</td><tr>
+<tr><td id=clasesLNKtext style="font-family:tahoma,arial;font-size:11px" $uns>$ApplyClass </td><td $uns id=clasesLNKapply style=""></td></tr>
+<tr><td colspan=2 $uns>
+<table align=center id=treeTR style="display:none" border=0 cellpadding=0 cellspacing=0><tr><td style="width:20px;padding-left:4px" $uns><img id=up_arrow5 onclick=upDIR5() src="$utif/up_arrow.png" width="16" height="16" border="0" alt="$BackOneFolderLeveltitle" style="cursor:pointer;visibility:hidden" $uns></td>
+<td style="width:20px;padding-left:7px;display:none"><img id=nu_folders onclick=cenewFolder5() src="$utif/foldernew.png" width="16" height="16" border="0" alt="$CreateNewFoldertitle" style="cursor:pointer" $uns></td>
+	<td style="font-family:tahoma,arial;font-size:11px;padding-left:7px" $uns>$SelectFileToLinkTo
+</td></tr></td></tr>
+<tr><td colspan=2 align=center style="padding:0px" $uns>
+<DIV align=center><iframe name=pad5 style="margin:0px 0px 5px 0px;width:370px;height:150px;border:1px solid #999999" 
+frameborder=0 src="$uttf?pathTree=x=create_link" $uns></iframe></DIV>
+</td></tr></table></td></tr>
+
+<tr><td style="font-family:tahoma,arial;font-size:11px" $uns>$LinkURL:</td>
+<td $uns><input  style="display:block;font-family:tahoma,arial;font-size:11px;border:1px solid #999999;width:320px" id=ceLinkUrl value="">
+<select id=ceanchorSelect style="font-family:tahoma,arial;font-size:11px;width:300px;display:none" class=input $uns>
+<option>$SelectAnAnchoroption</select></td>
+</tr>
+<tr><td style="font-family:tahoma,arial;font-size:11px" $uns>$LinkTitle:</td>
+<td $uns><input  style="display:block;font-family:tahoma,arial;font-size:11px;border:1px solid #999999;width:320px" id=ceLinkTitle  value=""></td></tr>
+
+<tr><td colspan=2 $uns>
+<table id=ceTargetTr border=0 cellpadding=0 cellspacing=0>
+<tr><td align=right style="white-space:nowrap;font-family:tahoma,arial;font-size:11px" $uns>$LinkTarget:</td>
+<td style="font-family:tahoma,arial;font-size:11px" width=33% $uns align=right><input type=radio id=ceinto_self name=into value="_self" onclick=cetrgt(this.value) checked $uns> </td><td style="white-space:nowrap;font-family:tahoma,arial;font-size:11px" $uns align=center>$SameWindow</td>
+<td style="font-family:tahoma,arial;font-size:11px" width=34% $uns align=right><input type=radio id=ceinto_frame name=into value="frame" onclick=cetrgt(this.value) $uns> </td><td style="white-space:nowrap;font-family:tahoma,arial;font-size:11px" $uns align=center>$DifferentFrame</td>
+<td style="font-family:tahoma,arial;font-size:11px;" width=33% $uns align=right><input type=radio id=ceinto_window name=into value="window" onclick=cetrgt(this.value) $uns> </td><td style="white-space:nowrap;font-family:tahoma,arial;font-size:11px" $uns align=center>$NewWindow</td></tr></table></td></tr>
+<tr id=ceTrgTd style="display:none" $uns><td $uns>&nbsp;</td><td $uns><table border=0 cellpadding=0 cellspacing=0><tr><td style="font-family:tahoma,arial;font-size:11px" $uns>$FramesName </td><td $uns><input style="margin-left:10px;font-family:tahoma,arial;font-size:11px;border:1px solid #999999;width:100px" id=ceTrg value=""></td></tr></table></td></tr>
+</table></td></tr></table>
+
+<center $uns>
+<div style="border:1px solid #999999;padding:3px 5px;background-color:#f9f9f9;margin:5px 0px;width:250px;" class=widgetText11>
+$text1 </div>$BTN
+</center>
+</form>
+
+$BODY_BOT';~;
+$RETURN=~s`[\n]``g;$RETURN=~s`[\t]``g;
+$RETURN.=qq~
+function setceanchorSelect(){
+	if(doc().anchors){
+		for(i=0;i<doc().anchors.length;++i){
+			newOPT=document.createElement("OPTION")
+			newOPT.text=doc().anchors[i].name
+			newOPT.value=doc().anchors[i].name
+			byId("ceanchorSelect").options.add(newOPT)
+		}
+	}
+}
+function cemoveLink(val){
+	if(val!="web" && val!="dnld"){byId('treeTR').style.display="none"}else{byId('treeTR').style.display="block"}
+	
+	if(val == "toanchor"){
+		byId('ceLinkUrl').style.display="none"
+		byId('ceanchorSelect').style.display="block"
+	}else{
+		byId('ceLinkUrl').style.display="block"
+		byId('ceanchorSelect').style.display="none"	
+	}
+	if(val == "www"){
+		byId('ceLinkUrl').value="http://"
+		byId('insertLinkButton').innerHTML="$InsertLinkbutton"
+		byId('ceTargetTr').style.display="block"
+	}else if(val == "createanchor"){
+		byId('ceLinkUrl').value="$enternameforanchor"
+		byId('insertLinkButton').innerHTML="$InsertAnchorbutton"
+		byId('ceTargetTr').style.display="none"
+		byId('ceTrgTd').style.display='none'
+	}else if(val == "toanchor"){
+		byId('insertLinkButton').innerHTML="$InsertLinkToAnchor"		
+		byId('ceTargetTr').style.display="none"
+		byId('ceTrgTd').style.display='none'
+	}else if(val == "dnld"){
+		byId('insertLinkButton').innerHTML="$InsertLinkToDownload"		
+		byId('ceTargetTr').style.display="none"
+		byId('ceLinkUrl').value="$Selectfiletolinkto"
+		byId('ceTrgTd').style.display='none'
+	}else if(val == "mailto"){
+		byId('insertLinkButton').innerHTML="$InsertMailtoLink"		
+		byId('ceTargetTr').style.display="none"
+		byId('ceLinkUrl').value="$mailtosomebodysomecom"
+		byId('ceTrgTd').style.display='none'
+	}else if(val=="web"){
+		byId('ceLinkUrl').value="$Selectfiletolinkto"
+		byId('insertLinkButton').innerHTML="$InsertLinkbutton"
+		byId('ceTargetTr').style.display="block"
+	}
+}
+function create_Anchor(){
+		strng = '<a class=anchorblock name="'+byId("ceLinkUrl").value+'">'+cetxt+'</a>'
+		insert_the_link(strng)	
+		newOPT=document.createElement("OPTION")
+		newOPT.text=byId("ceLinkUrl").value
+		newOPT.value=byId("ceLinkUrl").value
+		byId("ceanchorSelect").options.add(newOPT)
+}
+function insert_AnchorLink(){
+		strng = '<a href="#'+byId("ceanchorSelect").options[byId("ceanchorSelect").selectedIndex].value+'" title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		insert_the_link(strng)	
+}
+function insert_Download(){
+		path=byId("ceLinkUrl").value.replace(/^.+\\..+?\\//,"/")
+		strng = '<iframe name=dnldhole style="width:0px;height:0px;display:none"></iframe><a href="$uttf?forceDownload='+path+'" target=dnldhole>'+cetxt+'</a>'
+		insert_the_link(strng)
+}
+function insert_Mailto(){
+	path=byId("ceLinkUrl").value.replace(/^mailto:/,"")
+	alf="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	mess_="dgchiGIjsONklefpMqrab3YZ40QL6oRAuvxEFyz125wm789BHCDJKPStTUnVWX"
+	mess=mess_.split("")
+	krypt=''
+	chars=path.split("")
+	for(i=0;i<chars.length;++i){
+		if(alf.indexOf(chars[i])!=-1){
+			krypt+=mess[alf.indexOf(chars[i])]
+		}else{
+			krypt+=chars[i]
+		}
+	}
+	strng = '<iframe name=mailtohole style="width:0px;height:0px;display:none"></iframe><a href="$uttf?mailto='+krypt+'.com" target=mailtohole>'+cetxt+'</a>'
+	insert_the_link(strng)	
+}
+function ceInsertLink(){
+	for(i=0;i<byId('ceLinkSelector').options.length;++i){
+		if(byId('ceLinkSelector').options[i].selected==true){
+			selectedLink=byId('ceLinkSelector').options[i].value
+		}
+	}
+	getLNKclass()
+	go_on=check_selection()
+	if(go_on==false){return false}
+	if(selectedLink=="web"){insert_Link()}
+	if(selectedLink=="www"){insert_Link()}
+	if(selectedLink=="toanchor"){insert_AnchorLink()}
+	if(selectedLink=="createanchor"){create_Anchor()}
+	if(selectedLink=="dnld"){insert_Download()}
+	if(selectedLink=="mailto"){insert_Mailto()}
+}
+function check_selection(){
+	cecheck_selected()
+	ceget_selected()
+	if(cetxt==''){
+		basicAlert("$htmlalert1")
+		return false
+	}
+	if(ceinside==0){
+		basicAlert("$htmlalert2")
+		return false
+	}
+}
+function insert_Link(){
+		path=byId("ceLinkUrl").value
+		if(byId('ceinto_frame').checked==true){
+			strng = '<a class="editable" href="'+path+'" target="'+byId('ceTrg').value+'" '+LNKCLS+' title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		}
+		if(byId('ceinto_window').checked==true){
+			strng = '<a class="editable" href="'+path+'" target="_blank" '+LNKCLS+' title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		}
+		if(byId('ceinto_self').checked==true){
+			strng = '<a class="editable" href="'+path+'" '+LNKCLS+' title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		}
+		insert_the_link(strng)
+}
+function insert_download(){
+	if(document.getElementById("link_url").value!=''){
+		go_on=check_selection()
+		if(go_on==false){return false}		
+		path=byId("link_url").value.replace("$host","")
+		strng = '<a href="$url_to_editor?forceDownload='+path+'" '+LNKCLS+' title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		insert_the_link(strng)
+	}
+}
+function linkAnchor(){
+	if(byId("anchors").selectedIndex!=0){
+		hash=document.getElementById("anchors").options[document.getElementById("anchors").selectedIndex].value
+		url=location.href+"#"+hash
+		sel=document.selection.createRange();
+		txt = sel.htmlText;
+		strng = '<a '+LNKCLS+' href="'+url+'" title="'+byId('ceLinkTitle').value+'">'+cetxt+'</a>'
+		strng=strng.replace(/\s\w+=""/g,"");
+		insert_the_link(strng)
+	}
+}
+function getLNKclass(){
+	if(byId('classesLNKapply') && byId('classesLNKapply').options[byId('classesLNKapply').selectedIndex].value!=''){
+		LNKCLS='class="'+byId('classesLNKapply').options[byId('classesLNKapply').selectedIndex].value+'"'
+	}else{
+		LNKCLS=''
+	}
+	if(LNKCLS.match(/a\\.\\w+:\\w+/i)){
+		LNKCLS=LNKCLS.replace(/a\\./i,"")
+	}
+	if(LNKCLS.match(/\\w:\\w+/)){
+		LNKCLS=LNKCLS.replace(/:\\w+/,"")
+	}
+}
+function insert_the_link(htm){
+	if(isIE){
+		capture()
+		byId('undoBTN').style.visibility="visible"
+		byId('redoBTN').style.visibility="hidden"
+		cesel.pasteHTML(htm);
+	}else{
+		doc().execCommand("InsertHTML", false, htm); 
+	}
+}
+function cetrgt(val){
+	if(val=="frame"){byId('ceTrgTd').style.display=''}else{byId('ceTrgTd').style.display='none'}
+}
+function selection5(dir,path,url){
+	if(dir == "dir"){
+		pad5.location="$uttf?pathTree=x=create_link="+path
+	}else{
+		byId('ceLinkUrl').value=url.replace("$host","")
+		byId('undoBTN').style.visibility="hidden"
+		byId('redoBTN').style.visibility="hidden"
+
+	}
+}
+function upDIR5(){
+	pad5.location="$uttf?pathTree=up=create_link="+pad5.updir
+}
+
+byId('linksplace').innerHTML=linkerTbl;
+if(pageClassesArray.length>0){
+sopts='<option value="">$StyleClassOption'
+for(i=0;i<pageClassesArray.length;++i){
+	if(pageClassesArray[i].indexOf(".")==0){
+		pageClassesArray[i]=pageClassesArray[i].replace(/^\./,"")
+	}
+	sopts+='<option value="'+pageClassesArray[i]+'">'+pageClassesArray[i]
+}
+byId('clasesLNKapply').innerHTML='<select id=classesLNKapply class=input style="max-width:100px">'+sopts+'</select>'
+}else{
+byId('clasesLNKapply').style.display="none"
+byId('clasesLNKtext').style.display="none"
+}
+
+
+celink();
+~;
+
+1;

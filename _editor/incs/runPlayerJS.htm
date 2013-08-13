@@ -1,0 +1,52 @@
+($id,$src,$wid,$hei,$auto)=split(/=/,$params);
+$src=~s`$host_``;
+$wid.="px";
+$hei.="px";
+
+$RETURN.=qq~
+	function rollVid(id,src,wid,hei,auto){
+		document.getElementById(id).style.width=wid;
+		document.getElementById(id).style.height=hei;
+		flowplayer(id, {
+			src:'$flash_folder_URL/flowplayer.swf',
+			wmode: 'opaque'
+		},{
+			clip: {      
+				url:src,					     
+				autoPlay: $auto	
+			},
+			plugins: {     
+				controls: {      
+					bottom:0,  
+					height:26,   
+					backgroundColor: '#666666',         
+					backgroundGradient: 'low',                
+					durationColor: '#cccccc',           
+					timeColor: '#dddddd',     
+					bufferColor: '#444444',
+					bufferGradient: 'medium', 
+					progressColor: '#555555',
+					progressGradient: 'medium',
+					buttonColor:'#515151',
+					buttonOverColor: '#717171', 
+					sliderColor: '#515151' ,
+					sliderGradient: 'none',
+					autoHide: 'never',             
+					play:true,              
+					volume:true,         
+					mute:true,          
+					time:true,          
+					stop:false,         
+					playlist:false,          
+					fullscreen:true,                 
+					scrubber: true            
+				 } 
+			}
+		});
+	}
+rollVid("$id","$src","$wid","$hei","$auto")
+window.onerror=unalert 
+function unalert(){return true}
+~;
+1;
+

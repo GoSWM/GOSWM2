@@ -1,0 +1,20 @@
+lang("sendMail");
+if($smtp_password.length>20){denc($smtp_password)}else{$decrypted=$smtp_password}
+use Mail::Sendmail; 
+      %mail = ( $sm1 => "$sm_recipient",
+                $sm2 => "$sm_from",
+				$sm3 => "$sm_subject",
+                $sm4 => "$sm_message"				
+               );
+	$mail{'auth'} = {'user'=>"$smtp_username",'password'=>"$decrypted" };		
+	$mail{'Smtp'}="$smtp_server";
+	sendmail(%mail) || open(BUG,">$incs_folder_PATH/Mail/debug.log");print BUG $Mail::Sendmail::error;close(BUG);
+	
+sub denc{
+	$key=$_[0].$ENV{'HTTP_HOST'};
+	use Crypt::Lite;
+	$crypt = Crypt::Lite->new( debug => 0 );
+	$decrypted = $crypt->decrypt($_[0], $key);
+}
+1;
+

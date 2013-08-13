@@ -1,0 +1,2 @@
+htmlalert1=A full size image<br>
+htmlalert2=<br>does not exist for the thumbnail selected

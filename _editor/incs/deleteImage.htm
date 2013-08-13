@@ -1,0 +1,26 @@
+lang("deleteImage");
+($num,$file)=split(/=/,$params);
+$file_=$file;
+if($file !~ m`^http`){$file=$http.$file}
+$file=~s`$host`$root`;
+
+unlink($file);
+
+if($num==4){
+$RETURN=qq~byId('yesBut').innerHTML="$OK"
+active_alert="$htmlalert1"
+doAlert("alert")
+active_function = new Function("closeAlert();byId('cedisplayIMG').src='';byId('ceimgtitle').value='';byId('csimgurl').value=''")
+	if(pad4.dir){pad4.reloader()}
+	~;
+}
+if($num==9){
+$RETURN=qq~byId('yesBut').innerHTML="$OK"
+active_alert="$htmlalert2"
+doAlert("alert")
+active_function = new Function("closeAlert();byId('csflashurl').value=''")
+	if(pad9.dir){pad9.reloader()}
+	~;
+}
+
+1;

@@ -1,0 +1,11 @@
+text1=Loading Gallery...
+alert1=Could Not Open File To Write To It. Check File Permissions
+alert2=Could Not Open $saveitas To Write To It. Check File Permissions
+alert3=Could Not Open
+alert4=To Write To It. Check File Permissions
+htmlalert1=Changes were saved<BR>Do you want to reload the page
+htmlalert2=Changes were saved to new page<BR>Do you want to load the new page
+htmlalert3=Changes were saved<BR>Do you want to load the pending page
+email_source1=Copy of $FILE
+email_source2=ORIGINAL
+email_source3=NEW EDITS
